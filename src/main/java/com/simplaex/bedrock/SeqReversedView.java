@@ -1,0 +1,105 @@
+package com.simplaex.bedrock;
+
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Objects;
+
+class SeqReversedView<E> extends Seq<E> {
+
+  private final int beginOffset;
+  private final int endOffset;
+
+  SeqReversedView(@Nonnull final Object[] array, @Nonnegative final int beginOffset, @Nonnegative final int endOffset) {
+    super(array);
+    this.beginOffset = beginOffset;
+    this.endOffset = endOffset;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public E get(@Nonnegative final int index) {
+    checkBounds(index);
+    return (E) backingArray[beginOffset + endOffset - index - 1];
+  }
+
+  @Nonnull
+  @Override
+  public Seq<E> reversed() {
+    return new SeqSimpleView<>(backingArray, beginOffset, endOffset);
+  }
+
+  @Nonnull
+  @Override
+  public Seq<E> sorted() {
+    final int len = length();
+    final Object[] array = new Object[len];
+    System.arraycopy(backingArray, beginOffset, array, 0, len);
+    Arrays.sort(array);
+    return new SeqSimple<>(array);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Nonnull
+  @Override
+  public Seq<E> sortedBy(@Nonnull Comparator<? super E> comparator) {
+    Objects.requireNonNull(comparator);
+    final int len = length();
+    final Object[] array = new Object[len];
+    System.arraycopy(backingArray, beginOffset, array, 0, len);
+    Arrays.sort(array, (Comparator<Object>) comparator);
+    return new SeqSimple<>(array);
+  }
+
+  @Nonnull
+  @Override
+  public Seq<E> trimmedToSize() {
+    final int len = length();
+    final Object[] array = new Object[len];
+    System.arraycopy(backingArray, beginOffset, array, 0, len);
+    return new SeqReversed<>(array);
+  }
+
+  @Nonnull
+  @Override
+  public Object[] toArray() {
+    final Object[] array = new Object[length()];
+    int i = 0;
+    for (final E e : this) {
+      array[i++] = e;
+    }
+    return array;
+  }
+
+  @Nonnull
+  @Override
+  public Seq<E> subSequence(@Nonnegative final int beginOffset, @Nonnegative final int endOffset) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public Seq<E> subSequenceView(@Nonnegative final int beginOffset, @Nonnegative final int endOffset) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public E[] toArray(@Nonnull final Class<E> evidence) {
+    Objects.requireNonNull(evidence);
+    @SuppressWarnings("unchecked") final E[] array = (E[]) Array.newInstance(evidence, length());
+    int i = 0;
+    for (final E e : this) {
+      array[i++] = e;
+    }
+    return array;
+  }
+
+  @Nonnegative
+  @Override
+  public int length() {
+    return endOffset - beginOffset;
+  }
+}
