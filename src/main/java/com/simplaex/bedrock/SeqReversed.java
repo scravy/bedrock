@@ -61,26 +61,27 @@ class SeqReversed<E> extends Seq<E> {
   @Nonnull
   @Override
   public Seq<E> subSequence(@Nonnegative final int beginOffset, @Nonnegative final int endOffset) {
-    final int backingEndOffset = length() - beginOffset;
-    final int backingBeginOffset = length() - endOffset;
-    final int len = endOffset - beginOffset;
-    if (len <= 0 || backingBeginOffset + len > length()) {
+    final int begin = Math.max(0, beginOffset);
+    final int end = Math.min(length(), endOffset);
+    final int len = end - begin;
+    if (len <= 0) {
       return empty();
     }
     final Object[] array = new Object[len];
-    System.arraycopy(backingArray, backingBeginOffset, array, 0, len);
+    System.arraycopy(backingArray, length() - end, array, 0, len);
     return new SeqReversed<>(array);
   }
 
   @Nonnull
   @Override
   public Seq<E> subSequenceView(@Nonnegative final int beginOffset, @Nonnegative final int endOffset) {
-    final int len = endOffset - beginOffset;
-    if (len <= 0 || beginOffset + len > length()) {
+    final int begin = Math.max(0, beginOffset);
+    final int end = Math.min(length(), endOffset);
+    final int len = end - begin;
+    if (len <= 0) {
       return empty();
     }
-    final Object[] array = new Object[len];
-    return new SeqReversedView<>(array, backingArray.length - endOffset - 1, backingArray.length - beginOffset - 1);
+    return new SeqReversedView<>(backingArray, length() - end, length() - end);
   }
 
   @Nonnull

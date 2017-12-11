@@ -73,23 +73,27 @@ class SeqSimple<E> extends Seq<E> {
   @Nonnull
   @Override
   public Seq<E> subSequence(@Nonnegative final int beginOffset, @Nonnegative final int endOffset) {
-    final int len = endOffset - beginOffset;
-    if (len <= 0 || beginOffset + len > length()) {
+    final int begin = Math.max(0, beginOffset);
+    final int end = Math.min(length(), endOffset);
+    final int len = end - begin;
+    if (len <= 0) {
       return empty();
     }
     final Object[] array = new Object[len];
-    System.arraycopy(backingArray, beginOffset, array, 0, len);
+    System.arraycopy(backingArray, begin, array, 0, len);
     return new SeqSimple<>(array);
   }
 
   @Nonnull
   @Override
   public Seq<E> subSequenceView(@Nonnegative final int beginOffset, @Nonnegative final int endOffset) {
-    final int len = endOffset - beginOffset;
-    if (len <= 0 || beginOffset + len > length()) {
+    final int begin = Math.max(0, beginOffset);
+    final int end = Math.min(length(), endOffset);
+    final int len = end - begin;
+    if (len <= 0) {
       return empty();
     }
-    return new SeqSimpleView<>(backingArray, beginOffset, endOffset);
+    return new SeqSimpleView<>(backingArray, begin, end);
   }
 
   @SuppressWarnings("unchecked")

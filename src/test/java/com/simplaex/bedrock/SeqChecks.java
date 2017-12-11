@@ -2,6 +2,9 @@ package com.simplaex.bedrock;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
+
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
@@ -38,14 +41,28 @@ class SeqChecks {
       it("should count 3 elements divisble by 2", () -> expect(seq.countBy(i -> i % 2 == 0)).toEqual(3));
     });
 
-    describe("drop", () -> {
-      it("should return a new seq with the first element dropped", () -> expect(seq.drop(1)).toEqual(Seq.of(2, 2, 4, 3)));
-      it("should return a new seq with the first two elements dropped", () -> expect(seq.drop(2)).toEqual(Seq.of(2, 4, 3)));
-      it("should return a new seq with the first three dropped", () -> expect(seq.drop(3)).toEqual(Seq.of(4, 3)));
-      it("should return a new seq with the first four elements dropped", () -> expect(seq.drop(4)).toEqual(Seq.of(3)));
-      it("should return the empty seq when all five elements dropped", () -> expect(seq.drop(5)).toEqual(Seq.empty()));
-      it("should return an empty seq even when dropped more than five", () -> expect(seq.drop(6)).toEqual(Seq.empty()));
-    });
+    final Consumer<IntFunction<Seq<Integer>>> dropChecks = f -> {
+      it("should return a new seq with the first element dropped", () -> expect(f.apply(1)).toEqual(Seq.of(2, 2, 4, 3)));
+      it("should return a new seq with the first two elements dropped", () -> expect(f.apply(2)).toEqual(Seq.of(2, 4, 3)));
+      it("should return a new seq with the first three dropped", () -> expect(f.apply(3)).toEqual(Seq.of(4, 3)));
+      it("should return a new seq with the first four elements dropped", () -> expect(f.apply(4)).toEqual(Seq.of(3)));
+      it("should return the empty seq when all five elements dropped", () -> expect(f.apply(5)).toEqual(Seq.empty()));
+      it("should return an empty seq even when dropped more than five", () -> expect(f.apply(6)).toEqual(Seq.empty()));
+    };
+    describe("drop", () -> dropChecks.accept(seq::drop));
+    describe("dropView", () -> dropChecks.accept(seq::dropView));
+
+    final Consumer<IntFunction<Seq<Integer>>> takeChecks = f -> {
+      it("should return an empty seq when taking zero elements", () -> expect(f.apply(0)).toEqual(Seq.empty()));
+      it("should take one element", () -> expect(f.apply(1)).toEqual(Seq.of(1)));
+      it("should take two elements", () -> expect(f.apply(2)).toEqual(Seq.of(1, 2)));
+      it("should take three elements", () -> expect(f.apply(3)).toEqual(Seq.of(1, 2, 2)));
+      it("should take four elements", () -> expect(f.apply(4)).toEqual(Seq.of(1, 2, 2, 4)));
+      it("should take five elements", () -> expect(f.apply(5)).toEqual(Seq.of(1, 2, 2, 4, 3)));
+      it("should take just five elements if there are no more", () -> expect(f.apply(6)).toEqual(Seq.of(1, 2, 2, 4, 3)));
+    };
+    describe("take", () -> takeChecks.accept(seq::take));
+    describe("takeView", () -> takeChecks.accept(seq::takeView));
 
   }
 
