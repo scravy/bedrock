@@ -15,8 +15,8 @@
   <packaging>jar</packaging>
 
   <properties>
-    <coverage.branch.minimum>0.40</coverage.branch.minimum>
-    <coverage.instruction.minimum>0.50</coverage.instruction.minimum>
+    <coverage.branch.minimum>0.0</coverage.branch.minimum>
+    <coverage.instruction.minimum>0.0</coverage.instruction.minimum>
     <coverage.branch.class.minimum>0.0</coverage.branch.class.minimum>
     <coverage.instruction.class.minimum>0.0</coverage.instruction.class.minimum>
     <coverage.branch.method.minimum>0.0</coverage.branch.method.minimum>
@@ -77,7 +77,7 @@
         <configuration>
           <serverId>ossrh</serverId>
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
       <plugin>
@@ -235,6 +235,13 @@
       <groupId>com.greghaskins</groupId>
       <artifactId>spectrum</artifactId>
       <version>1.2.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.mscharhag.oleaster</groupId>
+      <artifactId>oleaster-matcher</artifactId>
+      <version>0.2.0</version>
       <scope>test</scope>
     </dependency>
 
