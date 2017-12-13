@@ -1,10 +1,13 @@
 package com.simplaex.bedrock;
 
+import lombok.val;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -146,6 +149,58 @@ public abstract class Seq<E>
       }
     }
     return new SeqSimple<>(resultArray);
+  }
+
+  @Nonnull
+  public <A, B> Seq<Pair<A, B>> zip(@Nonnull final Seq<A> a, @Nonnull final Seq<B> b) {
+    return zipWith(Pair::new, a, b);
+  }
+
+  @Nonnull
+  public <A, B, C> Seq<C> zipWith(@Nonnull final BiFunction<A, B, C> f, @Nonnull final Seq<A> a, @Nonnull final Seq<B> b) {
+    Objects.requireNonNull(f);
+    Objects.requireNonNull(a);
+    Objects.requireNonNull(b);
+    final int len = Math.min(a.length(), b.length());
+    final Object[] arr = new Object[len];
+    for (int i = 0; i < len; i += 1) {
+      arr[i] = f.apply(a.get(i), b.get(i));
+    }
+    return new SeqSimple<>(arr);
+  }
+
+  @Nonnull
+  public Pair<Seq<E>, Seq<E>> partitionBy(@Nonnull final Predicate<E> p) {
+    Objects.requireNonNull(p);
+    final int sizeHint = length() / 2 + 1;
+    val b1 = Seq.<E>builder(sizeHint);
+    val b2 = Seq.<E>builder(sizeHint);
+    forEach(x -> {
+      if (p.test(x)) {
+        b1.add(x);
+      } else {
+        b2.add(x);
+      }
+    });
+    return Pair.of(b1.result(), b2.result());
+  }
+
+  @Nonnull
+  public Seq<E> filter(@Nonnull final Predicate<E> p) {
+    Objects.requireNonNull(p);
+    final int sizeHint = length() / 2;
+    val b = Seq.<E>builder(sizeHint);
+    forEach(x -> {
+      if (p.test(x)) {
+        b.add(x);
+      }
+    });
+    return b.result();
+  }
+
+  @Nonnull
+  public Seq<E> filterNot(@Nonnull final Predicate<E> p) {
+    return filter(p.negate());
   }
 
   @Override
@@ -411,6 +466,15 @@ public abstract class Seq<E>
   @Nonnull
   public static <E> SeqBuilder<E> builder() {
     return new SeqBuilder<>();
+  }
+
+  @Nonnull
+  public static <E> SeqBuilder<E> builder(final int sizeHint) {
+    return new SeqBuilder<>(sizeHint);
+  }
+
+  public static <C, A extends C, B extends C> Seq<C> fromPair(final Pair<A, B> p) {
+    return Seq.<C>builder().addAll(p.fst, p.snd).result();
   }
 
 }

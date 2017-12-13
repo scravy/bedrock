@@ -1,16 +1,25 @@
 package com.simplaex.bedrock;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+/**
+ * A builder for immutable Sequences. Can not be instantiated directly, use Seq.builder
+ *
+ * @param <E> The type of the elements the builder accepts.
+ */
 public final class SeqBuilder<E> implements Iterable<E> {
 
-  private final ArrayList<E> arrayList = new ArrayList<>();
+  private final ArrayList<E> arrayList;
+
+  SeqBuilder() {
+    this.arrayList = new ArrayList<>();
+  }
+
+  SeqBuilder(final int sizeHint) {
+    this.arrayList = new ArrayList<>(sizeHint);
+  }
 
   @Nonnull
   public SeqBuilder<E> add(final E elem) {
@@ -28,7 +37,7 @@ public final class SeqBuilder<E> implements Iterable<E> {
   }
 
   @Nonnull
-  public SeqBuilder<E> addIterable(final Iterable<E> elems) {
+  public SeqBuilder<E> addElements(final Iterable<? extends E> elems) {
     for (final E elem : elems) {
       add(elem);
     }

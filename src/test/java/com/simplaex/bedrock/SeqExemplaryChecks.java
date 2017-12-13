@@ -4,7 +4,6 @@ import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -119,14 +118,6 @@ class SeqExemplaryChecks {
         expect(arr[2]).toEqual(2);
         expect(arr[3]).toEqual(4);
         expect(arr[4]).toEqual(3);
-      });
-    });
-
-    describe("hashCode", () -> {
-      it("should be usable as key in a HashMap", () -> {
-        val map = new HashMap<Seq<Integer>, String>();
-        map.put(seq, "quux");
-        expect(map.get(seq)).toEqual("quux");
       });
     });
 
