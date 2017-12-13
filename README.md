@@ -8,8 +8,8 @@ Utilities for modern java development.
 
     <dependency>
         <groupId>com.simplaex</groupId>
-        <artifactId>estuary</artifactId>
-        <version>2017.12.07</version>
+        <artifactId>bedrock</artifactId>
+        <version>2017.12.13</version>
     </dependency>
 
 ## Releasing
