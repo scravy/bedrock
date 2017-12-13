@@ -10,7 +10,7 @@ import static com.greghaskins.spectrum.Spectrum.describe;
 public class SeqSimpleViewTest {
 
   {
-    describe("a view of a simple seq", () -> SeqChecks.checks(Seq.of(0, 1, 2, 2, 4, 3, 10).subSequenceView(1, 6)));
+    describe("a view of a simple seq", () -> SeqExemplaryChecks.checks(Seq.of(0, 1, 2, 2, 4, 3, 10).subSequenceView(1, 6)));
   }
 
 }
