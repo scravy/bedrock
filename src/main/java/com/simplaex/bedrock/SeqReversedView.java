@@ -22,7 +22,7 @@ class SeqReversedView<E> extends Seq<E> {
   @Override
   public E get(@Nonnegative final int index) {
     checkBounds(index);
-    return (E) backingArray[beginOffset + endOffset - index - 1];
+    return (E) backingArray[this.beginOffset + length() - index - 1];
   }
 
   @Nonnull
@@ -76,13 +76,27 @@ class SeqReversedView<E> extends Seq<E> {
   @Nonnull
   @Override
   public Seq<E> subSequence(@Nonnegative final int beginOffset, @Nonnegative final int endOffset) {
-    throw new UnsupportedOperationException();
+    final int begin = Math.max(0, beginOffset);
+    final int end = Math.min(length(), endOffset);
+    final int len = end - begin;
+    if (len <= 0) {
+      return empty();
+    }
+    final Object[] array = new Object[len];
+    System.arraycopy(backingArray, this.beginOffset + length() - end, array, 0, len);
+    return new SeqReversed<>(array);
   }
 
   @Nonnull
   @Override
   public Seq<E> subSequenceView(@Nonnegative final int beginOffset, @Nonnegative final int endOffset) {
-    throw new UnsupportedOperationException();
+    final int begin = Math.max(0, beginOffset);
+    final int end = Math.min(length(), endOffset);
+    final int len = end - begin;
+    if (len <= 0) {
+      return empty();
+    }
+    return new SeqReversedView<>(backingArray, this.beginOffset + length() - end, this.beginOffset + length() - begin);
   }
 
   @Nonnull

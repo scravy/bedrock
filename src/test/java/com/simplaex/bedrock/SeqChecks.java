@@ -20,6 +20,19 @@ class SeqChecks {
    */
   void checks(final Seq<Integer> seq) {
 
+    describe("length", () -> {
+      it("should be 5", () -> expect(seq.length()).toEqual(5));
+    });
+
+    describe("get", () -> {
+      it("should return 1 for index 0", () -> expect(seq.get(0)).toEqual(1));
+      it("should return 2 for index 1", () -> expect(seq.get(1)).toEqual(2));
+      it("should return 2 for index 2", () -> expect(seq.get(2)).toEqual(2));
+      it("should return 4 for index 3", () -> expect(seq.get(3)).toEqual(4));
+      it("should return 3 for index 4", () -> expect(seq.get(4)).toEqual(3));
+      it("should throw for index 5", () -> expect(() -> seq.get(5)).toThrow(IndexOutOfBoundsException.class));
+    });
+
     describe("equal", () -> {
       it("should equal (1, 2, 2, 4, 3)", () -> expect(seq).toEqual(Seq.of(1, 2, 2, 4, 3)));
     });

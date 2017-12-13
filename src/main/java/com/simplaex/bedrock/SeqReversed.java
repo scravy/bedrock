@@ -81,7 +81,7 @@ class SeqReversed<E> extends Seq<E> {
     if (len <= 0) {
       return empty();
     }
-    return new SeqReversedView<>(backingArray, length() - end, length() - end);
+    return new SeqReversedView<>(backingArray, length() - end, length() - begin);
   }
 
   @Nonnull
