@@ -12,6 +12,10 @@ import static com.mscharhag.oleaster.matcher.Matchers.expect;
 public class SeqEmptyTest {
 
   {
+    describe("an empty seq (property checks)", () -> {
+      SeqPropertyChecks.checks(Seq.empty());
+    });
+
     describe("toArray", () -> {
       it("should produce an empty array", () -> {
         expect(Seq.empty().toArray().length).toEqual(0);
