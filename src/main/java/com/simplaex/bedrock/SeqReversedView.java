@@ -31,6 +31,7 @@ class SeqReversedView<E> extends Seq<E> {
     return new SeqSimpleView<>(backingArray, beginOffset, endOffset);
   }
 
+  @SuppressWarnings("unchecked")
   @Nonnull
   @Override
   public Seq<E> sorted() {
@@ -38,7 +39,7 @@ class SeqReversedView<E> extends Seq<E> {
     final Object[] array = new Object[len];
     System.arraycopy(backingArray, beginOffset, array, 0, len);
     Arrays.sort(array);
-    return new SeqSimple<>(array);
+    return new SeqSimpleSorted(array);
   }
 
   @SuppressWarnings("unchecked")

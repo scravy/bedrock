@@ -31,13 +31,14 @@ class SeqSimpleView<E> extends Seq<E> {
     return new SeqReversedView<>(backingArray, beginOffset, endOffset);
   }
 
+  @SuppressWarnings("unchecked")
   @Nonnull
   @Override
   public Seq<E> sorted() {
     final Object[] array = new Object[length()];
     System.arraycopy(backingArray, beginOffset, array, 0, length());
     Arrays.sort(array);
-    return new SeqSimple<>(array);
+    return new SeqSimpleSorted(array);
   }
 
   @SuppressWarnings("unchecked")

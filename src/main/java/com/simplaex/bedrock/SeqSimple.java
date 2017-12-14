@@ -29,12 +29,13 @@ class SeqSimple<E> extends Seq<E> {
     return new SeqReversed<>(backingArray);
   }
 
+  @SuppressWarnings("unchecked")
   @Nonnull
   @Override
   public Seq<E> sorted() {
     final Object[] array = backingArray.clone();
     Arrays.sort(array);
-    return new SeqSimple<>(array);
+    return new SeqSimpleSorted(array);
   }
 
   @SuppressWarnings("unchecked")
