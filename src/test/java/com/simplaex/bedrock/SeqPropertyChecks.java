@@ -104,6 +104,13 @@ class SeqPropertyChecks {
       describe("last + get", () -> {
         it("should return the last element", () -> expect(seq.last()).toEqual(seq.get(seq.size() - 1)));
       });
+
+      describe("sorted + contains", () -> {
+        it("should contain the elements it did before sorting", () -> {
+          val s = seq.sorted();
+          seq.forEach(e -> expect(s.contains(e)).toBeTrue());
+        });
+      });
     }
 
     describe("partition + filter + filterNot", () -> {
