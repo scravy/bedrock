@@ -145,12 +145,10 @@ class SeqPropertyChecks {
       });
     });
 
-    describe("headOptional", () -> {
-
-    });
-
-    describe("lastOptional", () -> {
-
+    describe("equals + concat", () -> {
+      it("should not compare as equal to itself concatenated with Seq.of(1)", () -> {
+        expect(Seq.concat(seq, Seq.of (1)).equals(seq)).toBeFalse();
+      });
     });
   }
 

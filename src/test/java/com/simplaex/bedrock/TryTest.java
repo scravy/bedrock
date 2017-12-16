@@ -4,6 +4,8 @@ import com.greghaskins.spectrum.Spectrum;
 import lombok.val;
 import org.junit.runner.RunWith;
 
+import java.util.function.Predicate;
+
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
@@ -28,6 +30,16 @@ public class TryTest {
         expect(r.isFailure()).toBeFalse();
         expect(r.isSuccess()).toBeTrue();
         expect(r.orElseThrow()).toEqual(3);
+      });
+    });
+
+    describe("filter", () -> {
+      it("should keep values that satisfy the predicate", () -> {
+        expect(Try.success(7).filter(x -> x % 2 == 1)).toEqual(Try.success(7));
+      });
+      it("should drop values with an exception that do not satisfy the predicate", () -> {
+        final Predicate<Integer> predicate = x -> x % 2 == 0;
+        expect(Try.success(7).filter(predicate)).toEqual(Try.failure(new Try.ValueDidNotSatisfyPredicateException(predicate, 7)));
       });
     });
   }

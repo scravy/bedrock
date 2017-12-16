@@ -54,12 +54,14 @@ public abstract class Try<E> implements Iterable<E> {
     }
   }
 
+  @EqualsAndHashCode(callSuper = true)
   public static class RethrownException extends Exception {
     public RethrownException(final Exception cause) {
       super(cause);
     }
   }
 
+  @EqualsAndHashCode(callSuper = false)
   public static class ValueDidNotSatisfyPredicateException extends Exception {
     @Getter
     private final Predicate<?> predicate;

@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -184,6 +185,25 @@ class SeqExemplaryChecks {
 
     describe("shuffled", () -> {
       it("should shuffle given a random generator", () -> expect(seq.shuffled(new Random(1337))).toEqual(Seq.of(2, 3, 4, 1, 2)));
+    });
+
+    describe("headOptional", () -> {
+      it("should return the head element", () -> {
+        expect(seq.headOptional()).toEqual(Optional.of(1));
+      });
+    });
+
+    describe("lastOptional", () -> {
+      it("should return the last element", () -> {
+        expect(seq.lastOptional()).toEqual(Optional.of(3));
+      });
+    });
+
+    describe("reverseIterator", () -> {
+      it("should iterate reversly", () -> {
+        val s = Seq.ofIterator(seq.reverseIterator());
+        expect(s).toEqual(Seq.of(3, 4, 2, 2, 1));
+      });
     });
   }
 

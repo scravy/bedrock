@@ -154,12 +154,6 @@ public class SeqTest {
         });
       });
 
-      describe("reverseIterator", () -> {
-        it("should iterate reversly", () -> {
-          val seq = Seq.ofIterator(Seq.of(1, 2, 3).reverseIterator());
-          expect(seq).toEqual(Seq.of(3, 2, 1));
-        });
-      });
     });
   }
 
