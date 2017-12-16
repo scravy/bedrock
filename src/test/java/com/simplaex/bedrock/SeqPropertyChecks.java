@@ -67,7 +67,7 @@ class SeqPropertyChecks {
       });
       it("should be ordered", () -> {
         val s = seq.sorted();
-        val z = seq.zipWith((a, b) -> a <= b, s, s.tail());
+        val z = s.zipWith((a, b) -> a <= b, s.tail());
         expect(z.forAll(x -> x)).toBeTrue();
       });
     });
@@ -137,6 +137,21 @@ class SeqPropertyChecks {
       });
     });
 
+    describe("zip", () -> {
+      it("create a list of pairs", () -> {
+        val builder = Seq.<Pair<Integer, Integer>>builder();
+        seq.forEach(x -> builder.add(Pair.of(x, x)));
+        expect(seq.zip(seq)).toEqual(builder.result());
+      });
+    });
+
+    describe("headOptional", () -> {
+
+    });
+
+    describe("lastOptional", () -> {
+
+    });
   }
 
 }

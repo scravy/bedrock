@@ -152,19 +152,18 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <A, B> Seq<Pair<A, B>> zip(@Nonnull final Seq<A> a, @Nonnull final Seq<B> b) {
-    return zipWith(Pair::new, a, b);
+  public <A> Seq<Pair<E, A>> zip(@Nonnull final Seq<A> a) {
+    return zipWith(Pair::new, a);
   }
 
   @Nonnull
-  public <A, B, C> Seq<C> zipWith(@Nonnull final BiFunction<A, B, C> f, @Nonnull final Seq<A> a, @Nonnull final Seq<B> b) {
+  public <A, C> Seq<C> zipWith(@Nonnull final BiFunction<E, A, C> f, @Nonnull final Seq<A> a) {
     Objects.requireNonNull(f);
     Objects.requireNonNull(a);
-    Objects.requireNonNull(b);
-    final int len = Math.min(a.length(), b.length());
+    final int len = Math.min(length(), a.length());
     final Object[] arr = new Object[len];
     for (int i = 0; i < len; i += 1) {
-      arr[i] = f.apply(a.get(i), b.get(i));
+      arr[i] = f.apply(get(i), a.get(i));
     }
     return new SeqSimple<>(arr);
   }
@@ -410,6 +409,16 @@ public abstract class Seq<E>
     Objects.requireNonNull(iterable);
     final SeqBuilder<E> builder = new SeqBuilder<>();
     iterable.forEach(builder::add);
+    return builder.result();
+  }
+
+  @Nonnull
+  public static <E> Seq<E> ofIterator(@Nonnull final Iterator<? extends E> iterator) {
+    Objects.requireNonNull(iterator);
+    final SeqBuilder<E> builder = new SeqBuilder<>();
+    while (iterator.hasNext()) {
+      builder.add(iterator.next());
+    }
     return builder.result();
   }
 

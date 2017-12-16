@@ -66,7 +66,7 @@ public class SeqTest {
           expect(Seq.ofArray(new Object[0])).toEqual(Seq.empty());
         });
         it("should create a sequence of an integer array", () -> {
-          expect(Seq.ofArray(new Integer[] {1, 2, 3})).toEqual(Seq.of(1, 2, 3));
+          expect(Seq.ofArray(new Integer[]{1, 2, 3})).toEqual(Seq.of(1, 2, 3));
         });
       });
 
@@ -142,6 +142,22 @@ public class SeqTest {
           expect(seq.get(0)).toEqual(1);
           expect(seq.get(1)).toEqual(2);
           expect(seq.get(2)).toEqual(3);
+        });
+      });
+
+      describe("ofPair", () -> {
+        it("should consutrct a list", () -> {
+          val seq = Seq.<Number, Long, Double>fromPair(Pair.pair(231L, 3.4));
+          expect(seq.get(0)).toEqual(231L);
+          expect(seq.get(1)).toEqual(3.4);
+          expect(seq.length()).toEqual(2);
+        });
+      });
+
+      describe("reverseIterator", () -> {
+        it("should iterate reversly", () -> {
+          val seq = Seq.ofIterator(Seq.of(1, 2, 3).reverseIterator());
+          expect(seq).toEqual(Seq.of(3, 2, 1));
         });
       });
     });
