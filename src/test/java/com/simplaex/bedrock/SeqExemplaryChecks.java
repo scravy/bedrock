@@ -6,9 +6,7 @@ import lombok.val;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
@@ -104,6 +102,20 @@ class SeqExemplaryChecks {
     };
     describe("takeRight", () -> takeRightChecks.accept(seq::takeRight));
     describe("takeRightView", () -> takeRightChecks.accept(seq::takeRightView));
+
+    final Consumer<Function<Predicate<Integer>, Seq<Integer>>> takeWhileChecks = f -> {
+      it("should take while odd", () -> expect(f.apply(i -> i % 2 == 1)).toEqual(Seq.of(1)));
+      it("should take while less than 4", () -> expect(f.apply(i -> i < 4)).toEqual(Seq.of(1, 2, 2)));
+    };
+    describe("takeWhile", () -> takeWhileChecks.accept(seq::takeWhile));
+    describe("takeWhileView", () -> takeWhileChecks.accept(seq::takeWhileView));
+
+    final Consumer<Function<Predicate<Integer>, Seq<Integer>>> dropWhileChecks = f -> {
+      it("should drop while odd", () -> expect(f.apply(i -> i % 2 == 1)).toEqual(Seq.of(2, 2, 4, 3)));
+      it("should drop while less than 4", () -> expect(f.apply(i -> i < 4)).toEqual(Seq.of(4, 3)));
+    };
+    describe("dropWhile", () -> dropWhileChecks.accept(seq::dropWhile));
+    describe("dropWhileView", () -> dropWhileChecks.accept(seq::dropWhileView));
 
     describe("map", () -> {
       it("should return the same seq when passing the identify function", () -> expect(seq.map(x -> x)).toEqual(seq));

@@ -222,6 +222,42 @@ public abstract class Seq<E>
     return filter(p.negate());
   }
 
+  @Nonnull
+  public Seq<E> takeWhile(@Nonnull final Predicate<E> p) {
+    int i = 0;
+    while (i < length() && p.test(get(i))) {
+      i += 1;
+    }
+    return take(i);
+  }
+
+  @Nonnull
+  public Seq<E> takeWhileView(@Nonnull final Predicate<E> p) {
+    int i = 0;
+    while (i < length() && p.test(get(i))) {
+      i += 1;
+    }
+    return takeView(i);
+  }
+
+  @Nonnull
+  public Seq<E> dropWhile(@Nonnull final Predicate<E> p) {
+    int i = 0;
+    while (i < length() && p.test(get(i))) {
+      i += 1;
+    }
+    return drop(i);
+  }
+
+  @Nonnull
+  public Seq<E> dropWhileView(@Nonnull final Predicate<E> p) {
+    int i = 0;
+    while (i < length() && p.test(get(i))) {
+      i += 1;
+    }
+    return dropView(i);
+  }
+
   @Override
   @Nonnull
   public Seq<Seq<E>> inits() {
