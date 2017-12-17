@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
@@ -154,6 +155,19 @@ public class SeqTest {
         });
       });
 
+    });
+
+    describe("sequences with null values", () -> {
+      it("should compare sequences with null values using equals", () -> {
+        expect(Seq.of(1, null)).toEqual(Seq.of(1, null));
+        expect(Seq.of(null, 1).equals(Seq.of(1, null))).toBeFalse();
+        expect(Seq.of(1, null).equals(Seq.of(null, 1))).toBeFalse();
+      });
+      it("should calculate hashCodes for sequences involving null", () -> {
+        val m = new HashSet<Seq<Integer>>();
+        m.add(Seq.of(1, null));
+        expect(m.contains(Seq.of(1, null))).toBeTrue();
+      });
     });
   }
 

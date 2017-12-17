@@ -16,6 +16,10 @@ public class SeqSimpleTest {
       SeqExemplaryChecks.checks(seq);
       SeqPropertyChecks.checks(seq);
     });
+    describe("some seqs containing null values", () -> {
+      val seq = Seq.of(3, null, 4, 12, null, null);
+      SeqPropertyChecks.checks(seq);
+    });
   }
 
 }

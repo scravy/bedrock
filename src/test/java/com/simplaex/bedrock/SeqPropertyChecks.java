@@ -3,6 +3,7 @@ package com.simplaex.bedrock;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -67,7 +68,20 @@ class SeqPropertyChecks {
       });
       it("should be ordered", () -> {
         val s = seq.sorted();
-        val z = s.zipWith((a, b) -> a <= b, s.tail());
+        final Comparator<Integer> comparator = (left, right) -> {
+          if (left == null && right == null) {
+            return 0;
+          }
+          if (left == null) {
+            return -1;
+          }
+          if (right == null) {
+            return 1;
+          }
+          //noinspection unchecked
+          return ((Comparable) left).compareTo(right);
+        };
+        val z = s.zipWith((a, b) -> comparator.compare(a, b) <= 0, s.tail());
         expect(z.forAll(x -> x)).toBeTrue();
       });
     });
@@ -148,6 +162,20 @@ class SeqPropertyChecks {
     describe("equals + concat", () -> {
       it("should not compare as equal to itself concatenated with Seq.of(1)", () -> {
         expect(Seq.concat(seq, Seq.of (1)).equals(seq)).toBeFalse();
+      });
+    });
+
+    describe("foldl", () -> {
+      it("should reverse a list when provided with cons", () -> {
+        val s = seq.foldl((xs, x) -> Seq.concat(Seq.of(x), xs), Seq.empty());
+        expect(s).toEqual(seq.reversed());
+      });
+    });
+
+    describe("foldr", () -> {
+      it("should recreate the same list when provided with cons", () -> {
+        val s = seq.foldr((x, xs) -> Seq.concat(Seq.of(x), xs), Seq.empty());
+        expect(s).toEqual(seq);
       });
     });
   }

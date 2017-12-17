@@ -205,6 +205,8 @@ class SeqExemplaryChecks {
         expect(s).toEqual(Seq.of(3, 4, 2, 2, 1));
       });
     });
+
+
   }
 
 }

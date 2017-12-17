@@ -3,6 +3,8 @@ package com.simplaex.bedrock;
 import com.greghaskins.spectrum.Spectrum;
 import org.junit.runner.RunWith;
 
+import java.util.Optional;
+
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
@@ -43,6 +45,18 @@ public class SeqEmptyTest {
     describe("countBy", () -> {
       it("should return zero", () -> {
         expect(Seq.<Integer>empty().countBy(i -> i % 2 == 0)).toEqual(0);
+      });
+    });
+
+    describe("headOptional", () -> {
+      it("should return empty", () -> {
+        expect(Seq.empty().headOptional()).toEqual(Optional.empty());
+      });
+    });
+
+    describe("lastOptional", () -> {
+      it("should return empty", () -> {
+        expect(Seq.empty().lastOptional()).toEqual(Optional.empty());
       });
     });
   }

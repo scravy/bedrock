@@ -169,6 +169,26 @@ public abstract class Seq<E>
   }
 
   @Nonnull
+  public <A> A foldl(@Nonnull final BiFunction<A, E, A> f, final A startValue) {
+    Objects.requireNonNull(f);
+    A acc = startValue;
+    for (int i = 0; i < length(); i += 1) {
+      acc = f.apply(acc, get(i));
+    }
+    return acc;
+  }
+
+  @Nonnull
+  public <A> A foldr(@Nonnull final BiFunction<E, A, A> f, final A startValue) {
+    Objects.requireNonNull(f);
+    A acc = startValue;
+    for (int i = length() - 1; i >= 0; i -= 1) {
+      acc = f.apply(get(i), acc);
+    }
+    return acc;
+  }
+
+  @Nonnull
   public Pair<Seq<E>, Seq<E>> partitionBy(@Nonnull final Predicate<E> p) {
     Objects.requireNonNull(p);
     final int sizeHint = length() / 2 + 1;
@@ -295,11 +315,7 @@ public abstract class Seq<E>
 
   @Override
   public int hashCode() {
-    int result = 1;
-    for (final E element : this) {
-      result = 31 * result + (element == null ? 0 : element.hashCode());
-    }
-    return result;
+    return Arrays.hashCode(backingArray);
   }
 
   @Override
