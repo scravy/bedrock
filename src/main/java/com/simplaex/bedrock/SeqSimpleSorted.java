@@ -12,8 +12,8 @@ class SeqSimpleSorted<E extends Comparable<E>> extends SeqSimple<E> {
 
   @SuppressWarnings("unchecked")
   @Override
-  public boolean contains(@Nullable final E e) {
-    return Arrays.binarySearch(backingArray, e, nullAcceptingComparator) >= 0;
+  public boolean contains(@Nullable final E element) {
+    return Arrays.binarySearch(backingArray, element, nullAcceptingComparator) >= 0;
   }
 
   @Nonnull

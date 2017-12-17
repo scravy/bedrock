@@ -101,16 +101,6 @@ interface SequenceMethods<R extends SequenceMethods<R>> {
   Seq<R> tailsView();
 
   @Nonnull
-  default R subSequence(@Nonnegative final int beginOffset) {
-    return subSequence(beginOffset, length());
-  }
-
-  @Nonnull
-  default R subSequenceView(@Nonnegative final int beginOffset) {
-    return subSequenceView(beginOffset, length());
-  }
-
-  @Nonnull
   default R take(@Nonnegative final int length) {
     return subSequence(0, length);
   }
