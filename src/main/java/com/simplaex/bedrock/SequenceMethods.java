@@ -2,10 +2,25 @@ package com.simplaex.bedrock;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import java.util.Comparator;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 interface SequenceMethods<R extends SequenceMethods<R>> {
+
+  @SuppressWarnings("unchecked")
+  Comparator<Object> nullAcceptingComparator = (left, right) -> {
+    if (left == null && right == null) {
+      return 0;
+    }
+    if (left == null) {
+      return -1;
+    }
+    if (right == null) {
+      return 1;
+    }
+    return ((Comparable) left).compareTo(right);
+  };
 
   @Nonnegative
   int length();

@@ -31,18 +31,7 @@ class SeqReversed<E> extends Seq<E> {
   @Override
   public Seq<E> sorted() {
     final Object[] array = backingArray.clone();
-    Arrays.sort(array, (left, right) -> {
-      if (left == null && right == null) {
-        return 0;
-      }
-      if (left == null) {
-        return -1;
-      }
-      if (right == null) {
-        return 1;
-      }
-      return ((Comparable) left).compareTo(right);
-    });
+    Arrays.sort(array, nullAcceptingComparator);
     return new SeqSimpleSorted(array);
   }
 

@@ -38,18 +38,7 @@ class SeqReversedView<E> extends Seq<E> {
     final int len = length();
     final Object[] array = new Object[len];
     System.arraycopy(backingArray, beginOffset, array, 0, len);
-    Arrays.sort(array, (left, right) -> {
-      if (left == null && right == null) {
-        return 0;
-      }
-      if (left == null) {
-        return -1;
-      }
-      if (right == null) {
-        return 1;
-      }
-      return ((Comparable) left).compareTo(right);
-    });
+    Arrays.sort(array, nullAcceptingComparator);
     return new SeqSimpleSorted(array);
   }
 

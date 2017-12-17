@@ -70,6 +70,17 @@ class SeqExemplaryChecks {
     describe("drop", () -> dropChecks.accept(seq::drop));
     describe("dropView", () -> dropChecks.accept(seq::dropView));
 
+    final Consumer<IntFunction<Seq<Integer>>> dropRightChecks = f -> {
+      it("should return a new seq with the last element dropped", () -> expect(f.apply(1)).toEqual(Seq.of(1, 2, 2, 4)));
+      it("should return a new seq with the last two elements dropped", () -> expect(f.apply(2)).toEqual(Seq.of(1, 2, 2)));
+      it("should return a new seq with the last three dropped", () -> expect(f.apply(3)).toEqual(Seq.of(1, 2)));
+      it("should return a new seq with the last four elements dropped", () -> expect(f.apply(4)).toEqual(Seq.of(1)));
+      it("should return the empty seq when all five elements dropped", () -> expect(f.apply(5)).toEqual(Seq.empty()));
+      it("should return an empty seq even when dropped more than five", () -> expect(f.apply(6)).toEqual(Seq.empty()));
+    };
+    describe("dropRight", () -> dropRightChecks.accept(seq::dropRight));
+    describe("dropRightView", () -> dropRightChecks.accept(seq::dropRightView));
+
     final Consumer<IntFunction<Seq<Integer>>> takeChecks = f -> {
       it("should return an empty seq when taking zero elements", () -> expect(f.apply(0)).toEqual(Seq.empty()));
       it("should take one element", () -> expect(f.apply(1)).toEqual(Seq.of(1)));
@@ -81,6 +92,18 @@ class SeqExemplaryChecks {
     };
     describe("take", () -> takeChecks.accept(seq::take));
     describe("takeView", () -> takeChecks.accept(seq::takeView));
+
+    final Consumer<IntFunction<Seq<Integer>>> takeRightChecks = f -> {
+      it("should return an empty seq when taking zero elements", () -> expect(f.apply(0)).toEqual(Seq.empty()));
+      it("should take one element", () -> expect(f.apply(1)).toEqual(Seq.of(3)));
+      it("should take two elements", () -> expect(f.apply(2)).toEqual(Seq.of(4, 3)));
+      it("should take three elements", () -> expect(f.apply(3)).toEqual(Seq.of(2, 4, 3)));
+      it("should take four elements", () -> expect(f.apply(4)).toEqual(Seq.of(2, 2, 4, 3)));
+      it("should take five elements", () -> expect(f.apply(5)).toEqual(Seq.of(1, 2, 2, 4, 3)));
+      it("should take just five elements if there are no more", () -> expect(f.apply(6)).toEqual(Seq.of(1, 2, 2, 4, 3)));
+    };
+    describe("takeRight", () -> takeRightChecks.accept(seq::takeRight));
+    describe("takeRightView", () -> takeRightChecks.accept(seq::takeRightView));
 
     describe("map", () -> {
       it("should return the same seq when passing the identify function", () -> expect(seq.map(x -> x)).toEqual(seq));
@@ -205,7 +228,6 @@ class SeqExemplaryChecks {
         expect(s).toEqual(Seq.of(3, 4, 2, 2, 1));
       });
     });
-
 
   }
 

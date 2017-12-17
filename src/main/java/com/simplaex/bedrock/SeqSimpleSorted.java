@@ -13,18 +13,12 @@ class SeqSimpleSorted<E extends Comparable<E>> extends SeqSimple<E> {
   @SuppressWarnings("unchecked")
   @Override
   public boolean contains(@Nullable final E e) {
-    return Arrays.binarySearch(backingArray, e, (left, right) -> {
-      if (left == null && right == null) {
-        return 0;
-      }
-      if (left == null) {
-        return -1;
-      }
-      if (right == null) {
-        return 1;
-      }
-      return ((Comparable) left).compareTo(right);
-    }) >= 0;
+    return Arrays.binarySearch(backingArray, e, nullAcceptingComparator) >= 0;
   }
 
+  @Nonnull
+  @Override
+  public Seq<E> sorted() {
+    return this;
+  }
 }

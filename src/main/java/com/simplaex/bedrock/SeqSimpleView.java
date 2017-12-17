@@ -37,18 +37,7 @@ class SeqSimpleView<E> extends Seq<E> {
   public Seq<E> sorted() {
     final Object[] array = new Object[length()];
     System.arraycopy(backingArray, beginOffset, array, 0, length());
-    Arrays.sort(array, (left, right) -> {
-      if (left == null && right == null) {
-        return 0;
-      }
-      if (left == null) {
-        return -1;
-      }
-      if (right == null) {
-        return 1;
-      }
-      return ((Comparable) left).compareTo(right);
-    });
+    Arrays.sort(array, nullAcceptingComparator);
     return new SeqSimpleSorted(array);
   }
 
