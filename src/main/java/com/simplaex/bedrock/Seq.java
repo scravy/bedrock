@@ -9,13 +9,14 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class Seq<E>
-  implements Serializable, RandomAccess, Iterable<E>, SequenceMethods<Seq<E>> {
+  implements Serializable, RandomAccess, Iterable<E>, SequenceMethods<Seq<E>>, IntFunction<E> {
 
   final Object[] backingArray;
 
@@ -24,6 +25,11 @@ public abstract class Seq<E>
   }
 
   public abstract E get(@Nonnegative final int index);
+
+  @Override
+  public E apply(@Nonnegative final int index) {
+    return get(index);
+  }
 
   @Override
   @Nonnull

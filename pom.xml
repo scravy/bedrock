@@ -11,12 +11,12 @@
   <description>Essential utilities for modern Java.</description>
   <url>https://github.com/simplaex/bedrock</url>
 
-  <version>2017.12.17</version>
+  <version>2017.12.27</version>
   <packaging>jar</packaging>
 
   <properties>
-    <coverage.branch.minimum>0.5</coverage.branch.minimum>
-    <coverage.instruction.minimum>0.75</coverage.instruction.minimum>
+    <coverage.branch.minimum>0.25</coverage.branch.minimum>
+    <coverage.instruction.minimum>0.25</coverage.instruction.minimum>
     <coverage.branch.class.minimum>0.0</coverage.branch.class.minimum>
     <coverage.instruction.class.minimum>0.0</coverage.instruction.class.minimum>
     <coverage.branch.method.minimum>0.0</coverage.branch.method.minimum>
