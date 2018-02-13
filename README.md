@@ -9,7 +9,7 @@ Utilities for modern java development.
     <dependency>
         <groupId>com.simplaex</groupId>
         <artifactId>bedrock</artifactId>
-        <version>2017.12.17</version>
+        <version>2017.12.27</version>
     </dependency>
 
 ## Releasing

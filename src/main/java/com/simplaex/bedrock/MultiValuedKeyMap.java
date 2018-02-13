@@ -15,10 +15,12 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
 
   private final Node<T> rootNode;
 
+  @SuppressWarnings("unchecked")
   public <K> Optional<T> get(final Seq<K> key) {
     return Optional.ofNullable(find(rootNode, (Seq<Object>) key));
   }
 
+  @SuppressWarnings("unchecked")
   public <K> T get(final Seq<K> key, final T fallback) {
     final T result = find(rootNode, (Seq<Object>) key);
     if (result == null) {
@@ -27,6 +29,7 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
     return result;
   }
 
+  @SuppressWarnings("unchecked")
   public <K> T get(final Seq<K> key, final Supplier<T> fallbackSupplier) {
     final T result = find(rootNode, (Seq<Object>) key);
     if (result == null) {
@@ -55,7 +58,7 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
     }
 
     public MultiValuedKeyMap<T> build() {
-      return new MultiValuedKeyMap<T>(build(root));
+      return new MultiValuedKeyMap<>(build(root));
     }
 
     private static <T> void add(final BuilderNode<T> node, final T value, final Seq<Object> key) {
@@ -63,7 +66,7 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
         node.value = value;
       } else if (key.head() == null) {
         if (node.fallback == null) {
-          node.fallback = new BuilderNode<T>();
+          node.fallback = new BuilderNode<>();
         }
         add(node.fallback, value, key.tail());
       } else {
@@ -72,13 +75,14 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
         }
         BuilderNode<T> child = node.children.get(key.head());
         if (child == null) {
-          child = new BuilderNode<T>();
+          child = new BuilderNode<>();
           node.children.put(key.head(), child);
         }
         add(child, value, key.tail());
       }
     }
 
+    @SuppressWarnings("unchecked")
     private static <T> Node<T> build(final BuilderNode<T> node) {
       if (node == null) {
         return null;
@@ -87,7 +91,7 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
       final Node<T>[] children;
       if (node.children != null) {
         keys = node.children.keySet().toArray();
-        children = (Node<T>[]) Seq.of(keys).map(key -> build(node.children.get(key))).toArray((Class<Node<T>>) (Object) Node.class);
+        children = Seq.of(keys).map(key -> build(node.children.get(key))).toArray((Class<Node<T>>) (Object) Node.class);
       } else {
         keys = null;
         children = null;
@@ -128,7 +132,7 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
   private static <T> T find(final Node<T> node, final Seq<Object> key) {
 
     Node<T> currentNode = node;
-    Node<T> nextNode = null;
+    Node<T> nextNode;
 
     int i = 0;
     for (; i < key.length(); i += 1) {

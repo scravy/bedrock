@@ -5,11 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -25,7 +21,7 @@ import java.util.function.Function;
  */
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>> {
+public final class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>> {
 
   private final Object[] keys;
   private final Object[] values;
@@ -93,12 +89,12 @@ public class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>> {
 
   @Nonnull
   public Seq<K> keys() {
-    return new SeqSimple<K>(keys);
+    return new SeqSimple<>(keys);
   }
 
   @Nonnull
   public Seq<V> values() {
-    return new SeqSimple<V>(values);
+    return new SeqSimple<>(values);
   }
 
   @Nonnull
@@ -115,6 +111,34 @@ public class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>> {
       keys[i] = sorted[i].fst;
       values[i] = sorted[i].snd;
     }
-    return new ArrayMap<K, V>(keys, values);
+    return new ArrayMap<>(keys, values);
+  }
+
+  @Nonnull
+  public static <K extends Comparable<K>, V> ArrayMap<K, V> ofSeq(@Nonnull final Seq<Pair<K, V>> pairs) {
+
+    final Object[] keys = new Object[pairs.length()];
+    final Object[] values = new Object[pairs.length()];
+
+    final Seq<Pair<K, V>> sorted = pairs.sortedBy(Comparator.comparing(p -> p.fst));
+
+    for (int i = 0; i < sorted.length(); i += 1) {
+      keys[i] = sorted.get(i).getFst();
+      values[i] = sorted.get(i).getSnd();
+    }
+    return new ArrayMap<>(keys, values);
+  }
+
+  @Nonnull
+  public static <K extends Comparable<K>, V> ArrayMap<K, V> ofMap(@Nonnull final Map<K, V> pairs) {
+
+    final Object[] keys = Seq.ofCollection(pairs.keySet()).sorted().backingArray;
+    final Object[] values = new Object[pairs.size()];
+
+    for (int i = 0; i < keys.length; i += 1) {
+      //noinspection SuspiciousMethodCalls
+      values[i] = pairs.get(keys[i]);
+    }
+    return new ArrayMap<>(keys, values);
   }
 }

@@ -158,6 +158,18 @@ public abstract class Seq<E>
   }
 
   @Nonnull
+  public <F> Seq<F> flatMapOptional(@Nonnull final Function<E, Optional<F>> f) {
+    Objects.requireNonNull(f);
+    @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
+    val resultBuilder = Seq.<F>builder();
+    for (final E e : this) {
+      final Optional<F> result = f.apply(e);
+      result.ifPresent(resultBuilder::add);
+    }
+    return resultBuilder.build();
+  }
+
+  @Nonnull
   public <A> Seq<Pair<E, A>> zip(@Nonnull final Seq<A> a) {
     return zipWith(Pair::new, a);
   }
