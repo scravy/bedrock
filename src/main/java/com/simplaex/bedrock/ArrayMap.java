@@ -14,7 +14,7 @@ import java.util.function.Function;
  * (one for the keys, one for the values). Lookups are performed by performing
  * binary searches on the key array - thus the keys need to implement the
  * Comparable interface.
- *
+ * <p>
  * Some operations are implemented quite space efficiently. For instance
  * both mapValues and mapValuesWithKey share the key array with the source
  * ArrayMap.

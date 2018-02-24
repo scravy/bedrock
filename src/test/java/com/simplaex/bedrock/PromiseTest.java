@@ -5,10 +5,6 @@ import lombok.val;
 import org.junit.runner.RunWith;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.concurrent.Executors;
 
 import static com.greghaskins.spectrum.Spectrum.describe;

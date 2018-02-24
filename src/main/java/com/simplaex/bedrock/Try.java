@@ -2,7 +2,6 @@ package com.simplaex.bedrock;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.Value;
 
 import javax.annotation.Nonnull;
@@ -12,7 +11,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 

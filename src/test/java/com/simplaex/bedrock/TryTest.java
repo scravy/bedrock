@@ -24,7 +24,8 @@ public class TryTest {
         expect(r.isFailure()).toBeTrue();
         expect(r.isSuccess()).toBeFalse();
         expect(r::orElseThrow).toThrow(Try.RethrownException.class);
-      });      it("should turn a value into a Try.Success", () -> {
+      });
+      it("should turn a value into a Try.Success", () -> {
         val r = Try.execute(() -> 3);
         expect(r).toBeInstanceOf(Try.Success.class);
         expect(r.isFailure()).toBeFalse();

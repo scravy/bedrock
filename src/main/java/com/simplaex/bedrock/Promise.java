@@ -4,9 +4,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
-import java.util.List;
 
 public final class Promise<T> {
 

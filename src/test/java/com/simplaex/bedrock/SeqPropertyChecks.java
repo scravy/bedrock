@@ -131,6 +131,7 @@ class SeqPropertyChecks {
       it("should partition into filter and filterNot", () -> {
         class F implements Predicate {
           private int x = 0;
+
           @Override
           public boolean test(final Object ignored) {
             return (x++) % 2 == 0;
@@ -161,7 +162,7 @@ class SeqPropertyChecks {
 
     describe("equals + concat", () -> {
       it("should not compare as equal to itself concatenated with Seq.of(1)", () -> {
-        expect(Seq.concat(seq, Seq.of (1)).equals(seq)).toBeFalse();
+        expect(Seq.concat(seq, Seq.of(1)).equals(seq)).toBeFalse();
       });
     });
 
