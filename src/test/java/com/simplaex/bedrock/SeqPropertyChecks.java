@@ -139,9 +139,9 @@ class SeqPropertyChecks {
         //noinspection unchecked
         val r = seq.partitionBy(new F());
         //noinspection unchecked
-        expect(r.fst).toEqual(seq.filter(new F()));
+        expect(r.first).toEqual(seq.filter(new F()));
         //noinspection unchecked
-        expect(r.snd).toEqual(seq.filterNot(new F()));
+        expect(r.second).toEqual(seq.filterNot(new F()));
       });
     });
 

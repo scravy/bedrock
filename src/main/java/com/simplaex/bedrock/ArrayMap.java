@@ -10,7 +10,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
- * An ArrayMap is a very simple immutable map that is backed by two arrays
+ * A very simple immutable map that is backed by two arrays
  * (one for the keys, one for the values). Lookups are performed by performing
  * binary searches on the key array - thus the keys need to implement the
  * Comparable interface.
@@ -105,11 +105,11 @@ public final class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>
     final Object[] values = new Object[pairs.length];
 
     final Pair<K, V>[] sorted = pairs.clone();
-    Arrays.sort(sorted, Comparator.comparing(p -> p.fst));
+    Arrays.sort(sorted, Comparator.comparing(p -> p.first));
 
     for (int i = 0; i < sorted.length; i += 1) {
-      keys[i] = sorted[i].fst;
-      values[i] = sorted[i].snd;
+      keys[i] = sorted[i].first;
+      values[i] = sorted[i].second;
     }
     return new ArrayMap<>(keys, values);
   }
@@ -120,11 +120,11 @@ public final class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>
     final Object[] keys = new Object[pairs.length()];
     final Object[] values = new Object[pairs.length()];
 
-    final Seq<Pair<K, V>> sorted = pairs.sortedBy(Comparator.comparing(p -> p.fst));
+    final Seq<Pair<K, V>> sorted = pairs.sortedBy(Comparator.comparing(p -> p.first));
 
     for (int i = 0; i < sorted.length(); i += 1) {
-      keys[i] = sorted.get(i).getFst();
-      values[i] = sorted.get(i).getSnd();
+      keys[i] = sorted.get(i).getFirst();
+      values[i] = sorted.get(i).getSecond();
     }
     return new ArrayMap<>(keys, values);
   }

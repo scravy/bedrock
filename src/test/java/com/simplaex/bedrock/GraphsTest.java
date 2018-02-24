@@ -16,19 +16,21 @@ public class GraphsTest {
   {
     describe("topologicalSort", () -> {
       it("should topo sort", () -> {
-        val result = Graphs.topologicalSort(Seq.of(
+        val maybeResult = Graphs.topologicalSort(Seq.of(
           pair("a", "c"),
           pair("b", "c"),
           pair("c", "d"),
           pair("c", "e")
         ));
+        expect(maybeResult.isPresent()).toBeTrue();
+        @SuppressWarnings("ConstantConditions") val result = maybeResult.get();
         expect(result.find("b") < result.find("c")).toBeTrue();
         expect(result.find("a") < result.find("c")).toBeTrue();
         expect(result.find("c") < result.find("d")).toBeTrue();
         expect(result.find("c") < result.find("e")).toBeTrue();
       });
       it("should topo sort a huge graph", () -> {
-        val result = Graphs.topologicalSort(Seq.of(
+        val maybeResult = Graphs.topologicalSort(Seq.of(
           pair("c", "d"),
           pair("c", "e"),
           pair("b", "c"),
@@ -38,6 +40,8 @@ public class GraphsTest {
           pair("c", "g"),
           pair("c", "h")
         ));
+        expect(maybeResult.isPresent()).toBeTrue();
+        @SuppressWarnings("ConstantConditions") val result = maybeResult.get();
         expect(result.find("c") < result.find("d")).toBeTrue();
         expect(result.find("c") < result.find("e")).toBeTrue();
         expect(result.find("b") < result.find("c")).toBeTrue();
@@ -47,8 +51,27 @@ public class GraphsTest {
         expect(result.find("c") < result.find("g")).toBeTrue();
         expect(result.find("c") < result.find("h")).toBeTrue();
       });
+      it("should topo sort another huge graph", () -> {
+        val edges = Seq.of(
+          pair("a", "f"),
+          pair("c", "f"),
+          pair("e", "q"),
+          pair("p", "q"),
+          pair("m", "p"),
+          pair("n", "p"),
+          pair("a", "d"),
+          pair("b", "d"),
+          pair("b", "e"),
+          pair("c", "e")
+        );
+        val maybeResult = Graphs.topologicalSort(edges);
+        expect(maybeResult.isPresent()).toBeTrue();
+        @SuppressWarnings("ConstantConditions") val result = maybeResult.get();
+        System.out.println(result);
+        edges.forEach(edge -> expect(result.find(edge.getFirst()) < result.find(edge.getSecond())).toBeTrue());
+      });
       it("should detect cycle", () -> {
-        val result = Graphs.topologicalSort(Seq.of(
+        val maybeResult = Graphs.topologicalSort(Seq.of(
           pair("c", "d"),
           pair("c", "e"),
           pair("b", "c"),
@@ -61,15 +84,15 @@ public class GraphsTest {
           pair("b", "c"),
           pair("c", "a")
         ));
-        expect(result).toBeNull();
+        expect(maybeResult.isPresent()).toBeFalse();
       });
       it("should detect cycle huge graph", () -> {
-        val result = Graphs.topologicalSort(Seq.of(
+        val maybeResult = Graphs.topologicalSort(Seq.of(
           pair("a", "b"),
           pair("b", "c"),
           pair("c", "a")
         ));
-        expect(result).toBeNull();
+        expect(maybeResult.isPresent()).toBeFalse();
       });
     });
   }

@@ -15,17 +15,25 @@ import java.util.Map;
 @Value
 public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pair<A, B>> {
 
-  public final A fst;
-  public final B snd;
+  public final A first;
+  public final B second;
+
+  public A fst() {
+    return first;
+  }
+
+  public B snd() {
+    return second;
+  }
 
   @Override
   public A getKey() {
-    return fst;
+    return first;
   }
 
   @Override
   public B getValue() {
-    return snd;
+    return second;
   }
 
   /**
@@ -45,30 +53,30 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
   @Override
   public int compareTo(@Nonnull final Pair<A, B> p) {
     final int r;
-    if (fst == null) {
-      if (p.fst == null) {
+    if (first == null) {
+      if (p.first == null) {
         r = 0;
       } else {
         return -1;
       }
-    } else if (p.fst == null) {
+    } else if (p.first == null) {
       return 1;
     } else {
-      r = ((Comparable) fst).compareTo(p.fst);
+      r = ((Comparable) first).compareTo(p.first);
     }
     if (r != 0) {
       return r;
     }
-    if (snd == null) {
-      if (p.snd == null) {
+    if (second == null) {
+      if (p.second == null) {
         return 0;
       } else {
         return -1;
       }
-    } else if (p.snd == null) {
+    } else if (p.second == null) {
       return 1;
     } else {
-      return ((Comparable) snd).compareTo(p.snd);
+      return ((Comparable) second).compareTo(p.second);
     }
   }
 

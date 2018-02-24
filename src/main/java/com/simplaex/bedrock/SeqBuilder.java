@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * A builder for immutable Sequences. Can not be instantiated directly, use Seq.builder
+ * A builder for immutable sequences. Can not be instantiated directly, use Seq.builder
  *
  * @param <E> The type of the elements the builder accepts.
  */

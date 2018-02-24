@@ -1,18 +1,17 @@
 package com.simplaex.bedrock;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.UtilityClass;
-import lombok.val;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
 import java.util.function.Consumer;
 
 /**
  * Missing control structures for Java.
  */
 @UtilityClass
+@SuppressWarnings("WeakerAccess")
 public class Control {
 
   @Value
@@ -41,8 +40,8 @@ public class Control {
   @SafeVarargs
   public static <T> T dispatch(final Object value, final DispatchBranch<?, ? extends T>... dispatchBranches) {
     for (val branch : dispatchBranches) {
-      if (branch.clazz.isAssignableFrom(value.getClass())) {
-        return Try.execute(() -> (T) ((ThrowingFunction) branch.callable).execute(value)).orElseThrowRuntime();
+      if (branch.getClazz().isAssignableFrom(value.getClass())) {
+        return Try.execute(() -> (T) ((ThrowingFunction) branch.getCallable()).execute(value)).orElseThrowRuntime();
       }
     }
     return null;
@@ -51,8 +50,8 @@ public class Control {
   @SuppressWarnings("unchecked")
   public static void dispatch(final Object value, final DispatchVoidBranch<?>... branches) {
     for (val branch : branches) {
-      if (branch.clazz.isAssignableFrom(value.getClass())) {
-        Try.run(() -> ((ThrowingConsumer) branch.callable).accept(value));
+      if (branch.getClazz().isAssignableFrom(value.getClass())) {
+        Try.run(() -> ((ThrowingConsumer) branch.getCallable()).accept(value));
         return;
       }
     }
@@ -72,6 +71,11 @@ public class Control {
         exceptionHandler.accept(exc);
       }
     }
+  }
+
+  @SneakyThrows
+  public static void sleep(final Duration duration) {
+    Thread.sleep(duration.toMillis());
   }
 
 }

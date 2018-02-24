@@ -14,6 +14,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * An immutable sequence.
+ *
+ * @param <E>
+ */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class Seq<E>
   implements Serializable, RandomAccess, Iterable<E>, SequenceMethods<Seq<E>>, IntFunction<E> {
@@ -553,7 +558,7 @@ public abstract class Seq<E>
   }
 
   public static <C, A extends C, B extends C> Seq<C> fromPair(final Pair<A, B> p) {
-    return Seq.<C>builder().addAll(p.fst, p.snd).result();
+    return Seq.<C>builder().addAll(p.first, p.second).result();
   }
 
 }
