@@ -4,6 +4,9 @@ import com.greghaskins.spectrum.Spectrum;
 import lombok.val;
 import org.junit.runner.RunWith;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
@@ -11,6 +14,7 @@ import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
 import static com.simplaex.bedrock.Pair.pair;
 
+@SuppressWarnings({"ClassInitializerMayBeStatic", "CodeBlock2Expr"})
 @RunWith(Spectrum.class)
 public class ArrayMapTest {
 
@@ -78,6 +82,58 @@ public class ArrayMapTest {
           pair("three", 3),
           pair("two", 2)
         ));
+      });
+    });
+    describe("values", () -> {
+      it("should return the values in the order of the keys", () -> {
+        val map = ArrayMap.of(
+          pair(4, "one"),
+          pair(2, "two"),
+          pair(3, "three")
+        );
+        expect(map.values()).toEqual(Seq.of("two", "three", "one"));
+      });
+    });
+    describe("ofSeq", () -> {
+      it("should create an ArrayMap from a Seq", () -> {
+        val arrayMap = ArrayMap.ofSeq(Seq.of(
+          pair("one", 1),
+          pair("two", 2),
+          pair("three", 3)
+        ));
+        expect(arrayMap.keys()).toEqual(Seq.of("one", "two", "three").sorted());
+        expect(arrayMap.get("one")).toEqual(Optional.of(1));
+        expect(arrayMap.get("two")).toEqual(Optional.of(2));
+        expect(arrayMap.get("three")).toEqual(Optional.of(3));
+      });
+    });
+    describe("ofMap", () -> {
+      it("should create an ArrayMap from a Map", () -> {
+        val map = new HashMap<String, Number>();
+        map.put("one", 1);
+        map.put("ninety-three", BigDecimal.valueOf(93));
+        map.put("pi", Math.PI);
+        val arrayMap = ArrayMap.ofMap(map);
+        expect(arrayMap.keys()).toEqual(Seq.ofCollection(map.keySet()).sorted());
+        expect(arrayMap.get("pi")).toEqual(Optional.of(Math.PI));
+        expect(arrayMap.get("ninety-three")).toEqual(Optional.of(BigDecimal.valueOf(93)));
+        expect(arrayMap.get("one")).toEqual(Optional.of(1));
+      });
+    });
+    describe("apply", () -> {
+      val map = ArrayMap.of(
+        pair(1, "one"),
+        pair(2, "two"),
+        pair(3, "three"),
+        pair(4, "four"),
+        pair(5, "five")
+      );
+      it("should be usable as a regular function", () -> {
+        val seq = Seq.of(1, 3, 5);
+        expect(seq.map(map)).toEqual(Seq.of("one", "three", "five"));
+      });
+      it("should throw a NoSuchElementException if element is not present", () -> {
+        expect(() -> map.apply(0)).toThrow(NoSuchElementException.class);
       });
     });
   }
