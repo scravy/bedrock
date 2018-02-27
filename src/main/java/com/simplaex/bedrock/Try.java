@@ -36,20 +36,6 @@ public abstract class Try<E> implements Iterable<E> {
     }
   }
 
-  @EqualsAndHashCode(callSuper = false)
-  public static class ValueDidNotSatisfyPredicateException extends Exception {
-    @Getter
-    private final Predicate<?> predicate;
-
-    @Getter
-    private final Object value;
-
-    public ValueDidNotSatisfyPredicateException(@Nonnull final Predicate<?> predicate, final Object value) {
-      this.predicate = predicate;
-      this.value = value;
-    }
-  }
-
   public static class FailedRecoveringException extends Exception {
     @Getter
     private final Exception originalException;

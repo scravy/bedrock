@@ -40,7 +40,7 @@ public class TryTest {
       });
       it("should drop values with an exception that do not satisfy the predicate", () -> {
         final Predicate<Integer> predicate = x -> x % 2 == 0;
-        expect(Try.success(7).filter(predicate)).toEqual(Try.failure(new Try.ValueDidNotSatisfyPredicateException(predicate, 7)));
+        expect(Try.success(7).filter(predicate)).toEqual(Try.failure(new ValueDidNotSatisfyPredicateException(predicate, 7)));
       });
     });
   }
