@@ -4,6 +4,8 @@ import lombok.Value;
 
 import javax.annotation.Nonnull;
 import java.io.Serializable;
+import java.util.AbstractList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -90,4 +92,43 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
     return new Pair<>(a, b);
   }
 
+  public static <C, A extends C, B extends C> List<C> toList(final Pair<A, B> pair) {
+    return new AbstractList<C>() {
+      @Override
+      public C get(final int index) {
+        switch (index) {
+          case 0:
+            return pair.fst();
+          case 1:
+            return pair.snd();
+        }
+        return null;
+      }
+
+      @Override
+      public int size() {
+        return 2;
+      }
+    };
+  }
+
+  public List<Object> toList() {
+    return new AbstractList<Object>() {
+      @Override
+      public Object get(final int index) {
+        switch (index) {
+          case 0:
+            return first;
+          case 1:
+            return second;
+        }
+        return null;
+      }
+
+      @Override
+      public int size() {
+        return 2;
+      }
+    };
+  }
 }

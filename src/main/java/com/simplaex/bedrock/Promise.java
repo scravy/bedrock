@@ -2,11 +2,9 @@ package com.simplaex.bedrock;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.val;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
 public class Promise<T> {
@@ -30,15 +28,43 @@ public class Promise<T> {
     return new Promise<>(State.PENDING, null);
   }
 
+  public static <T> Promise<T> fulfilled(final T value) {
+    return new FulfilledPromise<>(value);
+  }
+
+  public static <T> Promise<T> failed(final Throwable value) {
+    return new FailedPromise<>(value);
+  }
+
   private static class FulfilledPromise<T> extends Promise<T> {
     private FulfilledPromise(final T result) {
       super(State.FULFILLED, result);
+    }
+
+    @Override
+    public void fulfill(final T result) {
+      throw new IllegalStateException("Already fulfilled (" + getState() + ").");
+    }
+
+    @Override
+    public void fail(final Throwable result) {
+      throw new IllegalStateException("Already fulfilled (" + getState() + ").");
     }
   }
 
   private static class FailedPromise<T> extends Promise<T> {
     private FailedPromise(final Throwable exc) {
       super(State.FAILED, exc);
+    }
+
+    @Override
+    public void fulfill(final T result) {
+      throw new IllegalStateException("Already fulfilled (" + getState() + ").");
+    }
+
+    @Override
+    public void fail(final Throwable result) {
+      throw new IllegalStateException("Already fulfilled (" + getState() + ").");
     }
   }
 
@@ -158,12 +184,12 @@ public class Promise<T> {
     }
     if (state == State.FULFILLED) {
       try {
-        return new FulfilledPromise<>(func.execute((T) result));
+        return fulfilled(func.execute((T) result));
       } catch (final Exception exc) {
-        return new FailedPromise<>(exc);
+        return failed(exc);
       }
     }
-    return new FailedPromise<>((Throwable) result);
+    return failed((Throwable) result);
   }
 
   public Promise<T> filter(final Predicate<T> predicate) {
