@@ -4,6 +4,8 @@ import com.greghaskins.spectrum.Spectrum;
 import lombok.val;
 import org.junit.runner.RunWith;
 
+import java.util.List;
+
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
@@ -72,6 +74,20 @@ public class PairTest {
           pair(2, 1),
           pair(2, 2)
         ));
+      });
+    });
+    describe("static toList", () -> {
+      it("should turn a pair into a list", () -> {
+        final List<Number> list = Pair.toList(Pair.of(1, 1.2));
+        expect(list.get(0)).toEqual(1);
+        expect(list.get(1)).toEqual(1.2);
+      });
+    });
+    describe("toList", () -> {
+      it("should turn a pair into a list", () -> {
+        final List<Object> list = Pair.of(1, 1.2).toList();
+        expect(list.get(0)).toEqual(1);
+        expect(list.get(1)).toEqual(1.2);
       });
     });
   }

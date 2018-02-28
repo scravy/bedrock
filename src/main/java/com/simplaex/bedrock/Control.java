@@ -57,9 +57,14 @@ public class Control {
     }
   }
 
-  public static void forever(final @Nonnull Runnable runnable) {
+  public static void forever(final @Nonnull ThrowingRunnable runnable) {
     while (!Thread.currentThread().isInterrupted()) {
-      runnable.run();
+      try {
+        runnable.run();
+      } catch (final InterruptedException exc) {
+        return;
+      } catch (final Exception ignore) {
+      }
     }
   }
 
@@ -67,6 +72,8 @@ public class Control {
     while (!Thread.currentThread().isInterrupted()) {
       try {
         runnable.run();
+      } catch (final InterruptedException exc) {
+        return;
       } catch (final Exception exc) {
         exceptionHandler.accept(exc);
       }

@@ -77,6 +77,68 @@ public class PromiseTest {
         });
       });
     });
+
+    describe("fulfill", () -> {
+      describe("with FULFILLED promise", () -> {
+        it("should throw an IllegalStateException", () -> {
+          expect(() -> Promise.fulfilled("").fulfill("")).toThrow(IllegalStateException.class);
+        });
+      });
+      describe("with FAILED promise", () -> {
+        it("should throw an IllegalStateException", () -> {
+          expect(() -> Promise.failed(new IllegalArgumentException()).fulfill("")).toThrow(IllegalStateException.class);
+        });
+      });
+    });
+
+    describe("fail", () -> {
+      describe("with FULFILLED promise", () -> {
+        it("should throw an IllegalStateException", () -> {
+          expect(() -> Promise.fulfilled("").fail(new IllegalArgumentException())).toThrow(IllegalStateException.class);
+        });
+      });
+      describe("with FAILED promise", () -> {
+        it("should throw an IllegalStateException", () -> {
+          expect(() -> Promise.failed(new IllegalArgumentException()).fail(new IllegalArgumentException())).toThrow(IllegalStateException.class);
+        });
+      });
+    });
+
+    describe("filter", () -> {
+      describe("with PENDING promise", () -> {
+        it("should keep FULFILLED state for filter(true)", () -> {
+          val p = Promise.<Integer>promise().filter(x -> x >= 3);
+          p.fulfill(3);
+          expect(p.getState()).toEqual(Promise.State.FULFILLED);
+        });
+        it("should keep FAILED state for filter(false)", () -> {
+          val p = Promise.<Integer>promise().filter(x -> x > 3);
+          p.fulfill(3);
+          expect(p.getState()).toEqual(Promise.State.FAILED);
+        });
+        it("should keep FAILED state when already failed", () -> {
+          val p = Promise.<Integer>promise();
+          p.fail(new IllegalArgumentException());
+          expect(p.getState()).toEqual(Promise.State.FAILED);
+        });
+      });
+      describe("with FULFILLED promise", () -> {
+        it("should keep FULFILLED state for filter(true)", () -> {
+          val p = Promise.fulfilled(3).filter(x -> x >= 3);
+          expect(p.getState()).toEqual(Promise.State.FULFILLED);
+        });
+        it("should keep FAILED state for filter(false)", () -> {
+          val p = Promise.fulfilled(3).filter(x -> x > 3);
+          expect(p.getState()).toEqual(Promise.State.FAILED);
+        });
+      });
+      describe("with FULFILLED promise", () -> {
+        it("should keep FAILED state when already failed", () -> {
+          val p = Promise.<Integer>failed(new IllegalArgumentException()).filter(x -> x > 3);
+          expect(p.getState()).toEqual(Promise.State.FAILED);
+        });
+      });
+    });
   }
 
 }

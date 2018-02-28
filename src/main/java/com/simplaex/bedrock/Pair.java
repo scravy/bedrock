@@ -101,8 +101,9 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
             return pair.fst();
           case 1:
             return pair.snd();
+          default:
+            return null;
         }
-        return null;
       }
 
       @Override
@@ -121,8 +122,9 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
             return first;
           case 1:
             return second;
+          default:
+            return null;
         }
-        return null;
       }
 
       @Override
