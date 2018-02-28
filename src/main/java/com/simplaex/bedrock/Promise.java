@@ -161,6 +161,13 @@ public class Promise<T> {
     }
   }
 
+  public Throwable getException() {
+    if (state == State.FAILED) {
+      return (Throwable) result;
+    }
+    return null;
+  }
+
   public boolean isSuccess() {
     return state == State.FULFILLED;
   }

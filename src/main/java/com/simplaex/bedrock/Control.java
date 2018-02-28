@@ -5,6 +5,12 @@ import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
 
 /**
@@ -85,4 +91,62 @@ public class Control {
     Thread.sleep(duration.toMillis());
   }
 
+  public static void parallel(final @Nonnull Executor executor, final @Nonnull ThrowingRunnable... runnables)
+    throws ParallelExecutionException {
+    Objects.requireNonNull(executor, "executor must not be null");
+    Objects.requireNonNull(runnables, "nullables must not be null");
+    val semaphore = new Semaphore(0);
+    val exceptions = Collections.synchronizedList(new ArrayList<Exception>());
+    for (val runnable : runnables) {
+      executor.execute(() -> {
+        try {
+          runnable.run();
+        } catch (final Exception exc) {
+          exceptions.add(exc);
+        } finally {
+          semaphore.release(1);
+        }
+      });
+    }
+    semaphore.acquireUninterruptibly(runnables.length);
+    if (!exceptions.isEmpty()) {
+      throw new ParallelExecutionException(Seq.ofCollection(exceptions));
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @SafeVarargs
+  public static <T> Seq<T> parallel(final @Nonnull Executor executor, final @Nonnull Callable<? extends T>... runnables)
+    throws ParallelExecutionException {
+    Objects.requireNonNull(executor, "executor must not be null");
+    Objects.requireNonNull(runnables, "nullables must not be null");
+    val promises = new Promise[runnables.length];
+    int i = 0;
+    for (val runnable : runnables) {
+      val promise = Promise.<T>promise();
+      promises[i++] = promise;
+      executor.execute(() -> {
+        try {
+          val result = runnable.call();
+          promise.fulfill(result);
+        } catch (final Exception exc) {
+          promise.fail(exc);
+        }
+      });
+    }
+    val results = Seq.<T>builder();
+    val exceptions = Seq.<Throwable>builder();
+    for (val promise : promises) {
+      promise.waitFor();
+      if (promise.isSuccess()) {
+        results.add((T) promise.get());
+      } else {
+        exceptions.add(promise.getException());
+      }
+    }
+    if (exceptions.isEmpty()) {
+      return results.build();
+    }
+    throw new ParallelExecutionException(exceptions.result());
+  }
 }

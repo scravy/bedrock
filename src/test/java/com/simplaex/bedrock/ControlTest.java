@@ -5,6 +5,7 @@ import lombok.val;
 import org.junit.runner.RunWith;
 
 import java.time.Duration;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -91,6 +92,73 @@ public class ControlTest {
         expect(counter.get()).toEqual(3);
         expect(thread.getState()).toEqual(Thread.State.TERMINATED);
         expect(finished.get()).toEqual(1);
+      });
+    });
+    describe("parallel(Executor,ThrowingRunnable...)", () -> {
+      it("using an Executor on the same thread", () -> {
+        val counter = new AtomicInteger(0);
+        Control.parallel(
+          Runnable::run,
+          (ThrowingRunnable) counter::incrementAndGet,
+          counter::incrementAndGet,
+          counter::incrementAndGet
+        );
+        expect(counter.get()).toEqual(3);
+      });
+      it("using a SingleThreadExecutor", () -> {
+        val counter = new AtomicInteger(0);
+        Control.parallel(
+          Executors.newSingleThreadExecutor(),
+          (ThrowingRunnable) counter::incrementAndGet,
+          counter::incrementAndGet,
+          counter::incrementAndGet
+        );
+        expect(counter.get()).toEqual(3);
+      });
+      it("using a WorkStealingPool", () -> {
+        val counter = new AtomicInteger(0);
+        Control.parallel(
+          Executors.newWorkStealingPool(),
+          (ThrowingRunnable) counter::incrementAndGet,
+          counter::incrementAndGet,
+          counter::incrementAndGet
+        );
+        expect(counter.get()).toEqual(3);
+      });
+    });
+    describe("parallel(Executor,Callable...)", () -> {
+      it("using an Executor on the same thread", () -> {
+        val counter = new AtomicInteger(0);
+        val result = Control.parallel(
+          Runnable::run,
+          counter::incrementAndGet,
+          counter::incrementAndGet,
+          counter::incrementAndGet
+        );
+        expect(result.stream().mapToInt(Integer::intValue).sum()).toEqual(6);
+        expect(counter.get()).toEqual(3);
+      });
+      it("using a SingleThreadExecutor", () -> {
+        val counter = new AtomicInteger(0);
+        val result = Control.parallel(
+          Executors.newSingleThreadExecutor(),
+          counter::incrementAndGet,
+          counter::incrementAndGet,
+          counter::incrementAndGet
+        );
+        expect(result.stream().mapToInt(Integer::intValue).sum()).toEqual(6);
+        expect(counter.get()).toEqual(3);
+      });
+      it("using a WorkStealingPool", () -> {
+        val counter = new AtomicInteger(0);
+        val result = Control.parallel(
+          Executors.newWorkStealingPool(),
+          counter::incrementAndGet,
+          counter::incrementAndGet,
+          counter::incrementAndGet
+        );
+        expect(result.stream().mapToInt(Integer::intValue).sum()).toEqual(6);
+        expect(counter.get()).toEqual(3);
       });
     });
   }
