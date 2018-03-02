@@ -3,6 +3,7 @@ package com.simplaex.bedrock;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Random;
@@ -241,6 +242,11 @@ class SeqExemplaryChecks {
       });
     });
 
+    describe("findFirst", () -> {
+      it("should find first number divisble by 4", () -> {
+        expect(seq.findFirst(n -> n % 4 == 0)).toEqual(Optional.of(4));
+      });
+    });
   }
 
 }

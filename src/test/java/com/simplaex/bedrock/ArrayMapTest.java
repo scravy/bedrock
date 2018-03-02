@@ -5,9 +5,7 @@ import lombok.val;
 import org.junit.runner.RunWith;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
@@ -137,16 +135,37 @@ public class ArrayMapTest {
       });
     });
     describe("toMap", () -> {
-      val map = ArrayMap.of(
-        pair(1, "one"),
-        pair(2, "two"),
-        pair(3, "three")
-      ).toMap();
-      val hashMap = new HashMap<Integer, String>();
-      hashMap.put(1, "one");
-      hashMap.put(2, "two");
-      hashMap.put(3, "three");
-      expect(map).toEqual(hashMap);
+      it("should create a java map from an array map", () -> {
+        val map = ArrayMap.of(
+          pair(1, "one"),
+          pair(2, "two"),
+          pair(3, "three")
+        ).toMap();
+        val hashMap = new HashMap<Integer, String>();
+        hashMap.put(1, "one");
+        hashMap.put(2, "two");
+        hashMap.put(3, "three");
+        expect(map).toEqual(hashMap);
+      });
+    });
+    describe("ofMap", () -> {
+      val map = new TreeMap<String, Number>();
+      map.put("one", 1);
+      map.put("two", 2);
+      map.put("three", 3);
+      val expected = ArrayMap.of(
+        pair("one", 1),
+        pair("two", 2),
+        pair("three", 3)
+      );
+      it("should create a map from a TreeMap using ofMap(TreeMap)", () -> {
+        val arrayMap = ArrayMap.ofMap(map);
+        expect(arrayMap).toEqual(expected);
+      });
+      it("should create a map from a TreeMap using ofMap(Map)", () -> {
+        val arrayMap = ArrayMap.ofMap((Map<String,Number>) map);
+        expect(arrayMap).toEqual(expected);
+      });
     });
   }
 

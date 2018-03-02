@@ -181,26 +181,6 @@ class SeqPropertyChecks {
       });
     });
 
-    describe("toMap", () -> {
-      it("should create a Map by grouping", () -> {
-        val m = Seq.of("one", "two", "three").toMap(s -> s.charAt(0));
-        expect(m.apply('o')).toEqual(Seq.of("one"));
-        expect(m.apply('t')).toEqual(Seq.of("two", "three"));
-      });
-      it("should create a Map from non-Comparable values by grouping", () -> {
-        val m = Seq.<Number>of(BigDecimal.ONE, 1).toMap(x -> (Class) x.getClass());
-        expect(m.apply(BigDecimal.class)).toEqual(Seq.<Number>of(BigDecimal.ONE));
-        expect(m.apply(Integer.class)).toEqual(Seq.of(1));
-      });
-    });
-
-    describe("toArrayMap", () -> {
-      it("should create an ArrayMap by grouping", () -> {
-        val m = Seq.of("one", "two", "three").toArrayMap(s -> s.charAt(0));
-        expect(m.apply('o')).toEqual(Seq.of("one"));
-        expect(m.apply('t')).toEqual(Seq.of("two", "three"));
-      });
-    });
   }
 
 }
