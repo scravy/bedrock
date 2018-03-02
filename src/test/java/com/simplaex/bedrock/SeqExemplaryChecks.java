@@ -126,6 +126,14 @@ class SeqExemplaryChecks {
       it("should return the same seq when passing the monadic identify function", () -> expect(seq.flatMap(Seq::of)).toEqual(seq));
     });
 
+    describe("flatMapOptional", () -> {
+      it("should return the same seq when passing the monadic identify function", () -> expect(seq.flatMapOptional(Optional::of)).toEqual(seq));
+    });
+
+    describe("flatMapIterable", () -> {
+      it("should return the same seq when passing the monadic identify function", () -> expect(seq.flatMapIterable(Seq::of)).toEqual(seq));
+    });
+
     describe("sorted", () -> {
       it("should sort the seq", () -> expect(seq.sorted()).toEqual(Seq.of(1, 2, 2, 3, 4)));
     });
