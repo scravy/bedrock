@@ -3,6 +3,7 @@ package com.simplaex.bedrock;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.function.Predicate;
@@ -140,9 +141,9 @@ class SeqPropertyChecks {
         //noinspection unchecked
         val r = seq.partitionBy(new F());
         //noinspection unchecked
-        expect(r.first).toEqual(seq.filter(new F()));
+        expect(r.fst()).toEqual(seq.filter(new F()));
         //noinspection unchecked
-        expect(r.second).toEqual(seq.filterNot(new F()));
+        expect(r.snd()).toEqual(seq.filterNot(new F()));
       });
     });
 
@@ -177,6 +178,27 @@ class SeqPropertyChecks {
       it("should recreate the same list when provided with cons", () -> {
         val s = seq.foldr((x, xs) -> Seq.concat(Seq.of(x), xs), Seq.empty());
         expect(s).toEqual(seq);
+      });
+    });
+
+    describe("toMap", () -> {
+      it("should create a Map by grouping", () -> {
+        val m = Seq.of("one", "two", "three").toMap(s -> s.charAt(0));
+        expect(m.apply('o')).toEqual(Seq.of("one"));
+        expect(m.apply('t')).toEqual(Seq.of("two", "three"));
+      });
+      it("should create a Map from non-Comparable values by grouping", () -> {
+        val m = Seq.<Number>of(BigDecimal.ONE, 1).toMap(x -> (Class) x.getClass());
+        expect(m.apply(BigDecimal.class)).toEqual(Seq.<Number>of(BigDecimal.ONE));
+        expect(m.apply(Integer.class)).toEqual(Seq.of(1));
+      });
+    });
+
+    describe("toArrayMap", () -> {
+      it("should create an ArrayMap by grouping", () -> {
+        val m = Seq.of("one", "two", "three").toArrayMap(s -> s.charAt(0));
+        expect(m.apply('o')).toEqual(Seq.of("one"));
+        expect(m.apply('t')).toEqual(Seq.of("two", "three"));
       });
     });
   }

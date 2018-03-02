@@ -168,6 +168,14 @@ public class Promise<T> {
     return null;
   }
 
+  @SuppressWarnings("unchecked")
+  public T getValue() {
+    if (state == State.FULFILLED) {
+      return (T) result;
+    }
+    return null;
+  }
+
   public boolean isSuccess() {
     return state == State.FULFILLED;
   }

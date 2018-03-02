@@ -77,7 +77,7 @@ public abstract class Seq<E>
 
   @Nonnegative
   public int countBy(@Nonnull final Predicate<? super E> predicate) {
-    Objects.requireNonNull(predicate);
+    Objects.requireNonNull(predicate, "'predicate' must not be null");
     final int len = length();
     int c = 0;
     for (int i = 0; i < len; i += 1) {
@@ -100,16 +100,28 @@ public abstract class Seq<E>
     return -1;
   }
 
-  public int findBy(@Nonnull final Predicate<? super E> e) {
-    Objects.requireNonNull(e);
+  public int findBy(@Nonnull final Predicate<? super E> predicate) {
+    Objects.requireNonNull(predicate, "'predicate' must not be null");
     final int len = length();
     for (int i = 0; i < len; i += 1) {
-      final E el = get(i);
-      if (e.test(el)) {
+      final E element = get(i);
+      if (predicate.test(element)) {
         return i;
       }
     }
     return -1;
+  }
+
+  public Optional<E> findFirst(@Nonnull final Predicate<? super E> predicate) {
+    Objects.requireNonNull(predicate, "'predicate' must not be null");
+    final int len = length();
+    for (int i = 0; i < len; i += 1) {
+      final E element = get(i);
+      if (predicate.test(element)) {
+        return Optional.ofNullable(element);
+      }
+    }
+    return Optional.empty();
   }
 
   public boolean contains(@Nullable final E e) {
@@ -163,13 +175,24 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <F> Seq<F> flatMapOptional(@Nonnull final Function<E, Optional<F>> f) {
-    Objects.requireNonNull(f);
+  public <F> Seq<F> flatMapOptional(@Nonnull final Function<E, Optional<F>> function) {
+    Objects.requireNonNull(function, "'function' must not be null");
     @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
     val resultBuilder = Seq.<F>builder();
     for (final E e : this) {
-      final Optional<F> result = f.apply(e);
+      final Optional<F> result = function.apply(e);
       result.ifPresent(resultBuilder::add);
+    }
+    return resultBuilder.build();
+  }
+
+  @Nonnull
+  public <F> Seq<F> flatMapIterable(@Nonnull final Function<E, ? extends Iterable<F>> function) {
+    Objects.requireNonNull(function, "'function' must not be null");
+    @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
+    val resultBuilder = Seq.<F>builder();
+    for (final E e : this) {
+      resultBuilder.addElements(function.apply(e));
     }
     return resultBuilder.build();
   }
@@ -436,6 +459,59 @@ public abstract class Seq<E>
   }
 
   @Nonnull
+  public <K> Mapping<K, Seq<E>> toMap(@Nonnull final Function<E, K> groupingFunction) {
+    Objects.requireNonNull(groupingFunction, "'groupingFunction' must not be null");
+    final Map<K, SeqBuilder<E>> map = new HashMap<>();
+    boolean allComparable = true;
+    for (final E element : this) {
+      final K key = groupingFunction.apply(element);
+      allComparable = allComparable && key instanceof Comparable;
+      if (!map.containsKey(key)) {
+        map.put(key, Seq.builder());
+      }
+      map.get(key).add(element);
+    }
+    if (map.isEmpty()) {
+      return ArrayMap.empty();
+    }
+    if (allComparable) {
+      final Object[] keys = Seq.ofCollection(map.keySet()).sorted().backingArray;
+      final Object[] values = new Object[keys.length];
+      for (int i = 0; i < keys.length; i += 1) {
+        //noinspection SuspiciousMethodCalls
+        values[i] = map.get(keys[i]).result();
+      }
+      return new ArrayMap<>(keys, values);
+    }
+    final Map<K, Seq<E>> finalMap = new HashMap<>();
+    map.forEach((key, builder) -> finalMap.put(key, builder.result()));
+    return Mapping.wrap(finalMap);
+  }
+
+  @Nonnull
+  public <K extends Comparable<K>> ArrayMap<K, Seq<E>> toArrayMap(@Nonnull final Function<E, K> groupingFunction) {
+    Objects.requireNonNull(groupingFunction, "'groupingFunction' must not be null");
+    final TreeMap<K, SeqBuilder<E>> map = new TreeMap<>();
+    for (final E element : this) {
+      final K key = groupingFunction.apply(element);
+      if (!map.containsKey(key)) {
+        map.put(key, Seq.builder());
+      }
+      map.get(key).add(element);
+    }
+    if (map.isEmpty()) {
+      return ArrayMap.empty();
+    }
+    final Object[] keys = Seq.ofCollection(map.keySet()).backingArray;
+    final Object[] values = new Object[keys.length];
+    for (int i = 0; i < keys.length; i += 1) {
+      //noinspection SuspiciousMethodCalls
+      values[i] = map.get(keys[i]).result();
+    }
+    return new ArrayMap<>(keys, values);
+  }
+
+  @Nonnull
   public Stream<E> stream() {
     return toList().stream();
   }
@@ -498,6 +574,17 @@ public abstract class Seq<E>
   }
 
   @Nonnull
+  public static <C, A extends C, B extends C> Seq<C> ofPair(@Nonnull final Pair<A, B> pair) {
+    Objects.requireNonNull(pair, "'pair' must not be null");
+    return Seq.<C>builder().addAll(pair.fst(), pair.snd()).result();
+  }
+
+  @Deprecated
+  public static <C, A extends C, B extends C> Seq<C> fromPair(final Pair<A, B> p) {
+    return ofPair(p);
+  }
+
+  @Nonnull
   public static Seq<Character> ofString(@Nonnull final String string) {
     Objects.requireNonNull(string);
     final Character[] array = new Character[string.length()];
@@ -555,10 +642,6 @@ public abstract class Seq<E>
   @Nonnull
   public static <E> SeqBuilder<E> builder(final int sizeHint) {
     return new SeqBuilder<>(sizeHint);
-  }
-
-  public static <C, A extends C, B extends C> Seq<C> fromPair(final Pair<A, B> p) {
-    return Seq.<C>builder().addAll(p.first, p.second).result();
   }
 
 }

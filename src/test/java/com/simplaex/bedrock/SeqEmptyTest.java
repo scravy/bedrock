@@ -24,6 +24,18 @@ public class SeqEmptyTest {
       });
     });
 
+    describe("toArrayMap", () -> {
+      it("should produce an empty ArrayMap", () -> {
+        expect(Seq.empty().toArrayMap(Object::hashCode)).toEqual(ArrayMap.empty());
+      });
+    });
+
+    describe("toMap", () -> {
+      it("should produce an empty array", () -> {
+        expect(Seq.empty().toMap(Object::hashCode)).toEqual(ArrayMap.empty());
+      });
+    });
+
     describe("sortedBy", () -> {
       it("should return an empty seq", () -> {
         expect(Seq.<Long>empty().sortedBy(Long::compare)).toEqual(Seq.empty());

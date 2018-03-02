@@ -148,7 +148,7 @@ public class SeqTest {
 
       describe("ofPair", () -> {
         it("should consutrct a list", () -> {
-          val seq = Seq.<Number, Long, Double>fromPair(Pair.pair(231L, 3.4));
+          val seq = Seq.<Number, Long, Double>ofPair(Pair.pair(231L, 3.4));
           expect(seq.get(0)).toEqual(231L);
           expect(seq.get(1)).toEqual(3.4);
           expect(seq.length()).toEqual(2);

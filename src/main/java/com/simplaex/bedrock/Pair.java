@@ -17,8 +17,8 @@ import java.util.Map;
 @Value
 public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pair<A, B>> {
 
-  public final A first;
-  public final B second;
+  private final A first;
+  private final B second;
 
   public A fst() {
     return first;
@@ -90,6 +90,14 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
   @Nonnull
   public static <A, B> Pair<A, B> of(final A a, final B b) {
     return new Pair<>(a, b);
+  }
+
+  @Nonnull
+  public static <A, B> Pair<A, B> of(final Map.Entry<A, B> entry) {
+    if (entry instanceof Pair) {
+      return (Pair<A, B>) entry;
+    }
+    return new Pair<>(entry.getKey(), entry.getValue());
   }
 
   public static <C, A extends C, B extends C> List<C> toList(final Pair<A, B> pair) {

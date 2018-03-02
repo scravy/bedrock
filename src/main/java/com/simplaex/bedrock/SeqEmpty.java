@@ -101,7 +101,7 @@ class SeqEmpty extends Seq<Object> {
     return -1;
   }
 
-  public int findBy(@Nonnull final Predicate<? super Object> e) {
+  public int findBy(@Nonnull final Predicate<? super Object> predicate) {
     return -1;
   }
 

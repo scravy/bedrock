@@ -20,30 +20,28 @@ import java.util.function.Function;
  * ArrayMap.
  */
 @EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>> {
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+public final class ArrayMap<K, V> implements Mapping<K, V> {
+
+  private static final ArrayMap EMPTY;
+
+  static {
+    final Object[] empty = new Object[0];
+    EMPTY = new ArrayMap(empty, empty);
+  }
 
   private final Object[] keys;
   private final Object[] values;
 
   @SuppressWarnings("unchecked")
+  @Nonnull
+  @Override
   public Optional<V> get(final K key) {
     final int ix = Arrays.binarySearch(keys, key);
     if (ix >= 0) {
       return Optional.ofNullable((V) values[ix]);
     } else {
       return Optional.empty();
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public V apply(final K key) {
-    final int ix = Arrays.binarySearch(keys, key);
-    if (ix >= 0) {
-      return (V) values[ix];
-    } else {
-      throw new NoSuchElementException();
     }
   }
 
@@ -88,11 +86,13 @@ public final class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>
   }
 
   @Nonnull
+  @Override
   public Seq<K> keys() {
     return new SeqSimple<>(keys);
   }
 
   @Nonnull
+  @Override
   public Seq<V> values() {
     return new SeqSimple<>(values);
   }
@@ -105,11 +105,11 @@ public final class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>
     final Object[] values = new Object[pairs.length];
 
     final Pair<K, V>[] sorted = pairs.clone();
-    Arrays.sort(sorted, Comparator.comparing(p -> p.first));
+    Arrays.sort(sorted, Comparator.comparing(Pair::fst));
 
     for (int i = 0; i < sorted.length; i += 1) {
-      keys[i] = sorted[i].first;
-      values[i] = sorted[i].second;
+      keys[i] = sorted[i].fst();
+      values[i] = sorted[i].snd();
     }
     return new ArrayMap<>(keys, values);
   }
@@ -120,7 +120,7 @@ public final class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>
     final Object[] keys = new Object[pairs.length()];
     final Object[] values = new Object[pairs.length()];
 
-    final Seq<Pair<K, V>> sorted = pairs.sortedBy(Comparator.comparing(p -> p.first));
+    final Seq<Pair<K, V>> sorted = pairs.sortedBy(Comparator.comparing(Pair::fst));
 
     for (int i = 0; i < sorted.length(); i += 1) {
       keys[i] = sorted.get(i).getFirst();
@@ -132,6 +132,10 @@ public final class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>
   @Nonnull
   public static <K extends Comparable<K>, V> ArrayMap<K, V> ofMap(@Nonnull final Map<K, V> pairs) {
 
+    if (pairs instanceof TreeMap) {
+      return ofMap((TreeMap<K, V>) pairs);
+    }
+
     final Object[] keys = Seq.ofCollection(pairs.keySet()).sorted().backingArray;
     final Object[] values = new Object[pairs.size()];
 
@@ -140,5 +144,23 @@ public final class ArrayMap<K, V> implements Function<K, V>, Iterable<Pair<K, V>
       values[i] = pairs.get(keys[i]);
     }
     return new ArrayMap<>(keys, values);
+  }
+
+  @Nonnull
+  public static <K extends Comparable<K>, V> ArrayMap<K, V> ofMap(@Nonnull final TreeMap<K, V> pairs) {
+
+    final Object[] keys = Seq.ofCollection(pairs.keySet()).backingArray;
+    final Object[] values = new Object[pairs.size()];
+
+    for (int i = 0; i < keys.length; i += 1) {
+      //noinspection SuspiciousMethodCalls
+      values[i] = pairs.get(keys[i]);
+    }
+    return new ArrayMap<>(keys, values);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <K, V> ArrayMap<K, V> empty() {
+    return (ArrayMap<K, V>) EMPTY;
   }
 }

@@ -136,6 +136,18 @@ public class ArrayMapTest {
         expect(() -> map.apply(0)).toThrow(NoSuchElementException.class);
       });
     });
+    describe("toMap", () -> {
+      val map = ArrayMap.of(
+        pair(1, "one"),
+        pair(2, "two"),
+        pair(3, "three")
+      ).toMap();
+      val hashMap = new HashMap<Integer, String>();
+      hashMap.put(1, "one");
+      hashMap.put(2, "two");
+      hashMap.put(3, "three");
+      expect(map).toEqual(hashMap);
+    });
   }
 
 }
