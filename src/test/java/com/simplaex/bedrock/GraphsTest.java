@@ -67,7 +67,6 @@ public class GraphsTest {
         val maybeResult = Graphs.topologicalSort(edges);
         expect(maybeResult.isPresent()).toBeTrue();
         @SuppressWarnings("ConstantConditions") val result = maybeResult.get();
-        System.out.println(result);
         edges.forEach(edge -> expect(result.find(edge.getFirst()) < result.find(edge.getSecond())).toBeTrue());
       });
       it("should detect cycle", () -> {

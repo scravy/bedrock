@@ -8,10 +8,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -256,6 +253,36 @@ public abstract class Seq<E>
       }
     });
     return Pair.of(b1.result(), b2.result());
+  }
+
+  @Nonnull
+  public Seq<Seq<E>> group() {
+    return groupBy(Objects::equals);
+  }
+
+  @Nonnull
+  public Seq<Seq<E>> groupBy(final @Nonnull BiPredicate<E, E> operator) {
+    Objects.requireNonNull(operator, "'operator' must not be null");
+    if (isEmpty()) {
+      return Seq.empty();
+    }
+    val b1 = Seq.<Seq<E>>builder();
+    val b2 = Seq.<E>builder();
+    E previous = head();
+    b2.add(previous);
+    for (int i = 1; i < size(); i += 1) {
+      val current = get(i);
+      if (!operator.test(previous, current)) {
+        b1.add(b2.result());
+        b2.clear();
+      }
+      b2.add(current);
+      previous = current;
+    }
+    if (!b2.isEmpty()) {
+      b1.add(b2.result());
+    }
+    return b1.result();
   }
 
   @Nonnull

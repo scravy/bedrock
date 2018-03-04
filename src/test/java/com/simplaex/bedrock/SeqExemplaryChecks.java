@@ -275,7 +275,7 @@ class SeqExemplaryChecks {
         );
       });
       it("should return a pair of this and empty when the predicate does not match", () -> {
-        val result = seq.breakBy(x -> false);
+        val result = seq.breakByView(x -> false);
         expect(result.fst() == seq).toBeTrue();
         expect(result.snd()).toEqual(Seq.empty());
       });
@@ -301,9 +301,20 @@ class SeqExemplaryChecks {
         );
       });
       it("should return a pair of this and empty when the predicate does match all", () -> {
-        val result = seq.spanBy(x -> true);
+        val result = seq.spanByView(x -> true);
         expect(result.fst() == seq).toBeTrue();
         expect(result.snd()).toEqual(Seq.empty());
+      });
+    });
+
+    describe("group", () -> {
+      it("should group by object equality", () -> {
+        expect(seq.group()).toEqual(Seq.of(
+          Seq.of(1),
+          Seq.of(2, 2),
+          Seq.of(4),
+          Seq.of(3)
+        ));
       });
     });
   }

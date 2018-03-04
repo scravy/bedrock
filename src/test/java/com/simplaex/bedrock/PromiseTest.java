@@ -4,6 +4,7 @@ import com.greghaskins.spectrum.Spectrum;
 import lombok.val;
 import org.junit.runner.RunWith;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
@@ -38,6 +39,19 @@ public class PromiseTest {
         });
         s.release();
         expect(p::get).toThrow(IndexOutOfBoundsException.class);
+      });
+      it("isSuccess", () -> {
+        expect(Promise.fulfilled(3).isSuccess()).toBeTrue();
+        expect(Promise.failed(new NoSuchAlgorithmException()).isSuccess()).toBeFalse();
+      });
+      it("isFailure", () -> {
+        expect(Promise.fulfilled(3).isFailure()).toBeFalse();
+        expect(Promise.failed(new NoSuchAlgorithmException()).isFailure()).toBeTrue();
+      });
+      it("isPending", () -> {
+        expect(Promise.promise().isPending()).toBeTrue();
+        expect(Promise.fulfilled(3).isPending()).toBeFalse();
+        expect(Promise.failed(new NoSuchAlgorithmException()).isPending()).toBeFalse();
       });
     });
 

@@ -66,6 +66,11 @@ public final class SeqBuilder<E> implements Iterable<E> {
     return arrayList.size();
   }
 
+  public SeqBuilder clear() {
+    arrayList.clear();
+    return this;
+  }
+
   @Override
   public Iterator<E> iterator() {
     return new Iterator<E>() {
