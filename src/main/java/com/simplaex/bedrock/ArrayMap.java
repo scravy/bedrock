@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -18,7 +19,11 @@ import java.util.function.Function;
  * Some operations are implemented quite space efficiently. For instance
  * both mapValues and mapValuesWithKey share the key array with the source
  * ArrayMap.
+ *
+ * @param <K>
+ * @param <V>
  */
+@Immutable
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class ArrayMap<K, V> implements Mapping<K, V> {

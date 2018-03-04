@@ -3,7 +3,6 @@ package com.simplaex.bedrock;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
-import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Random;
@@ -253,6 +252,58 @@ class SeqExemplaryChecks {
     describe("findFirst", () -> {
       it("should find first number divisble by 4", () -> {
         expect(seq.findFirst(n -> n % 4 == 0)).toEqual(Optional.of(4));
+      });
+    });
+
+    describe("breakBy", () -> {
+      it("should break once the predicate is fulfilled", () -> {
+        expect(seq.breakBy(x -> x == 4)).toEqual(
+          Pair.of(Seq.of(1, 2, 2), Seq.of(4, 3))
+        );
+      });
+      it("should return a pair of this and empty when the predicate does not match", () -> {
+        val result = seq.breakBy(x -> false);
+        expect(result.fst() == seq).toBeTrue();
+        expect(result.snd()).toEqual(Seq.empty());
+      });
+    });
+
+    describe("breakByView", () -> {
+      it("should break once the predicate is fulfilled", () -> {
+        expect(seq.breakByView(x -> x == 4)).toEqual(
+          Pair.of(Seq.of(1, 2, 2), Seq.of(4, 3))
+        );
+      });
+      it("should return a pair of this and empty when the predicate does not match", () -> {
+        val result = seq.breakBy(x -> false);
+        expect(result.fst() == seq).toBeTrue();
+        expect(result.snd()).toEqual(Seq.empty());
+      });
+    });
+
+    describe("spanBy", () -> {
+      it("should span as long as the predicate is fulfilled", () -> {
+        expect(seq.spanBy(x -> x != 4)).toEqual(
+          Pair.of(Seq.of(1, 2, 2), Seq.of(4, 3))
+        );
+      });
+      it("should return a pair of this and empty when the predicate does match all", () -> {
+        val result = seq.spanBy(x -> true);
+        expect(result.fst() == seq).toBeTrue();
+        expect(result.snd()).toEqual(Seq.empty());
+      });
+    });
+
+    describe("spanByView", () -> {
+      it("should span as long as the predicate is fulfilled", () -> {
+        expect(seq.spanByView(x -> x != 4)).toEqual(
+          Pair.of(Seq.of(1, 2, 2), Seq.of(4, 3))
+        );
+      });
+      it("should return a pair of this and empty when the predicate does match all", () -> {
+        val result = seq.spanBy(x -> true);
+        expect(result.fst() == seq).toBeTrue();
+        expect(result.snd()).toEqual(Seq.empty());
       });
     });
   }

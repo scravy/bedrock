@@ -19,53 +19,36 @@ public class MappingTest {
   {
     describe("wrap", () -> {
 
+      val map = new HashMap<String, Number>();
+      map.put("zero", BigDecimal.ZERO);
+      map.put("one", BigDecimal.ONE);
+      val mapping = Mapping.wrap(map);
+
       it("should create a Map for which get() works", () -> {
-        val map = new HashMap<String, Number>();
-        map.put("zero", BigDecimal.ZERO);
-        map.put("one", BigDecimal.ONE);
-        val mapping = Mapping.wrap(map);
         expect(mapping.get("zero")).toEqual(Optional.of(BigDecimal.ZERO));
         expect(mapping.get("one")).toEqual(Optional.of(BigDecimal.ONE));
         expect(mapping.get("two")).toEqual(Optional.empty());
       });
 
       it("should create a Map for which keys() works", () -> {
-        val map = new HashMap<String, Number>();
-        map.put("zero", BigDecimal.ZERO);
-        map.put("one", BigDecimal.ONE);
-        val mapping = Mapping.wrap(map);
         expect(mapping.keys().sorted()).toEqual(Seq.of("one", "zero"));
       });
 
       it("should create a Map for which values() works", () -> {
-        val map = new HashMap<String, Number>();
-        map.put("zero", BigDecimal.ZERO);
-        map.put("one", BigDecimal.ONE);
-        val mapping = Mapping.wrap(map);
         expect(mapping.values().sorted()).toEqual(Seq.of(BigDecimal.ZERO, BigDecimal.ONE));
       });
 
       it("should create a Map for which keys() works when called twice", () -> {
-        val map = new HashMap<String, Number>();
-        map.put("zero", BigDecimal.ZERO);
-        map.put("one", BigDecimal.ONE);
-        val mapping = Mapping.wrap(map);
-        mapping.keys();
+        expect(mapping.keys().sorted()).toEqual(Seq.of("one", "zero"));
         expect(mapping.keys().sorted()).toEqual(Seq.of("one", "zero"));
       });
 
       it("should create a Map for which values() works when called twice", () -> {
-        val map = new HashMap<String, Number>();
-        map.put("zero", BigDecimal.ZERO);
-        map.put("one", BigDecimal.ONE);
-        val mapping = Mapping.wrap(map);
-        mapping.values();
+        expect(mapping.values().sorted()).toEqual(Seq.of(BigDecimal.ZERO, BigDecimal.ONE));
         expect(mapping.values().sorted()).toEqual(Seq.of(BigDecimal.ZERO, BigDecimal.ONE));
       });
 
       it("should create a Map for which toMap return the original Map", () -> {
-        val map = new HashMap<String, Number>();
-        val mapping = Mapping.wrap(map);
         expect(mapping.toMap() == map).toBeTrue();
       });
 

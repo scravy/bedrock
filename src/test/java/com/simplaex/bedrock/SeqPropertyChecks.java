@@ -3,7 +3,6 @@ package com.simplaex.bedrock;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
-import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.function.Predicate;
@@ -181,6 +180,13 @@ class SeqPropertyChecks {
       });
     });
 
+    describe("contains + find", () -> {
+      it("contains(...) == true === find(...) >= 0", () -> {
+        Seq.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).forEach(n -> {
+          expect(seq.contains(n)).toEqual(seq.find(n) >= 0);
+        });
+      });
+    });
   }
 
 }

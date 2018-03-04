@@ -6,6 +6,7 @@ import lombok.Value;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -86,8 +87,11 @@ public abstract class Try<E> implements Iterable<E> {
   @Nonnull
   public abstract Optional<E> toOptional();
 
+  public abstract Try<E> fallback(final E value);
+
   @Value
   @EqualsAndHashCode(callSuper = false)
+  @Immutable
   public static final class Success<E> extends Try<E> {
 
     private final E value;
@@ -218,6 +222,11 @@ public abstract class Try<E> implements Iterable<E> {
     }
 
     @Override
+    public Try<E> fallback(final E value) {
+      return this;
+    }
+
+    @Override
     public Iterator<E> iterator() {
       return new Iterator<E>() {
         private boolean consumed = false;
@@ -241,6 +250,7 @@ public abstract class Try<E> implements Iterable<E> {
 
   @Value
   @EqualsAndHashCode(callSuper = false)
+  @Immutable
   public static final class Failure<E> extends Try<E> {
 
     private final Exception exception;
@@ -340,7 +350,10 @@ public abstract class Try<E> implements Iterable<E> {
 
     @Nonnull
     @Override
-    public <F> Try<F> transform(final @Nonnull ThrowingFunction<Exception, F> f, final @Nonnull ThrowingFunction<E, F> g) {
+    public <F> Try<F> transform(
+      final @Nonnull ThrowingFunction<Exception, F> f,
+      final @Nonnull ThrowingFunction<E, F> g
+    ) {
       Objects.requireNonNull(f, "f must not be null");
       Objects.requireNonNull(g, "g must not be null");
       try {
@@ -352,7 +365,10 @@ public abstract class Try<E> implements Iterable<E> {
 
     @Nonnull
     @Override
-    public <F> Try<F> transformWith(final @Nonnull ThrowingFunction<Exception, Try<F>> f, final @Nonnull ThrowingFunction<E, Try<F>> g) {
+    public <F> Try<F> transformWith(
+      final @Nonnull ThrowingFunction<Exception, Try<F>> f,
+      final @Nonnull ThrowingFunction<E, Try<F>> g
+    ) {
       Objects.requireNonNull(f, "f must not be null");
       Objects.requireNonNull(g, "g must not be null");
       try {
@@ -366,6 +382,11 @@ public abstract class Try<E> implements Iterable<E> {
     @Override
     public Optional<E> toOptional() {
       return Optional.empty();
+    }
+
+    @Override
+    public Try<E> fallback(final E value) {
+      return success(value);
     }
 
     @Override

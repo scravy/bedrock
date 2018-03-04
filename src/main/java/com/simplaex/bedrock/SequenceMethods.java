@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import java.util.Comparator;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 
 interface SequenceMethods<R extends SequenceMethods<R>> {
 

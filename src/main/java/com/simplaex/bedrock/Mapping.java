@@ -12,6 +12,10 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
   @Nonnull
   Optional<To> get(From key);
 
+  default To getOrElse(final From key, final To fallback) {
+    return get(key).orElse(fallback);
+  }
+
   @Override
   default To apply(final From key) {
     val result = get(key);
@@ -30,6 +34,25 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
       builder.add(apply(key));
     }
     return builder.result();
+  }
+
+  @Override
+  @Nonnull
+  default Iterator<Pair<From, To>> iterator() {
+    return new Iterator<Pair<From, To>>() {
+      private final Iterator<From> underlying = keys().iterator();
+
+      @Override
+      public boolean hasNext() {
+        return underlying.hasNext();
+      }
+
+      @Override
+      public Pair<From, To> next() {
+        val nextKey = underlying.next();
+        return Pair.of(nextKey, apply(nextKey));
+      }
+    };
   }
 
   default Map<From, To> toMap() {

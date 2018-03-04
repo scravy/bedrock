@@ -16,6 +16,12 @@ class SeqSimpleSorted<E extends Comparable<E>> extends SeqSimple<E> {
     return Arrays.binarySearch(backingArray, element, nullAcceptingComparator) >= 0;
   }
 
+  @Override
+  public int find(@Nullable final E element) {
+    final int ix = Arrays.binarySearch(backingArray, element, nullAcceptingComparator);
+    return ix >= 0 ? ix : -1;
+  }
+
   @Nonnull
   @Override
   public Seq<E> sorted() {

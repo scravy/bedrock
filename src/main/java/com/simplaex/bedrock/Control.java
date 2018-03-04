@@ -74,7 +74,10 @@ public class Control {
     }
   }
 
-  public static void forever(final @Nonnull Consumer<Exception> exceptionHandler, final @Nonnull ThrowingRunnable runnable) {
+  public static void forever(
+    final @Nonnull Consumer<Exception> exceptionHandler,
+    final @Nonnull ThrowingRunnable runnable
+  ) {
     while (!Thread.currentThread().isInterrupted()) {
       try {
         runnable.run();
