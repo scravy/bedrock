@@ -38,7 +38,7 @@ public abstract class Seq<E>
   @Override
   @Nonnull
   public Seq<E> shuffled(@Nonnull final Random random) {
-    Objects.requireNonNull(random);
+    Objects.requireNonNull(random, "the supplied 'random' generator must not be null");
     final Object[] array = toArray();
     final int len = array.length;
     for (int i = 0; i < len; i += 1) {
@@ -65,6 +65,11 @@ public abstract class Seq<E>
   @Nonnull
   public String asString() {
     return stream().map(Objects::toString).collect(Collectors.joining(""));
+  }
+
+  @Nonnull
+  public String asString(final String delimiter) {
+    return stream().map(Objects::toString).collect(Collectors.joining(delimiter));
   }
 
   @Nonnegative
@@ -148,24 +153,24 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <F> Seq<F> map(@Nonnull final Function<E, F> f) {
-    Objects.requireNonNull(f);
+  public <F> Seq<F> map(@Nonnull final Function<E, F> function) {
+    Objects.requireNonNull(function, "'function' must not be null");
     final Object[] array = new Object[length()];
     int i = 0;
     for (final E e : this) {
-      array[i++] = f.apply(e);
+      array[i++] = function.apply(e);
     }
     return new SeqSimple<>(array);
   }
 
   @Nonnull
-  public <F> Seq<F> flatMap(@Nonnull final Function<E, Seq<F>> f) {
-    Objects.requireNonNull(f);
+  public <F> Seq<F> flatMap(@Nonnull final Function<E, Seq<F>> function) {
+    Objects.requireNonNull(function, "'function' must not be null");
     @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
     int i = 0;
     int c = 0;
     for (final E e : this) {
-      final Seq<F> result = f.apply(e);
+      final Seq<F> result = function.apply(e);
       c += result.length();
       array[i++] = result;
     }
@@ -208,13 +213,16 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <A, C> Seq<C> zipWith(@Nonnull final BiFunction<E, A, C> function, @Nonnull final Seq<A> a) {
+  public <A, C> Seq<C> zipWith(
+    final @Nonnull BiFunction<E, A, C> function,
+    final @Nonnull Seq<A> sequence
+  ) {
     Objects.requireNonNull(function, "'function' must not be null");
-    Objects.requireNonNull(a);
-    final int len = Math.min(length(), a.length());
+    Objects.requireNonNull(sequence);
+    final int len = Math.min(length(), sequence.length());
     final Object[] arr = new Object[len];
     for (int i = 0; i < len; i += 1) {
-      arr[i] = function.apply(get(i), a.get(i));
+      arr[i] = function.apply(get(i), sequence.get(i));
     }
     return new SeqSimple<>(arr);
   }
@@ -261,7 +269,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public Seq<Seq<E>> groupBy(final @Nonnull BiPredicate<E, E> operator) {
+  public Seq<Seq<E>> groupBy(@Nonnull final BiPredicate<E, E> operator) {
     Objects.requireNonNull(operator, "'operator' must not be null");
     if (isEmpty()) {
       return Seq.empty();
@@ -345,7 +353,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public Pair<Seq<E>, Seq<E>> breakBy(final Predicate<E> predicate) {
+  public Pair<Seq<E>, Seq<E>> breakBy(@Nonnull final Predicate<E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     final int ix = findBy(predicate);
     if (ix < 0) {
@@ -358,7 +366,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public Pair<Seq<E>, Seq<E>> breakByView(final Predicate<E> predicate) {
+  public Pair<Seq<E>, Seq<E>> breakByView(@Nonnull final Predicate<E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     final int ix = findBy(predicate);
     if (ix < 0) {
@@ -371,13 +379,13 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public Pair<Seq<E>, Seq<E>> spanBy(final Predicate<E> predicate) {
+  public Pair<Seq<E>, Seq<E>> spanBy(@Nonnull final Predicate<E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     return breakBy(predicate.negate());
   }
 
   @Nonnull
-  public Pair<Seq<E>, Seq<E>> spanByView(final Predicate<E> predicate) {
+  public Pair<Seq<E>, Seq<E>> spanByView(@Nonnull final Predicate<E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     return breakByView(predicate.negate());
   }
@@ -450,8 +458,55 @@ public abstract class Seq<E>
     return Optional.of(last());
   }
 
+  @Nonnull
+  public Seq<E> intercalate(@Nonnull final Seq<E> seq) {
+    if (isEmpty()) {
+      return this;
+    }
+    val targetSize = (seq.size() + 1) * size() - seq.size();
+    val targetArray = new Object[targetSize];
+    targetArray[0] = head();
+    int targetIndex = 1;
+    for (int i = 1; i < size(); i += 1) {
+      for (int j = 0; j < seq.size(); j += 1) {
+        targetArray[targetIndex++] = seq.get(j);
+      }
+      targetArray[targetIndex++] = get(i);
+    }
+    return new SeqSimple<>(targetArray);
+  }
+
+  @Nonnull
+  public Seq<E> intersperse(final E e) {
+    if (isEmpty()) {
+      return this;
+    }
+    val targetSize = size() * 2 - 1;
+    val targetArray = new Object[targetSize];
+    targetArray[0] = head();
+    int targetIndex = 1;
+    for (int i = 1; i < size(); i += 1) {
+      targetArray[targetIndex++] = e;
+      targetArray[targetIndex++] = get(i);
+    }
+    return new SeqSimple<>(targetArray);
+  }
+
+  @Nonnull
+  public Seq<E> distinct() {
+    val elements = new HashSet<E>();
+    val builder = Seq.<E>builder(size());
+    forEach(element -> {
+      if (!elements.contains(element)) {
+        builder.add(element);
+        elements.add(element);
+      }
+    });
+    return builder.result();
+  }
+
   @Override
-  public boolean equals(@Nullable final Object that) {
+  public boolean equals(final @Nullable Object that) {
     if (this == that) {
       return true;
     }
@@ -489,7 +544,7 @@ public abstract class Seq<E>
     array[j] = src;
   }
 
-  static <E> void reverse(@Nonnull final E[] array) {
+  static <E> void reverse(final @Nonnull E[] array) {
     final int len = array.length;
     final int halfLen = len / 2;
     for (int i = 0, j = len - 1; i < halfLen; i += 1, j -= 1) {

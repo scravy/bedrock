@@ -34,11 +34,13 @@ public class Control {
     private final ThrowingConsumer<A> callable;
   }
 
-  public static <A, T> DispatchBranch<A, T> branch(final Class<A> clazz, final ThrowingFunction<A, T> f) {
+  @Nonnull
+  public static <A, T> DispatchBranch<A, T> branch(@Nonnull final Class<A> clazz, @Nonnull final ThrowingFunction<A, T> f) {
     return new DispatchBranch<>(clazz, f);
   }
 
-  public static <A> DispatchVoidBranch<A> voidBranch(final Class<A> clazz, final ThrowingConsumer<A> f) {
+  @Nonnull
+  public static <A> DispatchVoidBranch<A> voidBranch(@Nonnull final Class<A> clazz, @Nonnull final ThrowingConsumer<A> f) {
     return new DispatchVoidBranch<>(clazz, f);
   }
 
@@ -63,7 +65,7 @@ public class Control {
     }
   }
 
-  public static void forever(final @Nonnull ThrowingRunnable runnable) {
+  public static void forever(@Nonnull final ThrowingRunnable runnable) {
     while (!Thread.currentThread().isInterrupted()) {
       try {
         runnable.run();
@@ -75,8 +77,8 @@ public class Control {
   }
 
   public static void forever(
-    final @Nonnull Consumer<Exception> exceptionHandler,
-    final @Nonnull ThrowingRunnable runnable
+    @Nonnull final Consumer<Exception> exceptionHandler,
+    @Nonnull final ThrowingRunnable runnable
   ) {
     while (!Thread.currentThread().isInterrupted()) {
       try {
@@ -94,8 +96,8 @@ public class Control {
     Thread.sleep(duration.toMillis());
   }
 
-  public static void parallel(final @Nonnull Executor executor, final @Nonnull ThrowingRunnable... runnables)
-    throws ParallelExecutionException {
+  public static void parallel(@Nonnull final Executor executor, @Nonnull final ThrowingRunnable... runnables)
+    throws ExecutionException {
     Objects.requireNonNull(executor, "executor must not be null");
     Objects.requireNonNull(runnables, "nullables must not be null");
     val semaphore = new Semaphore(0);
@@ -113,14 +115,14 @@ public class Control {
     }
     semaphore.acquireUninterruptibly(runnables.length);
     if (!exceptions.isEmpty()) {
-      throw new ParallelExecutionException(Seq.ofCollection(exceptions));
+      throw new ExecutionException(Seq.ofCollection(exceptions));
     }
   }
 
   @SuppressWarnings("unchecked")
   @SafeVarargs
   public static <T> Seq<T> parallel(final @Nonnull Executor executor, final @Nonnull Callable<? extends T>... runnables)
-    throws ParallelExecutionException {
+    throws ExecutionException {
     Objects.requireNonNull(executor, "executor must not be null");
     Objects.requireNonNull(runnables, "nullables must not be null");
     val promises = new Promise[runnables.length];
@@ -150,6 +152,6 @@ public class Control {
     if (exceptions.isEmpty()) {
       return results.build();
     }
-    throw new ParallelExecutionException(exceptions.result());
+    throw new ExecutionException(exceptions.result());
   }
 }

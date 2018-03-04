@@ -316,6 +316,30 @@ class SeqExemplaryChecks {
           Seq.of(3)
         ));
       });
+      it("should group by a grouping function", () -> {
+        expect(seq.groupBy((a, b) -> Math.abs(a - b) <= 1)).toEqual(Seq.of(
+          Seq.of(1, 2, 2),
+          Seq.of(4, 3)
+        ));
+      });
+    });
+
+    describe("distinct", () -> {
+      it("should remove duplicates", () -> {
+        expect(seq.distinct()).toEqual(Seq.of(1, 2, 4, 3));
+      });
+    });
+
+    describe("intersperse", () -> {
+      it("should intersperse the given element", () -> {
+        expect(seq.intersperse(7)).toEqual(Seq.of(1, 7, 2, 7, 2, 7, 4, 7, 3));
+      });
+    });
+
+    describe("intercalate", () -> {
+      it("should intersperse the given sequence", () -> {
+        expect(seq.intercalate(Seq.of(0, 0))).toEqual(Seq.of(1, 0, 0, 2, 0, 0, 2, 0, 0, 4, 0, 0, 3));
+      });
     });
   }
 
