@@ -9,11 +9,6 @@ Utilities for modern java development.
     <dependency>
         <groupId>com.simplaex</groupId>
         <artifactId>bedrock</artifactId>
-        <version>2017.03.02</version>
+        <version>2017.03.04</version>
     </dependency>
 
-## Releasing
-
-    mvn clean deploy
-
-[More Info](http://central.sonatype.org/pages/apache-maven.html#performing-a-release-deployment) 
