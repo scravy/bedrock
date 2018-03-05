@@ -20,8 +20,12 @@ import java.util.stream.Stream;
  */
 @Immutable
 @SuppressWarnings({"unused", "WeakerAccess"})
-public abstract class Seq<E>
-  implements Serializable, RandomAccess, Iterable<E>, SequenceMethods<Predicate<? super E>, BiPredicate<? super E, ? super E>, Seq<E>>, IntFunction<E> {
+public abstract class Seq<E> implements
+  Serializable,
+  RandomAccess,
+  Iterable<E>,
+  SequenceMethods<Predicate<? super E>, BiPredicate<? super E, ? super E>, Seq<E>>,
+  IntFunction<E> {
 
   final Object[] backingArray;
 
@@ -52,7 +56,7 @@ public abstract class Seq<E>
   public abstract Seq<E> sortedBy(@Nonnull final Comparator<? super E> comparator);
 
   @Nonnull
-  public <F extends Comparable<F>> Seq<E> sortedOn(@Nonnull final Function<E, F> function) {
+  public <F extends Comparable<? super F>> Seq<E> sortedOn(@Nonnull final Function<? super E, ? extends F> function) {
     Objects.requireNonNull(function, "'function' must not be null");
     return sortedBy(Comparator.comparing(function));
   }

@@ -4,15 +4,12 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-interface SequenceMethods<P, Q, R extends SequenceMethods<P, Q, R>> {
+interface SequenceMethods<Predicate, BiPredicate, Sequence extends SequenceMethods<Predicate, BiPredicate, Sequence>> {
 
   @SuppressWarnings("unchecked")
   Comparator<Object> nullAcceptingComparator = (left, right) -> {
@@ -32,22 +29,22 @@ interface SequenceMethods<P, Q, R extends SequenceMethods<P, Q, R>> {
   int length();
 
   @Nonnull
-  R shuffled(@Nonnull final Random random);
+  Sequence shuffled(@Nonnull final Random random);
 
   @Nonnull
-  R reversed();
+  Sequence reversed();
 
   @Nonnull
-  R sorted();
+  Sequence sorted();
 
   @Nonnull
-  R trimmedToSize();
+  Sequence trimmedToSize();
 
   @Nonnull
-  R subSequence(@Nonnegative final int beginOffset, @Nonnegative final int endOffset);
+  Sequence subSequence(@Nonnegative final int beginOffset, @Nonnegative final int endOffset);
 
   @Nonnull
-  R subSequenceView(@Nonnegative final int beginOffset, @Nonnegative final int endOffset);
+  Sequence subSequenceView(@Nonnegative final int beginOffset, @Nonnegative final int endOffset);
 
   /**
    * Exactly the same as length().
@@ -70,152 +67,152 @@ interface SequenceMethods<P, Q, R extends SequenceMethods<P, Q, R>> {
   String asString(String delimiter);
 
 
-  default boolean startsWith(@Nonnull final R sequence) {
+  default boolean startsWith(@Nonnull final Sequence sequence) {
     return takeView(sequence.length()).equals(sequence);
   }
 
-  default boolean endsWith(@Nonnull final R sequence) {
+  default boolean endsWith(@Nonnull final Sequence sequence) {
     return takeRightView(sequence.length()).equals(sequence);
   }
 
-  boolean exists(@Nonnull P predicate);
+  boolean exists(@Nonnull Predicate predicate);
 
-  boolean forAll(@Nonnull P predicate);
+  boolean forAll(@Nonnull Predicate predicate);
 
   @Nonnull
-  default R shuffled() {
+  default Sequence shuffled() {
     return shuffled(ThreadLocalRandom.current());
   }
 
   @Nonnull
-  default R init() {
+  default Sequence init() {
     return subSequence(0, length() - 1);
   }
 
   @Nonnull
-  default R initView() {
+  default Sequence initView() {
     return subSequenceView(0, length() - 1);
   }
 
   @Nonnull
-  Seq<R> inits();
+  Seq<Sequence> inits();
 
   @Nonnull
-  Seq<R> initsView();
+  Seq<Sequence> initsView();
 
   @Nonnull
-  default R tail() {
+  default Sequence tail() {
     return subSequence(1, length());
   }
 
   @Nonnull
-  default R tailView() {
+  default Sequence tailView() {
     return subSequenceView(1, length());
   }
 
   @Nonnull
-  Seq<R> tails();
+  Seq<Sequence> tails();
 
   @Nonnull
-  Seq<R> tailsView();
+  Seq<Sequence> tailsView();
 
   @Nonnull
-  default R take(@Nonnegative final int length) {
+  default Sequence take(@Nonnegative final int length) {
     return subSequence(0, length);
   }
 
   @Nonnull
-  default R takeView(@Nonnegative final int length) {
+  default Sequence takeView(@Nonnegative final int length) {
     return subSequenceView(0, length);
   }
 
   @Nonnull
-  default R takeRight(@Nonnegative final int length) {
+  default Sequence takeRight(@Nonnegative final int length) {
     return subSequence(length() - length, length());
   }
 
   @Nonnull
-  default R takeRightView(@Nonnegative final int length) {
+  default Sequence takeRightView(@Nonnegative final int length) {
     return subSequenceView(length() - length, length());
   }
 
   @Nonnull
-  default R drop(@Nonnegative final int length) {
+  default Sequence drop(@Nonnegative final int length) {
     return subSequence(length, length());
   }
 
   @Nonnull
-  default R dropView(@Nonnegative final int length) {
+  default Sequence dropView(@Nonnegative final int length) {
     return subSequenceView(length, length());
   }
 
   @Nonnull
-  default R dropRight(@Nonnegative final int length) {
+  default Sequence dropRight(@Nonnegative final int length) {
     return subSequence(0, length() - length);
   }
 
   @Nonnull
-  default R dropRightView(@Nonnegative final int length) {
+  default Sequence dropRightView(@Nonnegative final int length) {
     return subSequenceView(0, length() - length);
   }
 
   @Nonnull
-  Iterator<R> permutationsIterator();
+  Iterator<Sequence> permutationsIterator();
 
   @Nonnull
-  default Iterable<R> permutationsIterable() {
+  default Iterable<Sequence> permutationsIterable() {
     return this::permutationsIterator;
   }
 
   @Nonnull
-  default Stream<R> permutationsStream() {
+  default Stream<Sequence> permutationsStream() {
     return StreamSupport.stream(permutationsIterable().spliterator(), false);
   }
 
   @Nonnull
-  Seq<R> permutations();
+  Sequence distinct();
 
   @Nonnull
-  R takeWhile(@Nonnull P predicate);
+  Sequence takeWhile(@Nonnull Predicate predicate);
 
   @Nonnull
-  R takeWhileView(@Nonnull P predicate);
+  Sequence takeWhileView(@Nonnull Predicate predicate);
 
   @Nonnull
-  R dropWhile(@Nonnull P predicate);
+  Sequence dropWhile(@Nonnull Predicate predicate);
 
   @Nonnull
-  R dropWhileView(@Nonnull P predicate);
+  Sequence dropWhileView(@Nonnull Predicate predicate);
 
   @Nonnull
-  Pair<R, R> breakBy(@Nonnull P predicate);
+  Sequence filter(@Nonnull Predicate predicate);
 
   @Nonnull
-  Pair<R, R> breakByView(@Nonnull P predicate);
+  Sequence filterNot(@Nonnull Predicate predicate);
 
   @Nonnull
-  Pair<R, R> spanBy(@Nonnull P predicate);
+  Pair<Sequence, Sequence> breakBy(@Nonnull Predicate predicate);
 
   @Nonnull
-  Pair<R, R> spanByView(@Nonnull P predicate);
+  Pair<Sequence, Sequence> breakByView(@Nonnull Predicate predicate);
 
   @Nonnull
-  R filter(@Nonnull P predicate);
+  Pair<Sequence, Sequence> spanBy(@Nonnull Predicate predicate);
 
   @Nonnull
-  R filterNot(@Nonnull P predicate);
+  Pair<Sequence, Sequence> spanByView(@Nonnull Predicate predicate);
 
   @Nonnull
-  Seq<R> group();
+  Pair<Sequence, Sequence> partitionBy(@Nonnull Predicate predicate);
 
   @Nonnull
-  Seq<R> groupBy(@Nonnull Q operator);
+  Seq<Sequence> group();
 
   @Nonnull
-  R distinct();
+  Seq<Sequence> groupBy(@Nonnull BiPredicate operator);
 
   @Nonnull
-  Pair<R, R> partitionBy(@Nonnull P predicate);
+  Seq<Sequence> permutations();
 
 
 }

@@ -12,7 +12,11 @@ class SeqSimpleView<E> extends Seq<E> {
   private final int beginOffset;
   private final int endOffset;
 
-  SeqSimpleView(@Nonnull final Object[] array, @Nonnegative final int beginOffset, @Nonnegative final int endOffset) {
+  SeqSimpleView(
+    @Nonnull final Object[] array,
+    @Nonnegative final int beginOffset,
+    @Nonnegative final int endOffset
+  ) {
     super(array);
     this.beginOffset = beginOffset;
     this.endOffset = endOffset;
