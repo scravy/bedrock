@@ -12,7 +12,6 @@ import java.util.function.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * An immutable sequence.
@@ -22,7 +21,7 @@ import java.util.stream.StreamSupport;
 @Immutable
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class Seq<E>
-  implements Serializable, RandomAccess, Iterable<E>, SequenceMethods<Seq<E>>, IntFunction<E> {
+  implements Serializable, RandomAccess, Iterable<E>, SequenceMethods<Predicate<? super E>, BiPredicate<? super E, ? super E>, Seq<E>>, IntFunction<E> {
 
   final Object[] backingArray;
 
@@ -64,11 +63,7 @@ public abstract class Seq<E>
   @Nonnull
   public abstract Object[] toArray();
 
-  @Nonnull
-  public String asString() {
-    return stream().map(Objects::toString).collect(Collectors.joining(""));
-  }
-
+  @Override
   @Nonnull
   public String asString(final String delimiter) {
     return stream().map(Objects::toString).collect(Collectors.joining(delimiter));
@@ -140,11 +135,13 @@ public abstract class Seq<E>
     return find(e) > -1;
   }
 
-  public boolean exists(@Nonnull final Predicate<E> predicate) {
+  @Override
+  public boolean exists(@Nonnull final Predicate<? super E> predicate) {
     return findBy(predicate) > -1;
   }
 
-  public boolean forAll(@Nonnull final Predicate<E> predicate) {
+  @Override
+  public boolean forAll(@Nonnull final Predicate<? super E> predicate) {
     return countBy(predicate) == length();
   }
 
@@ -155,7 +152,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <F> Seq<F> map(@Nonnull final Function<E, F> function) {
+  public <F> Seq<F> map(@Nonnull final Function<? super E, ? extends F> function) {
     Objects.requireNonNull(function, "'function' must not be null");
     final Object[] array = new Object[length()];
     int i = 0;
@@ -166,7 +163,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <F> Seq<F> flatMap(@Nonnull final Function<E, Seq<F>> function) {
+  public <F> Seq<F> flatMap(@Nonnull final Function<? super E, Seq<F>> function) {
     Objects.requireNonNull(function, "'function' must not be null");
     @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
     int i = 0;
@@ -187,7 +184,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <F> Seq<F> flatMapOptional(@Nonnull final Function<E, Optional<F>> function) {
+  public <F> Seq<F> flatMapOptional(@Nonnull final Function<? super E, Optional<F>> function) {
     Objects.requireNonNull(function, "'function' must not be null");
     @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
     val resultBuilder = Seq.<F>builder();
@@ -199,7 +196,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <F> Seq<F> flatMapIterable(@Nonnull final Function<E, ? extends Iterable<F>> function) {
+  public <F> Seq<F> flatMapIterable(@Nonnull final Function<? super E, ? extends Iterable<F>> function) {
     Objects.requireNonNull(function, "'function' must not be null");
     @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
     val resultBuilder = Seq.<F>builder();
@@ -216,7 +213,7 @@ public abstract class Seq<E>
 
   @Nonnull
   public <A, C> Seq<C> zipWith(
-    final @Nonnull BiFunction<E, A, C> function,
+    final @Nonnull BiFunction<? super E, ? super A, ? extends C> function,
     final @Nonnull Seq<A> sequence
   ) {
     Objects.requireNonNull(function, "'function' must not be null");
@@ -230,7 +227,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <A> A foldl(@Nonnull final BiFunction<A, E, A> function, final A startValue) {
+  public <A> A foldl(@Nonnull final BiFunction<? super A, ? super E, A> function, final A startValue) {
     Objects.requireNonNull(function, "'function' must not be null");
     A acc = startValue;
     for (int i = 0; i < length(); i += 1) {
@@ -240,7 +237,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <A> A foldr(@Nonnull final BiFunction<E, A, A> function, final A startValue) {
+  public <A> A foldr(@Nonnull final BiFunction<? super E, ? super A, ? extends A> function, final A startValue) {
     Objects.requireNonNull(function, "'function' must not be null");
     A acc = startValue;
     for (int i = length() - 1; i >= 0; i -= 1) {
@@ -249,8 +246,9 @@ public abstract class Seq<E>
     return acc;
   }
 
+  @Override
   @Nonnull
-  public Pair<Seq<E>, Seq<E>> partitionBy(@Nonnull final Predicate<E> predicate) {
+  public Pair<Seq<E>, Seq<E>> partitionBy(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     final int sizeHint = length() / 2 + 1;
     val b1 = Seq.<E>builder(sizeHint);
@@ -265,13 +263,15 @@ public abstract class Seq<E>
     return Pair.of(b1.result(), b2.result());
   }
 
+  @Override
   @Nonnull
   public Seq<Seq<E>> group() {
     return groupBy(Objects::equals);
   }
 
+  @Override
   @Nonnull
-  public Seq<Seq<E>> groupBy(@Nonnull final BiPredicate<E, E> operator) {
+  public Seq<Seq<E>> groupBy(@Nonnull final BiPredicate<? super E, ? super E> operator) {
     Objects.requireNonNull(operator, "'operator' must not be null");
     if (isEmpty()) {
       return Seq.empty();
@@ -295,8 +295,9 @@ public abstract class Seq<E>
     return b1.result();
   }
 
+  @Override
   @Nonnull
-  public Seq<E> filter(@Nonnull final Predicate<E> predicate) {
+  public Seq<E> filter(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     final int sizeHint = length() / 2;
     val b = Seq.<E>builder(sizeHint);
@@ -308,14 +309,16 @@ public abstract class Seq<E>
     return b.result();
   }
 
+  @Override
   @Nonnull
-  public Seq<E> filterNot(@Nonnull final Predicate<E> predicate) {
+  public Seq<E> filterNot(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     return filter(predicate.negate());
   }
 
+  @Override
   @Nonnull
-  public Seq<E> takeWhile(@Nonnull final Predicate<E> predicate) {
+  public Seq<E> takeWhile(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     int i = 0;
     while (i < length() && predicate.test(get(i))) {
@@ -324,8 +327,9 @@ public abstract class Seq<E>
     return take(i);
   }
 
+  @Override
   @Nonnull
-  public Seq<E> takeWhileView(@Nonnull final Predicate<E> predicate) {
+  public Seq<E> takeWhileView(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     int i = 0;
     while (i < length() && predicate.test(get(i))) {
@@ -334,8 +338,9 @@ public abstract class Seq<E>
     return takeView(i);
   }
 
+  @Override
   @Nonnull
-  public Seq<E> dropWhile(@Nonnull final Predicate<E> predicate) {
+  public Seq<E> dropWhile(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     int i = 0;
     while (i < length() && predicate.test(get(i))) {
@@ -344,8 +349,9 @@ public abstract class Seq<E>
     return drop(i);
   }
 
+  @Override
   @Nonnull
-  public Seq<E> dropWhileView(@Nonnull final Predicate<E> predicate) {
+  public Seq<E> dropWhileView(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     int i = 0;
     while (i < length() && predicate.test(get(i))) {
@@ -354,8 +360,9 @@ public abstract class Seq<E>
     return dropView(i);
   }
 
+  @Override
   @Nonnull
-  public Pair<Seq<E>, Seq<E>> breakBy(@Nonnull final Predicate<E> predicate) {
+  public Pair<Seq<E>, Seq<E>> breakBy(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     final int ix = findBy(predicate);
     if (ix < 0) {
@@ -367,8 +374,9 @@ public abstract class Seq<E>
     }
   }
 
+  @Override
   @Nonnull
-  public Pair<Seq<E>, Seq<E>> breakByView(@Nonnull final Predicate<E> predicate) {
+  public Pair<Seq<E>, Seq<E>> breakByView(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     final int ix = findBy(predicate);
     if (ix < 0) {
@@ -380,14 +388,16 @@ public abstract class Seq<E>
     }
   }
 
+  @Override
   @Nonnull
-  public Pair<Seq<E>, Seq<E>> spanBy(@Nonnull final Predicate<E> predicate) {
+  public Pair<Seq<E>, Seq<E>> spanBy(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     return breakBy(predicate.negate());
   }
 
+  @Override
   @Nonnull
-  public Pair<Seq<E>, Seq<E>> spanByView(@Nonnull final Predicate<E> predicate) {
+  public Pair<Seq<E>, Seq<E>> spanByView(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     return breakByView(predicate.negate());
   }
@@ -495,6 +505,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
+  @Override
   public Seq<E> distinct() {
     val elements = new HashSet<E>();
     val builder = Seq.<E>builder(size());
@@ -555,21 +566,13 @@ public abstract class Seq<E>
   }
 
   @Nonnull
+  @Override
   public Iterator<Seq<E>> permutationsIterator() {
     return new PermutationIterator<>(this);
   }
 
   @Nonnull
-  public Iterable<Seq<E>> permutationsIterable() {
-    return this::permutationsIterator;
-  }
-
-  @Nonnull
-  public Stream<Seq<E>> permutationsStream() {
-    return StreamSupport.stream(permutationsIterable().spliterator(), false);
-  }
-
-  @Nonnull
+  @Override
   public Seq<Seq<E>> permutations() {
     return permutationsStream().collect(collector());
   }
@@ -644,7 +647,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <K> Mapping<K, Seq<E>> toMap(@Nonnull final Function<E, K> groupingFunction) {
+  public <K> Mapping<K, Seq<E>> toMap(@Nonnull final Function<? super E, ? extends K> groupingFunction) {
     Objects.requireNonNull(groupingFunction, "'groupingFunction' must not be null");
     final Map<K, SeqBuilder<E>> map = new HashMap<>();
     boolean allComparable = true;
@@ -674,7 +677,7 @@ public abstract class Seq<E>
   }
 
   @Nonnull
-  public <K extends Comparable<K>> ArrayMap<K, Seq<E>> toArrayMap(@Nonnull final Function<E, K> groupingFunction) {
+  public <K extends Comparable<K>> ArrayMap<K, Seq<E>> toArrayMap(@Nonnull final Function<? super E, ? extends K> groupingFunction) {
     Objects.requireNonNull(groupingFunction, "'groupingFunction' must not be null");
     final TreeMap<K, SeqBuilder<E>> map = new TreeMap<>();
     for (final E element : this) {

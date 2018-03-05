@@ -57,7 +57,7 @@ class SeqEmpty extends Seq<Object> {
   @SuppressWarnings("unchecked")
   @Nonnull
   @Override
-  public <T> Seq<T> map(@Nonnull final Function<Object, T> function) {
+  public <T> Seq<T> map(@Nonnull final Function<? super Object, ? extends T> function) {
     Objects.requireNonNull(function);
     return (Seq<T>) this;
   }
