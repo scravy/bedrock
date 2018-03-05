@@ -349,8 +349,8 @@ class SeqExemplaryChecks {
         expect(all.size()).toEqual(5 * 4 * 3 * 2);
       });
       it("should differ in one swap only", () -> {
-        final Seq<Character> sequence = Seq.ofString("abcde");
-        final Seq<Seq<Character>> all = sequence.permutations();
+        final Seq<Integer> sequence = seq.distinct();
+        final Seq<Seq<Integer>> all = sequence.permutations();
         final Seq<Integer> diffs = all.zipWith((a, b) -> a.zipWith(Objects::equals, b).count(false), all.tail());
         expect(diffs.forAll(n -> n == 2)).toBeTrue();
       });
