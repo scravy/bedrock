@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.*;
@@ -339,6 +340,19 @@ class SeqExemplaryChecks {
     describe("intercalate", () -> {
       it("should intersperse the given sequence", () -> {
         expect(seq.intercalate(Seq.of(0, 0))).toEqual(Seq.of(1, 0, 0, 2, 0, 0, 2, 0, 0, 4, 0, 0, 3));
+      });
+    });
+
+    describe("permutations", () -> {
+      it("should generate a bunch", () -> {
+        final Seq<Seq<Integer>> all = seq.permutations();
+        expect(all.size()).toEqual(5 * 4 * 3 * 2);
+      });
+      it("should differ in one swap only", () -> {
+        final Seq<Character> sequence = Seq.ofString("abcde");
+        final Seq<Seq<Character>> all = sequence.permutations();
+        final Seq<Integer> diffs = all.zipWith((a, b) -> a.zipWith(Objects::equals, b).count(false), all.tail());
+        expect(diffs.forAll(n -> n == 2)).toBeTrue();
       });
     });
   }

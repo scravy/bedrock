@@ -9,8 +9,10 @@ import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * An immutable sequence.
@@ -51,7 +53,7 @@ public abstract class Seq<E>
   public abstract Seq<E> sortedBy(@Nonnull final Comparator<? super E> comparator);
 
   @Nonnull
-  public <F extends Comparable<F>> Seq<E> sortedOn(@Nonnull Function<E, F> function) {
+  public <F extends Comparable<F>> Seq<E> sortedOn(@Nonnull final Function<E, F> function) {
     Objects.requireNonNull(function, "'function' must not be null");
     return sortedBy(Comparator.comparing(function));
   }
@@ -553,6 +555,26 @@ public abstract class Seq<E>
   }
 
   @Nonnull
+  public Iterator<Seq<E>> permutationsIterator() {
+    return new PermutationIterator<>(this);
+  }
+
+  @Nonnull
+  public Iterable<Seq<E>> permutationsIterable() {
+    return this::permutationsIterator;
+  }
+
+  @Nonnull
+  public Stream<Seq<E>> permutationsStream() {
+    return StreamSupport.stream(permutationsIterable().spliterator(), false);
+  }
+
+  @Nonnull
+  public Seq<Seq<E>> permutations() {
+    return permutationsStream().collect(collector());
+  }
+
+  @Nonnull
   @Override
   public Iterator<E> iterator() {
     return new Iterator<E>() {
@@ -587,6 +609,36 @@ public abstract class Seq<E>
       @Override
       public int size() {
         return length();
+      }
+    };
+  }
+
+  public static <T> Collector<T, SeqBuilder<T>, Seq<T>> collector() {
+    return new Collector<T, SeqBuilder<T>, Seq<T>>() {
+
+      @Override
+      public Supplier<SeqBuilder<T>> supplier() {
+        return Seq::builder;
+      }
+
+      @Override
+      public BiConsumer<SeqBuilder<T>, T> accumulator() {
+        return SeqBuilder::add;
+      }
+
+      @Override
+      public BinaryOperator<SeqBuilder<T>> combiner() {
+        return SeqBuilder::addElements;
+      }
+
+      @Override
+      public Function<SeqBuilder<T>, Seq<T>> finisher() {
+        return SeqBuilder::result;
+      }
+
+      @Override
+      public Set<Characteristics> characteristics() {
+        return Collections.emptySet();
       }
     };
   }

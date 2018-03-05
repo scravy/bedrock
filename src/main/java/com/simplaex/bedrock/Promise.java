@@ -3,6 +3,7 @@ package com.simplaex.bedrock;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.function.Predicate;
@@ -15,11 +16,12 @@ public class Promise<T> {
     FAILED
   }
 
+  @Nonnull
   @Getter
   private volatile State state;
   private volatile Object result;
 
-  private Promise(final State state, final Object result) {
+  private Promise(@Nonnull final State state, final Object result) {
     this.state = state;
     this.result = result;
   }
@@ -189,7 +191,8 @@ public class Promise<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public <U> Promise<U> map(final ThrowingFunction<T, U> func) {
+  @Nonnull
+  public <U> Promise<U> map(final @Nonnull ThrowingFunction<T, U> func) {
     synchronized (children) {
       if (state == State.PENDING) {
         final MappedPromise mappedPromise = new MappedPromise(func);
@@ -207,7 +210,8 @@ public class Promise<T> {
     return failed((Throwable) result);
   }
 
-  public Promise<T> filter(final Predicate<T> predicate) {
+  @Nonnull
+  public Promise<T> filter(final @Nonnull Predicate<T> predicate) {
     return map(value -> {
       if (predicate.test(value)) {
         return value;
