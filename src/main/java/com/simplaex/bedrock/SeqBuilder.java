@@ -1,5 +1,6 @@
 package com.simplaex.bedrock;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -62,10 +63,12 @@ public final class SeqBuilder<E> implements Iterable<E> {
     return arrayList.isEmpty();
   }
 
+  @Nonnegative
   public int size() {
     return arrayList.size();
   }
 
+  @Nonnull
   public SeqBuilder clear() {
     arrayList.clear();
     return this;

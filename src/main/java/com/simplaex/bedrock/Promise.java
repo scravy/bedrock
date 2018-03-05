@@ -26,14 +26,17 @@ public class Promise<T> {
     this.result = result;
   }
 
+  @Nonnull
   public static <T> Promise<T> promise() {
     return new Promise<>(State.PENDING, null);
   }
 
+  @Nonnull
   public static <T> Promise<T> fulfilled(final T value) {
     return new FulfilledPromise<>(value);
   }
 
+  @Nonnull
   public static <T> Promise<T> failed(final Throwable value) {
     return new FailedPromise<>(value);
   }
