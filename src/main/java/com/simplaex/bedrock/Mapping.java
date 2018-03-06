@@ -6,6 +6,8 @@ import javax.annotation.Nonnull;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<From, To>> {
 
@@ -27,6 +29,14 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
   }
 
   Seq<From> keys();
+
+  default int size() {
+    return keys().length();
+  }
+
+  default boolean isEmpty() {
+    return keys().isEmpty();
+  }
 
   default Seq<To> values() {
     val builder = Seq.<To>builder();
@@ -53,6 +63,10 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
         return Pair.of(nextKey, apply(nextKey));
       }
     };
+  }
+
+  default Stream<Pair<From, To>> stream() {
+    return StreamSupport.stream(spliterator(), false);
   }
 
   default Map<From, To> toMap() {
@@ -139,6 +153,27 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
         return values;
       }
     };
+  }
+
+  @SuppressWarnings("unchecked")
+  static <K, V> Mapping<K, V> empty() {
+    return (Mapping<K, V>) EmptyMapping.EMPTY;
+  }
+
+  class EmptyMapping<K, V> implements Mapping<K, V> {
+
+    private static EmptyMapping EMPTY = new EmptyMapping();
+
+    @Nonnull
+    @Override
+    public Optional<V> get(final K key) {
+      return Optional.empty();
+    }
+
+    @Override
+    public Seq<K> keys() {
+      return Seq.empty();
+    }
   }
 
 }

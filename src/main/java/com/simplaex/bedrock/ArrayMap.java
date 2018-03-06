@@ -7,8 +7,9 @@ import lombok.RequiredArgsConstructor;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.function.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * A very simple immutable map that is backed by two arrays
@@ -26,7 +27,7 @@ import java.util.function.Function;
 @Immutable
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class ArrayMap<K, V> implements Mapping<K, V> {
+public final class ArrayMap<K extends Comparable<K>, V> implements Mapping<K, V> {
 
   private static final ArrayMap EMPTY;
 
@@ -71,6 +72,18 @@ public final class ArrayMap<K, V> implements Mapping<K, V> {
   }
 
   @Nonnull
+  public ArrayMap<K, V> filter(final Predicate<K> predicate) {
+    Objects.requireNonNull(predicate, "'predicate' must not be null");
+    return stream().filter(entry -> predicate.test(entry.getKey())).collect(collector());
+  }
+
+  @Nonnull
+  public ArrayMap<K, V> filterWithValue(final BiPredicate<K, V> predicate) {
+    Objects.requireNonNull(predicate, "'predicate' must not be null");
+    return stream().filter(entry -> predicate.test(entry.getKey(), entry.getValue())).collect(collector());
+  }
+
+  @Nonnull
   @Override
   @SuppressWarnings("unchecked")
   public Iterator<Pair<K, V>> iterator() {
@@ -100,6 +113,96 @@ public final class ArrayMap<K, V> implements Mapping<K, V> {
   @Override
   public Seq<V> values() {
     return new SeqSimple<>(values);
+  }
+
+  @Nonnull
+  public ArrayMap<K, V> union(@Nonnull final ArrayMap<K, V> arrayMap) {
+    final int targetSize = size() + arrayMap.size();
+    final Object[] keys = new Object[targetSize];
+    final Object[] values = new Object[targetSize];
+    final Seq<K> is = keys();
+    final Seq<K> js = arrayMap.keys();
+    int ix = 0;
+    int jx = 0;
+    int kx = 0;
+    while (ix < is.size() && jx < js.size()) {
+      final K i = is.apply(ix);
+      final K j = js.apply(jx);
+      final int c = i.compareTo(j);
+      if (c < 0) {
+        keys[kx] = i;
+        values[kx] = apply(i);
+        ix += 1;
+      } else if (c == 0) {
+        keys[kx] = i;
+        values[kx] = apply(i);
+        ix += 1;
+        jx += 1;
+      } else {
+        keys[kx] = j;
+        values[kx] = arrayMap.apply(j);
+        jx += 1;
+      }
+      kx += 1;
+    }
+    while (ix < is.size()) {
+      final K i = is.get(ix);
+      keys[kx] = i;
+      values[kx] = apply(i);
+      ix += 1;
+      kx += 1;
+    }
+    while (jx < js.size()) {
+      final K j = js.get(jx);
+      keys[kx] = j;
+      values[kx] = arrayMap.apply(j);
+      jx += 1;
+      kx += 1;
+    }
+    final Object[] finalKeys = new Object[kx];
+    final Object[] finalValues = new Object[kx];
+    System.arraycopy(keys, 0, finalKeys, 0, kx);
+    System.arraycopy(values, 0, finalValues, 0, kx);
+    return new ArrayMap<>(finalKeys, finalValues);
+  }
+
+  @Nonnull
+  public ArrayMap<K, V> intersect(@Nonnull final ArrayMap<K, V> arrayMap) {
+    final int targetSize = Math.max(size(), arrayMap.size());
+    final Object[] keys = new Object[targetSize];
+    final Object[] values = new Object[targetSize];
+    final Seq<K> is = keys();
+    final Seq<K> js = arrayMap.keys();
+    int ix = 0;
+    int jx = 0;
+    int kx = 0;
+    while (ix < is.size() && jx < js.size()) {
+      final K i = is.apply(ix);
+      final K j = js.apply(jx);
+      final int c = i.compareTo(j);
+      if (c < 0) {
+        ix += 1;
+      } else if (c == 0) {
+        keys[kx] = i;
+        values[kx] = apply(i);
+        ix += 1;
+        jx += 1;
+        kx += 1;
+      } else {
+        jx += 1;
+      }
+    }
+    final Object[] finalKeys = new Object[kx];
+    final Object[] finalValues = new Object[kx];
+    System.arraycopy(keys, 0, finalKeys, 0, kx);
+    System.arraycopy(values, 0, finalValues, 0, kx);
+    return new ArrayMap<>(finalKeys, finalValues);
+  }
+
+  public String toString() {
+    return stream()
+      .map(entry -> String.format("%s = %s", entry.fst(), entry.snd()))
+      .collect(Collectors.joining(", ", "{ ", " }"));
   }
 
   @Nonnull
@@ -165,7 +268,39 @@ public final class ArrayMap<K, V> implements Mapping<K, V> {
   }
 
   @SuppressWarnings("unchecked")
-  public static <K, V> ArrayMap<K, V> empty() {
+  public static <K extends Comparable<K>, V> ArrayMap<K, V> empty() {
     return (ArrayMap<K, V>) EMPTY;
+  }
+
+  public static <K extends Comparable<K>, V> Collector<Pair<K, V>, TreeMap<K, V>, ArrayMap<K, V>> collector() {
+    return new Collector<Pair<K, V>, TreeMap<K, V>, ArrayMap<K, V>>() {
+      @Override
+      public Supplier<TreeMap<K, V>> supplier() {
+        return TreeMap::new;
+      }
+
+      @Override
+      public BiConsumer<TreeMap<K, V>, Pair<K, V>> accumulator() {
+        return (treeMap, entry) -> treeMap.put(entry.getKey(), entry.getValue());
+      }
+
+      @Override
+      public BinaryOperator<TreeMap<K, V>> combiner() {
+        return (map1, map2) -> {
+          map1.putAll(map2);
+          return map1;
+        };
+      }
+
+      @Override
+      public Function<TreeMap<K, V>, ArrayMap<K, V>> finisher() {
+        return ArrayMap::ofMap;
+      }
+
+      @Override
+      public Set<Characteristics> characteristics() {
+        return Collections.emptySet();
+      }
+    };
   }
 }

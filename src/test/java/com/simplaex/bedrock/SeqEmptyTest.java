@@ -32,7 +32,7 @@ public class SeqEmptyTest {
 
     describe("toMap", () -> {
       it("should produce an empty array", () -> {
-        expect(Seq.empty().toMap(Object::hashCode)).toEqual(ArrayMap.empty());
+        expect(Seq.empty().toMap(Object::hashCode)).toEqual(Mapping.empty());
       });
     });
 

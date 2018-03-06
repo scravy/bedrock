@@ -163,8 +163,92 @@ public class ArrayMapTest {
         expect(arrayMap).toEqual(expected);
       });
       it("should create a map from a TreeMap using ofMap(Map)", () -> {
-        val arrayMap = ArrayMap.ofMap((Map<String,Number>) map);
+        val arrayMap = ArrayMap.ofMap((Map<String, Number>) map);
         expect(arrayMap).toEqual(expected);
+      });
+    });
+    describe("filter", () -> {
+      val map = ArrayMap.of(
+        pair(0, "zero"),
+        pair(3, "three"),
+        pair(4, "four"),
+        pair(5, "five")
+      );
+      it("should filter according to keys", () -> {
+        expect(map.filter(k -> k % 2 == 0)).toEqual(ArrayMap.of(
+          pair(0, "zero"),
+          pair(4, "four")
+        ));
+      });
+    });
+    describe("filterWithValue", () -> {
+      val map = ArrayMap.of(
+        pair(0, "zero"),
+        pair(3, "three"),
+        pair(4, "four"),
+        pair(5, "five")
+      );
+      it("should filter according to values", () -> {
+        expect(map.filterWithValue((k, v) -> v.charAt(0) == 'f')).toEqual(ArrayMap.of(
+          pair(4, "four"),
+          pair(5, "five")
+        ));
+      });
+    });
+    describe("union", () -> {
+      val map1 = ArrayMap.of(
+        pair(1, "1"),
+        pair(2, "2"),
+        pair(4, "4")
+      );
+      val map2 = ArrayMap.of(
+        pair(0, "zero"),
+        pair(3, "three"),
+        pair(4, "four"),
+        pair(5, "five")
+      );
+      it("should union left-biased", () -> {
+        expect(map1.union(map2)).toEqual(ArrayMap.of(
+          pair(0, "zero"),
+          pair(1, "1"),
+          pair(2, "2"),
+          pair(3, "three"),
+          pair(4, "4"),
+          pair(5, "five")
+        ));
+      });
+      it("should union left-biased (other way around)", () -> {
+        expect(map2.union(map1)).toEqual(ArrayMap.of(
+          pair(0, "zero"),
+          pair(1, "1"),
+          pair(2, "2"),
+          pair(3, "three"),
+          pair(4, "four"),
+          pair(5, "five")
+        ));
+      });
+    });
+    describe("intersect", () -> {
+      val map1 = ArrayMap.of(
+        pair(1, "1"),
+        pair(2, "2"),
+        pair(4, "4")
+      );
+      val map2 = ArrayMap.of(
+        pair(0, "zero"),
+        pair(3, "three"),
+        pair(4, "four"),
+        pair(5, "five")
+      );
+      it("should intersect left-biased", () -> {
+        expect(map1.intersect(map2)).toEqual(ArrayMap.of(
+          pair(4, "4")
+        ));
+      });
+      it("should intersect left-biased (other way around)", () -> {
+        expect(map2.intersect(map1)).toEqual(ArrayMap.of(
+          pair(4, "four")
+        ));
       });
     });
   }

@@ -664,16 +664,7 @@ public abstract class Seq<E> implements
       map.get(key).add(element);
     }
     if (map.isEmpty()) {
-      return ArrayMap.empty();
-    }
-    if (allComparable) {
-      final Object[] keys = Seq.ofCollection(map.keySet()).sorted().backingArray;
-      final Object[] values = new Object[keys.length];
-      for (int i = 0; i < keys.length; i += 1) {
-        //noinspection SuspiciousMethodCalls
-        values[i] = map.get(keys[i]).result();
-      }
-      return new ArrayMap<>(keys, values);
+      return Mapping.empty();
     }
     final Map<K, Seq<E>> finalMap = new HashMap<>();
     map.forEach((key, builder) -> finalMap.put(key, builder.result()));
