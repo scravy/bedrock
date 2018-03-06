@@ -4,6 +4,7 @@ import com.greghaskins.spectrum.Spectrum;
 import lombok.val;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -159,6 +160,19 @@ public class ControlTest {
         );
         expect(result.stream().mapToInt(Integer::intValue).sum()).toEqual(6);
         expect(counter.get()).toEqual(3);
+      });
+      it("should capture the exceptions when these are thrown", () -> {
+        val counter = new AtomicInteger(0);
+        expect(() -> Control.parallel(
+          Executors.newCachedThreadPool(),
+          counter::incrementAndGet,
+          () -> {
+            throw new IndexOutOfBoundsException();
+          },
+          () -> {
+            throw new IOException();
+          }
+        )).toThrow(ExecutionException.class);
       });
     });
   }

@@ -355,6 +355,15 @@ class SeqExemplaryChecks {
         expect(diffs.forAll(n -> n == 2)).toBeTrue();
       });
     });
+
+    describe("asString", () -> {
+      it("should turn the thing into a nice string", () -> {
+        expect(seq.asString()).toEqual("12243");
+      });
+      it("should turn the thing into a nice string with separators", () -> {
+        expect(seq.asString(", ")).toEqual("1, 2, 2, 4, 3");
+      });
+    });
   }
 
 }

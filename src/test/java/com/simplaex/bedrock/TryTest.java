@@ -49,25 +49,34 @@ public class TryTest {
     describe("Success", () -> {
       val t = Try.success(4711);
       describe("recoverWith", () -> {
-
+        it("should return itself", () -> {
+          expect(t.recoverWith(exc -> Try.success(3)) == t).toBeTrue();
+        });
       });
       describe("recover", () -> {
-
+        it("should return itself", () -> {
+          expect(t.recover(exc -> 3) == t).toBeTrue();
+        });
       });
       describe("orElse", () -> {
-
+        it("should return the value", () -> {
+          expect(t.orElse(3)).toEqual(4711);
+        });
       });
       describe("orElseNull", () -> {
-
+        it("should return the value", () -> {
+          expect(t.orElseNull()).toEqual(4711);
+        });
       });
       describe("orElseGet", () -> {
-
+        it("should return the value", () -> {
+          expect(t.orElseGet(() -> 3)).toEqual(4711);
+        });
       });
       describe("orElseThrow", () -> {
-
-      });
-      describe("orElseThrowRuntime", () -> {
-
+        it("should return the value", () -> {
+          expect(t.orElseThrow()).toEqual(4711);
+        });
       });
       describe("fallback", () -> {
         it("should keep the value", () -> {
@@ -109,15 +118,39 @@ public class TryTest {
           expect(t.get()).toEqual(4711);
         });
       });
+      describe("iterate", () -> {
+        it("should iterate over the one element in a Success", () -> {
+          int b = 0;
+          int c = 0;
+          for (val x : t) {
+            b = x;
+            c += 1;
+          }
+          expect(b).toEqual(4711);
+          expect(c).toEqual(1);
+        });
+      });
     });
 
     describe("Failure", () -> {
       val t = Try.failure(new IndexOutOfBoundsException());
       describe("recoverWith", () -> {
-
+        it("should catch an exception when recovering", () -> {
+          val r = t.recoverWith(exc -> {
+            throw exc;
+          });
+          expect(r.getException()).toBeInstanceOf(Try.FailedRecoveringException.class);
+          expect(r.getException().getCause()).toBeInstanceOf(IndexOutOfBoundsException.class);
+        });
       });
       describe("recover", () -> {
-
+        it("should catch an exception when recovering", () -> {
+          val r = t.recover(exc -> {
+            throw exc;
+          });
+          expect(r.getException()).toBeInstanceOf(Try.FailedRecoveringException.class);
+          expect(r.getException().getCause()).toBeInstanceOf(IndexOutOfBoundsException.class);
+        });
       });
       describe("orElse", () -> {
 
@@ -129,9 +162,6 @@ public class TryTest {
 
       });
       describe("orElseThrow", () -> {
-
-      });
-      describe("orElseThrowRuntime", () -> {
 
       });
       describe("fallback", () -> {
@@ -172,6 +202,15 @@ public class TryTest {
       describe("get", () -> {
         it("should throw a NoSuchElementException", () -> {
           expect(t::get).toThrow(NoSuchElementException.class);
+        });
+      });
+      describe("iterate", () -> {
+        it("should not iterate over the one element in a Success", () -> {
+          int c = 0;
+          for (val x : t) {
+            c += 1;
+          }
+          expect(c).toEqual(0);
         });
       });
     });

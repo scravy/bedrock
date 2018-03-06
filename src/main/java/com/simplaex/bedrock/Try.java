@@ -75,6 +75,8 @@ public abstract class Try<E> implements Iterable<E> {
 
   public abstract E get();
 
+  public abstract Throwable getException();
+
   @Nonnull
   public abstract Try<E> otherwise(@Nonnull final Try<E> alternative);
 
@@ -182,6 +184,11 @@ public abstract class Try<E> implements Iterable<E> {
     @Override
     public E get() {
       return this.value;
+    }
+
+    @Override
+    public Throwable getException() {
+      return null;
     }
 
     @Nonnull

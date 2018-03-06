@@ -82,12 +82,18 @@ public class PairTest {
         expect(list.get(0)).toEqual(1);
         expect(list.get(1)).toEqual(1.2);
       });
+      it("should have size 2", () -> {
+        expect(Pair.toList(Pair.of(1, 1.2)).size()).toEqual(2);
+      });
     });
     describe("toList", () -> {
       it("should turn a pair into a list", () -> {
         final List<Object> list = Pair.of(1, 1.2).toList();
         expect(list.get(0)).toEqual(1);
         expect(list.get(1)).toEqual(1.2);
+      });
+      it("should have size 2", () -> {
+        expect(Pair.of(1, 1.2).toList().size()).toEqual(2);
       });
     });
   }

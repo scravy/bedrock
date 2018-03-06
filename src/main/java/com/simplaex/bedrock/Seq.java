@@ -762,11 +762,6 @@ public abstract class Seq<E> implements
     return Seq.<C>builder().addAll(pair.fst(), pair.snd()).result();
   }
 
-  @Deprecated
-  public static <C, A extends C, B extends C> Seq<C> fromPair(final Pair<A, B> p) {
-    return ofPair(p);
-  }
-
   @Nonnull
   public static Seq<Character> ofString(@Nonnull final String string) {
     Objects.requireNonNull(string);

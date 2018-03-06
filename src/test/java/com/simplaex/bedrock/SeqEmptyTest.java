@@ -18,6 +18,12 @@ public class SeqEmptyTest {
       SeqPropertyChecks.checks(Seq.empty());
     });
 
+    describe("get", () -> {
+      it("should produce an empty array", () -> {
+        expect(() -> Seq.empty().get(0)).toThrow(IndexOutOfBoundsException.class);
+      });
+    });
+
     describe("toArray", () -> {
       it("should produce an empty array", () -> {
         expect(Seq.empty().toArray().length).toEqual(0);
@@ -45,6 +51,32 @@ public class SeqEmptyTest {
     describe("exists", () -> {
       it("should return false", () -> {
         expect(Seq.<Integer>empty().exists(i -> i % 2 == 0)).toBeFalse();
+      });
+    });
+
+    describe("forAll", () -> {
+      it("should return true", () -> {
+        expect(Seq.<Integer>empty().forAll(i -> i % 2 == 0)).toBeTrue();
+      });
+    });
+
+    describe("trimmedToSize", () -> {
+      it("should return itself", () -> {
+        expect(Seq.empty().trimmedToSize() == Seq.empty()).toBeTrue();
+      });
+    });
+
+    describe("inits", () -> {
+      it("should return itself", () -> {
+        //noinspection RedundantCast
+        expect(((Object)Seq.empty().inits()) == ((Object)Seq.empty())).toBeTrue();
+      });
+    });
+
+    describe("tails", () -> {
+      it("should return itself", () -> {
+        //noinspection RedundantCast
+        expect(((Object)Seq.empty().tails()) == ((Object)Seq.empty())).toBeTrue();
       });
     });
 
