@@ -6,6 +6,8 @@ import lombok.SneakyThrows;
 import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class Promise<T> {
@@ -55,6 +57,13 @@ public class Promise<T> {
     public void fail(final Throwable result) {
       throw new IllegalStateException("Already fulfilled (" + getState() + ").");
     }
+
+    @Override
+    @Nonnull
+    public Promise<T> onComplete(@Nonnull final Callback<T> callback) {
+      Try.unfailable(() -> callback.call(null, getValue()));
+      return this;
+    }
   }
 
   private static class FailedPromise<T> extends Promise<T> {
@@ -71,14 +80,26 @@ public class Promise<T> {
     public void fail(final Throwable result) {
       throw new IllegalStateException("Already fulfilled (" + getState() + ").");
     }
+
+    @Override
+    @Nonnull
+    public Promise<T> onComplete(@Nonnull final Callback<T> callback) {
+      Try.unfailable(() -> callback.call(getException(), null));
+      return this;
+    }
   }
 
-  private static class MappedPromise extends Promise<Object> {
+  private abstract static class UntypedPromise extends Promise<Object> {
+    private UntypedPromise() {
+      super(State.PENDING, null);
+    }
+  }
+
+  private static class MappedPromise extends UntypedPromise {
 
     private ThrowingFunction transform;
 
     private MappedPromise(final ThrowingFunction transform) {
-      super(State.PENDING, null);
       this.transform = transform;
     }
 
@@ -88,15 +109,33 @@ public class Promise<T> {
       try {
         super.fulfill(transform.execute(result));
       } catch (final Exception exc) {
-        Try.run(() -> super.fail(exc));
+        Try.unfailable(() -> super.fail(exc));
       } finally {
         transform = null;
       }
     }
-
   }
 
-  private final Deque<MappedPromise> children = new ArrayDeque<>(1);
+  private static class CallbackPromise extends UntypedPromise {
+    private final Callback<Object> callback;
+
+    @SuppressWarnings("unchecked")
+    private <T> CallbackPromise(final Callback<T> callback) {
+      this.callback = (Callback<Object>) callback;
+    }
+
+    @Override
+    public void fulfill(final Object result) {
+      Try.unfailable(() -> callback.call(null, result));
+    }
+
+    @Override
+    public void fail(final Throwable exc) {
+      Try.unfailable(() -> callback.call(exc, null));
+    }
+  }
+
+  private final Deque<UntypedPromise> children = new ArrayDeque<>(1);
 
   public void fulfill(final T result) {
     synchronized (children) {
@@ -106,11 +145,11 @@ public class Promise<T> {
       this.result = result;
       state = State.FULFILLED;
       while (!children.isEmpty()) {
-        final MappedPromise child = children.pop();
+        final UntypedPromise child = children.pop();
         try {
           child.fulfill(result);
         } catch (final Exception exc) {
-          Try.run(() -> child.fail(exc));
+          Try.unfailable(() -> child.fail(exc));
         }
       }
       children.notifyAll();
@@ -125,8 +164,8 @@ public class Promise<T> {
       this.result = exc;
       state = State.FAILED;
       while (!children.isEmpty()) {
-        final MappedPromise child = children.pop();
-        Try.run(() -> child.fail(exc));
+        final UntypedPromise child = children.pop();
+        Try.unfailable(() -> child.fail(exc));
       }
       children.notifyAll();
     }
@@ -195,17 +234,18 @@ public class Promise<T> {
 
   @SuppressWarnings("unchecked")
   @Nonnull
-  public <U> Promise<U> map(final @Nonnull ThrowingFunction<T, U> func) {
+  public <U> Promise<U> map(final @Nonnull ThrowingFunction<T, U> function) {
+    Objects.requireNonNull(function, "'function' must not be null.");
     synchronized (children) {
       if (state == State.PENDING) {
-        final MappedPromise mappedPromise = new MappedPromise(func);
+        final MappedPromise mappedPromise = new MappedPromise(function);
         children.push(mappedPromise);
         return (Promise<U>) mappedPromise;
       }
     }
     if (state == State.FULFILLED) {
       try {
-        return fulfilled(func.execute((T) result));
+        return fulfilled(function.execute((T) result));
       } catch (final Exception exc) {
         return failed(exc);
       }
@@ -215,6 +255,7 @@ public class Promise<T> {
 
   @Nonnull
   public Promise<T> filter(final @Nonnull Predicate<T> predicate) {
+    Objects.requireNonNull(predicate, "'predicate' must not be null.");
     return map(value -> {
       if (predicate.test(value)) {
         return value;
@@ -224,4 +265,50 @@ public class Promise<T> {
     });
   }
 
+  @SuppressWarnings("unchecked")
+  @Nonnull
+  public Promise<T> onComplete(final @Nonnull Callback<T> callback) {
+    Objects.requireNonNull(callback, "'callback' must not be null.");
+    synchronized (children) {
+      if (state == State.PENDING) {
+        final CallbackPromise callbackPromise = new CallbackPromise(callback);
+        children.push(callbackPromise);
+        return this;
+      }
+    }
+    if (state == State.FULFILLED) {
+      Try.unfailable(() -> callback.call(null, (T) result));
+    } else {
+      Try.unfailable(() -> callback.call(result, null));
+    }
+    return this;
+  }
+
+  @Nonnull
+  public Promise<T> onSuccess(final @Nonnull ThrowingConsumer<T> consumer) {
+    return onComplete((error, result) -> {
+      if (error == null) {
+        Try.unfailable(() -> consumer.accept(result));
+      }
+    });
+  }
+
+  @Nonnull
+  public Promise<T> onFailure(final @Nonnull ThrowingConsumer<Throwable> consumer) {
+    return onComplete((error, result) -> {
+      if (error instanceof Throwable) {
+        Try.unfailable(() -> consumer.accept((Throwable) error));
+      }
+    });
+  }
+
+  @Nonnull
+  public Optional<T> toOptional() {
+    waitFor();
+    if (isSuccess()) {
+      return Optional.ofNullable(getValue());
+    } else {
+      return Optional.empty();
+    }
+  }
 }

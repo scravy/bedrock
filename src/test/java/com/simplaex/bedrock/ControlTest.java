@@ -5,6 +5,7 @@ import lombok.val;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -173,6 +174,80 @@ public class ControlTest {
             throw new IOException();
           }
         )).toThrow(ExecutionException.class);
+      });
+    });
+    describe("async", () -> {
+      describe("andThen(ThrowingBiConsumer)", () -> {
+        final Control.Async<Object, Integer> async = Control
+          .<Object, String>async((a, callback) -> {
+            callback.call(null, a.toString());
+          })
+          .<Integer>andThen((a, callback) -> {
+            callback.call(null, Integer.parseInt(a));
+          })
+          .andThen((a, callback) -> {
+            callback.call(null, a + 1);
+          });
+        it("should invoke the async computations and pass results through", () -> {
+          final Promise<Integer> promise = async.runPromised(BigInteger.TEN);
+          promise.waitFor();
+          promise.onComplete((error, result) -> {
+            expect(error).toBeNull();
+            expect(result).toEqual(11);
+          });
+        });
+        it("should return the error if an exception occurs", () -> {
+          final Promise<Integer> promise = async.runPromised("can not be parsed as integer");
+          promise.waitFor();
+          promise.onComplete((error, result) -> {
+            expect(error).toBeNotNull();
+          });
+        });
+      });
+      describe("andThen(ThrowingBiConsumer,ThrowingBiConsumer...)", () -> {
+        final Control.Async<Object, Integer> async = Control
+          .<Object, String>async((a, callback) -> {
+            callback.call(null, a.toString());
+          })
+          .<Integer>andThen(
+            (a, callback) -> {
+              callback.call(null, Integer.parseInt(a));
+            },
+            (a, callback) -> {
+              callback.call(null, Integer.parseInt(a));
+            }
+          )
+          .andThen((a, callback) -> {
+            callback.call(null, a.foldl((a0, a1) -> a0 + a1, 5));
+          });
+        it("should invoke the async computations and pass results through", () -> {
+          final Promise<Integer> promise = async.runPromised(BigInteger.TEN);
+          promise.waitFor();
+          promise.onComplete((error, result) -> {
+            expect(error).toBeNull();
+            expect(result).toEqual(25);
+          });
+        });
+        it("should return the error if an exception occurs", () -> {
+          final Promise<Integer> promise = async.runPromised("can not be parsed as integer");
+          promise.waitFor();
+          promise.onComplete((error, result) -> {
+            expect(error).toBeNotNull();
+          });
+        });
+        it("should return the error if an exception occurs (in first step)", () -> {
+          final Promise<Integer> promise = async.runPromised(new Object() {
+            @Override
+            public String toString() {
+              throw new RuntimeException("I blow up");
+            }
+          });
+          promise.waitFor();
+          promise.onComplete((error, result) -> {
+            expect(error).toBeNotNull();
+            expect(error).toBeInstanceOf(RuntimeException.class);
+          });
+        });
       });
     });
   }

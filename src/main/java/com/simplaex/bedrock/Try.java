@@ -434,7 +434,7 @@ public abstract class Try<E> implements Iterable<E> {
   }
 
   /**
-   * Tries to run the given ThrowingRunnable and throws a runtime exception in case it fails.
+   * Tries to run the given ThrowingRunnable and throws a RuntimeException in case it fails.
    * <p>
    * If the given ThrowingRunnable throws a RuntimeException that Exception is rethrown.
    *
@@ -452,7 +452,7 @@ public abstract class Try<E> implements Iterable<E> {
   }
 
   /**
-   * Tries to run the given ThrowingRunnable and throws a runtime exception with the given message in case it fails.
+   * Tries to run the given ThrowingRunnable and throws a RuntimeException with the given message in case it fails.
    * <p>
    * If the given ThrowingRunnable throws a RuntimeException it is not rethrown but wrapped in a new RuntimeException
    * with the given message (just like a checked Exception).
@@ -469,4 +469,20 @@ public abstract class Try<E> implements Iterable<E> {
       throw new RuntimeException(message, exc);
     }
   }
+
+  /**
+   * Runs the given ThrowingRunnable and catches all Exceptions, reporting them to the uncaught exception handler.
+   *
+   * @param runnable A runnable which might throw a checked Exception.
+   */
+  public static void unfailable(final @Nonnull ThrowingRunnable runnable) {
+    try {
+      runnable.run();
+    } catch (final Exception exc) {
+      Optional
+        .ofNullable(Thread.currentThread().getUncaughtExceptionHandler())
+        .ifPresent(ueh -> ueh.uncaughtException(Thread.currentThread(), exc));
+    }
+  }
+
 }

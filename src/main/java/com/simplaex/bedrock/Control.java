@@ -154,4 +154,111 @@ public class Control {
     }
     throw new ExecutionException(exceptions.result());
   }
+
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  public static final class Async<In, Out> implements ThrowingBiConsumer<In, Callback<Out>> {
+
+    private final ThrowingBiConsumer<In, Callback<Out>> function;
+
+    @SuppressWarnings("CodeBlock2Expr")
+    public final <T> Async<In, T> andThen(final ThrowingBiConsumer<Out, Callback<T>> function) {
+      Objects.requireNonNull(function, "'function' must not be null.");
+      return async((arg, callback) -> {
+        run(arg, (error, result) -> {
+          if (error == null) {
+            async(function).run(result, callback);
+          } else {
+            Try.unfailable(() -> callback.call(error, null));
+          }
+        });
+      });
+    }
+
+    @SafeVarargs
+    public final <T> Async<In, Seq<T>> andThen(
+      @Nonnull final ThrowingBiConsumer<Out, Callback<T>> function,
+      @Nonnull final ThrowingBiConsumer<Out, Callback<T>>... functions
+    ) {
+      Objects.requireNonNull(function, "'function' must not be null.");
+      Objects.requireNonNull(functions, "'functions' must not be null.");
+      return async((arg, callback) -> {
+        @SuppressWarnings("unchecked") final Async<Out, T>[] asyncs = new Async[1 + functions.length];
+        asyncs[0] = async(function);
+        for (int i = 0; i < functions.length; ) {
+          final Async<Out, T> asyncFunction = async(functions[i]);
+          i += 1;
+          asyncs[i] = asyncFunction;
+        }
+        run(arg, (error, result) -> {
+          if (error == null) {
+            final Object[] results = new Object[asyncs.length];
+            final Object[] errors = new Object[asyncs.length];
+            final Box<Integer> numberOfReturns = new Box<>(0);
+            final Box<Integer> numberOfErrors = new Box<>(0);
+            for (int i = 0; i < asyncs.length; i += 1) {
+              final int myIndex = i;
+              asyncs[i].run(result, (error2, result2) -> {
+                if (error2 == null) {
+                  results[myIndex] = result2;
+                } else {
+                  errors[myIndex] = error2;
+                  synchronized (numberOfErrors) {
+                    numberOfErrors.apply(n -> n + 1);
+                  }
+                }
+                final boolean lastOne;
+                synchronized (numberOfReturns) {
+                  lastOne = numberOfReturns.apply(n -> n + 1).equals(asyncs.length);
+                }
+                if (lastOne) {
+                  if (numberOfErrors.getValue() == 0) {
+                    callback.call(null, new SeqSimple<>(results));
+                  } else {
+                    callback.call(new SeqSimple<>(errors), new SeqSimple<>(results));
+                  }
+                }
+              });
+            }
+          } else {
+            callback.call(error, null);
+          }
+        });
+      });
+    }
+
+    public void run(final In argument, @Nonnull final Callback<Out> callback) {
+      try {
+        function.accept(argument, (error, result) -> Try.unfailable(() -> callback.call(error, result)));
+      } catch (final Exception exc) {
+        Try.unfailable(() -> callback.call(exc, null));
+      }
+    }
+
+    @Nonnull
+    public Promise<Out> runPromised(final In argument) {
+      final Promise<Out> promise = Promise.promise();
+      run(argument, (error, result) -> {
+        if (error == null) {
+          promise.fulfill(result);
+        } else if (error instanceof Exception) {
+          promise.fail((Exception) error);
+        } else if (error instanceof String) {
+          promise.fail(new LightweightRuntimeException((String) error));
+        } else {
+          promise.fail(new AsyncException(error));
+        }
+      });
+      return promise;
+    }
+
+    @Override
+    public void accept(final In argument, @Nonnull final Callback<Out> callback) {
+      run(argument, callback);
+    }
+  }
+
+  public static <In, Out> Async<In, Out> async(@Nonnull final ThrowingBiConsumer<In, Callback<Out>> function) {
+    Objects.requireNonNull(function, "'function' must not be null.");
+    return new Async<>(function);
+  }
 }
