@@ -14,6 +14,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Missing control structures for Java.
@@ -157,7 +158,9 @@ public class Control {
     throw new ExecutionException(exceptions.result());
   }
 
-  public static final class Async<In, Out> implements ThrowingBiConsumer<In, Callback<Out>> {
+  @AllArgsConstructor(access = AccessLevel.PRIVATE)
+  @Wither(AccessLevel.PRIVATE)
+  public static final class Async<In, Out> implements ThrowingBiConsumer<In, Callback<Out>>, Function<In, Promise<Out>> {
 
     @Value
     @Wither
@@ -183,13 +186,14 @@ public class Control {
     }
 
     private final AsyncFunction<In, Out> function;
+    private final AsyncOptions options;
 
     private Async(@Nonnull final AsyncFunction<In, Out> function) {
-      this.function = function;
+      this(function, AsyncOptions.defaultOptions());
     }
 
     private Async(@Nonnull final ThrowingBiConsumer<In, Callback<Out>> function) {
-      this.function = (opts, arg, callback) -> function.accept(arg, (error, result) -> callback.call(opts, error, result));
+      this((opts, arg, callback) -> function.accept(arg, (error, result) -> callback.call(opts, error, result)));
     }
 
     @Nonnull
@@ -207,6 +211,7 @@ public class Control {
       });
     }
 
+    @SuppressWarnings("CodeBlock2Expr")
     @Nonnull
     @SafeVarargs
     public final <T> Async<In, Seq<T>> andThen(
@@ -215,14 +220,14 @@ public class Control {
     ) {
       Objects.requireNonNull(function, "'function' must not be null.");
       Objects.requireNonNull(functions, "'functions' must not be null.");
+      @SuppressWarnings("unchecked") final Async<Out, T>[] asyncs = new Async[1 + functions.length];
+      asyncs[0] = async(function);
+      for (int i = 0; i < functions.length; ) {
+        final Async<Out, T> asyncFunction = async(functions[i]);
+        i += 1;
+        asyncs[i] = asyncFunction;
+      }
       return asyncWithOptions((options, argument, callback) -> {
-        @SuppressWarnings("unchecked") final Async<Out, T>[] asyncs = new Async[1 + functions.length];
-        asyncs[0] = async(function);
-        for (int i = 0; i < functions.length; ) {
-          final Async<Out, T> asyncFunction = async(functions[i]);
-          i += 1;
-          asyncs[i] = asyncFunction;
-        }
         runWithOptions(options, argument, (opts, error, result) -> {
           if (error == null) {
             final Object[] results = new Object[asyncs.length];
@@ -282,23 +287,21 @@ public class Control {
     }
 
     public void run(final In argument, @Nonnull final Callback<Out> callback) {
-      runWithOptions(AsyncOptions.defaultOptions(), argument, (opts, error, result) -> callback.call(error, result));
+      runWithOptions(options, argument, (opts, error, result) -> callback.call(error, result));
     }
 
     public void run(final @Nonnull Executor executor, final In argument, final @Nonnull Callback<Out> callback) {
-      final AsyncOptions options = AsyncOptions.defaultOptions().withExecutor(executor);
-      runWithOptions(options, argument, (opts, error, result) -> callback.call(error, result));
+      runWithOptions(options.withExecutor(executor), argument, (opts, error, result) -> callback.call(error, result));
     }
 
     @Nonnull
     public Promise<Out> runPromised(final In argument) {
-      return runPromised(AsyncOptions.defaultOptions(), argument);
+      return runPromised(options, argument);
     }
 
     @Nonnull
     public Promise<Out> runPromised(final @Nonnull Executor executor, final In argument) {
-      final AsyncOptions options = AsyncOptions.defaultOptions().withExecutor(executor);
-      return runPromised(options, argument);
+      return runPromised(options.withExecutor(executor), argument);
     }
 
     @Nonnull
@@ -321,6 +324,12 @@ public class Control {
     @Override
     public void accept(final In argument, @Nonnull final Callback<Out> callback) {
       run(argument, callback);
+    }
+
+    @Nonnull
+    @Override
+    public Promise<Out> apply(final In in) {
+      return runPromised(in);
     }
 
     private static <In, Out> Async<In, Out> asyncWithOptions(@Nonnull final Async.AsyncFunction<In, Out> function) {
