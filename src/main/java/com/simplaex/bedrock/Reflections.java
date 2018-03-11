@@ -3,8 +3,6 @@ package com.simplaex.bedrock;
 import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
