@@ -3,7 +3,10 @@ package com.simplaex.bedrock;
 import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -64,6 +67,15 @@ public class Reflections {
       .filter(constructor -> constructor.getParameterCount() == 0)
       .findFirst()
       .map(constructor -> (Callable<T>) (() -> (T) constructor.newInstance()));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T proxy(final Class<T> clazz, final ThrowingBiFunction<String, Seq<Object>, Object> handler) {
+    return (T) Proxy.newProxyInstance(
+      Thread.currentThread().getContextClassLoader(),
+      new Class[]{clazz},
+      (proxy, method, args) -> handler.apply(method.getName(), new SeqSimple<>(args))
+    );
   }
 
 }
