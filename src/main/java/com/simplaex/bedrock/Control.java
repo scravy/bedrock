@@ -2,7 +2,9 @@ package com.simplaex.bedrock;
 
 import lombok.*;
 import lombok.experimental.UtilityClass;
+import lombok.experimental.Wither;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -155,25 +157,57 @@ public class Control {
     throw new ExecutionException(exceptions.result());
   }
 
-  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static final class Async<In, Out> implements ThrowingBiConsumer<In, Callback<Out>> {
 
-    private final ThrowingBiConsumer<In, Callback<Out>> function;
+    @Value
+    @Wither
+    private static class AsyncOptions {
+      private final Executor executor;
 
+      private static final AsyncOptions DEFAULT_OPTIONS = new AsyncOptions(Runnable::run);
+
+      @Nonnull
+      public static AsyncOptions defaultOptions() {
+        return DEFAULT_OPTIONS;
+      }
+    }
+
+    @FunctionalInterface
+    private interface AsyncCallback<Out> {
+      void call(@Nonnull final AsyncOptions opts, final Object error, final Out result) throws Exception;
+    }
+
+    @FunctionalInterface
+    private interface AsyncFunction<In, Out> {
+      void run(@Nonnull final AsyncOptions options, final In arg, @Nonnull final AsyncCallback<Out> callback) throws Exception;
+    }
+
+    private final AsyncFunction<In, Out> function;
+
+    private Async(@Nonnull final AsyncFunction<In, Out> function) {
+      this.function = function;
+    }
+
+    private Async(@Nonnull final ThrowingBiConsumer<In, Callback<Out>> function) {
+      this.function = (opts, arg, callback) -> function.accept(arg, (error, result) -> callback.call(opts, error, result));
+    }
+
+    @Nonnull
     @SuppressWarnings("CodeBlock2Expr")
-    public final <T> Async<In, T> andThen(final ThrowingBiConsumer<Out, Callback<T>> function) {
+    public final <T> Async<In, T> andThen(@Nonnull final ThrowingBiConsumer<Out, Callback<T>> function) {
       Objects.requireNonNull(function, "'function' must not be null.");
-      return async((arg, callback) -> {
-        run(arg, (error, result) -> {
+      return asyncWithOptions((options, argument, callback) -> {
+        runWithOptions(options, argument, (opts, error, result) -> {
           if (error == null) {
-            async(function).run(result, callback);
+            async(function).runWithOptions(opts, result, callback);
           } else {
-            Try.unfailable(() -> callback.call(error, null));
+            Try.unfailable(() -> callback.call(opts, error, null));
           }
         });
       });
     }
 
+    @Nonnull
     @SafeVarargs
     public final <T> Async<In, Seq<T>> andThen(
       @Nonnull final ThrowingBiConsumer<Out, Callback<T>> function,
@@ -181,7 +215,7 @@ public class Control {
     ) {
       Objects.requireNonNull(function, "'function' must not be null.");
       Objects.requireNonNull(functions, "'functions' must not be null.");
-      return async((arg, callback) -> {
+      return asyncWithOptions((options, argument, callback) -> {
         @SuppressWarnings("unchecked") final Async<Out, T>[] asyncs = new Async[1 + functions.length];
         asyncs[0] = async(function);
         for (int i = 0; i < functions.length; ) {
@@ -189,55 +223,88 @@ public class Control {
           i += 1;
           asyncs[i] = asyncFunction;
         }
-        run(arg, (error, result) -> {
+        runWithOptions(options, argument, (opts, error, result) -> {
           if (error == null) {
             final Object[] results = new Object[asyncs.length];
             final Object[] errors = new Object[asyncs.length];
-            final Box<Integer> numberOfReturns = new Box<>(0);
-            final Box<Integer> numberOfErrors = new Box<>(0);
+            final Box.IntBox numberOfReturns = Box.intBox(0);
+            final Box.IntBox numberOfErrors = Box.intBox(0);
             for (int i = 0; i < asyncs.length; i += 1) {
               final int myIndex = i;
-              asyncs[i].run(result, (error2, result2) -> {
+              asyncs[i].runWithOptions(opts, result, (opts2, error2, result2) -> {
                 if (error2 == null) {
                   results[myIndex] = result2;
                 } else {
                   errors[myIndex] = error2;
                   synchronized (numberOfErrors) {
-                    numberOfErrors.apply(n -> n + 1);
+                    numberOfErrors.update(n -> n + 1);
                   }
                 }
                 final boolean lastOne;
                 synchronized (numberOfReturns) {
-                  lastOne = numberOfReturns.apply(n -> n + 1).equals(asyncs.length);
+                  lastOne = numberOfReturns.update(n -> n + 1) == asyncs.length;
                 }
                 if (lastOne) {
                   if (numberOfErrors.getValue() == 0) {
-                    callback.call(null, new SeqSimple<>(results));
+                    callback.call(opts, null, new SeqSimple<>(results));
                   } else {
-                    callback.call(new SeqSimple<>(errors), new SeqSimple<>(results));
+                    callback.call(opts, new SeqSimple<>(errors), new SeqSimple<>(results));
                   }
                 }
               });
             }
           } else {
-            callback.call(error, null);
+            callback.call(opts, error, null);
           }
         });
       });
     }
 
-    public void run(final In argument, @Nonnull final Callback<Out> callback) {
+    @SuppressWarnings("CodeBlock2Expr")
+    private void runWithOptions(
+      final @Nonnull AsyncOptions options,
+      final In argument,
+      final @Nonnull AsyncCallback<Out> callback
+    ) {
       try {
-        function.accept(argument, (error, result) -> Try.unfailable(() -> callback.call(error, result)));
+        options.getExecutor().execute(() -> {
+          try {
+            function.run(options, argument, (opts, error, result) -> {
+              Try.unfailable(() -> callback.call(opts, error, result));
+            });
+          } catch (final Exception exc) {
+            Try.unfailable(() -> callback.call(options, exc, null));
+          }
+        });
       } catch (final Exception exc) {
-        Try.unfailable(() -> callback.call(exc, null));
+        Try.unfailable(() -> callback.call(options, exc, null));
       }
+    }
+
+    public void run(final In argument, @Nonnull final Callback<Out> callback) {
+      runWithOptions(AsyncOptions.defaultOptions(), argument, (opts, error, result) -> callback.call(error, result));
+    }
+
+    public void run(final @Nonnull Executor executor, final In argument, final @Nonnull Callback<Out> callback) {
+      final AsyncOptions options = AsyncOptions.defaultOptions().withExecutor(executor);
+      runWithOptions(options, argument, (opts, error, result) -> callback.call(error, result));
     }
 
     @Nonnull
     public Promise<Out> runPromised(final In argument) {
+      return runPromised(AsyncOptions.defaultOptions(), argument);
+    }
+
+    @Nonnull
+    public Promise<Out> runPromised(final @Nonnull Executor executor, final In argument) {
+      final AsyncOptions options = AsyncOptions.defaultOptions().withExecutor(executor);
+      return runPromised(options, argument);
+    }
+
+    @Nonnull
+    private Promise<Out> runPromised(final @Nonnull AsyncOptions options, final In argument) {
       final Promise<Out> promise = Promise.promise();
-      run(argument, (error, result) -> {
+      runWithOptions(options, argument, (opts, error, result) -> {
         if (error == null) {
           promise.fulfill(result);
         } else if (error instanceof Exception) {
@@ -254,6 +321,10 @@ public class Control {
     @Override
     public void accept(final In argument, @Nonnull final Callback<Out> callback) {
       run(argument, callback);
+    }
+
+    private static <In, Out> Async<In, Out> asyncWithOptions(@Nonnull final Async.AsyncFunction<In, Out> function) {
+      return new Async<>(function);
     }
   }
 

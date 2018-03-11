@@ -7,13 +7,16 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Duration;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
+import static com.greghaskins.spectrum.Spectrum.let;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
+import static com.simplaex.bedrock.Pair.pair;
 
 @SuppressWarnings({"ClassInitializerMayBeStatic", "CodeBlock2Expr"})
 @RunWith(Spectrum.class)
@@ -26,7 +29,7 @@ public class ControlTest {
         Control.sleep(Duration.ofMillis(200));
         val finished = System.nanoTime();
         val duration = Duration.ofNanos(finished - started);
-        expect(duration.toMillis()).toBeGreaterThan(200);
+        expect(duration.toMillis()).toBeGreaterThan(199);
       });
     });
     describe("forever(ThrowingRunnable)", () -> {
@@ -176,76 +179,111 @@ public class ControlTest {
         )).toThrow(ExecutionException.class);
       });
     });
-    describe("async", () -> {
-      describe("andThen(ThrowingBiConsumer)", () -> {
-        final Control.Async<Object, Integer> async = Control
-          .<Object, String>async((a, callback) -> {
-            callback.call(null, a.toString());
-          })
-          .<Integer>andThen((a, callback) -> {
-            callback.call(null, Integer.parseInt(a));
-          })
-          .andThen((a, callback) -> {
-            callback.call(null, a + 1);
-          });
-        it("should invoke the async computations and pass results through", () -> {
-          final Promise<Integer> promise = async.runPromised(BigInteger.TEN);
-          promise.waitFor();
-          promise.onComplete((error, result) -> {
-            expect(error).toBeNull();
-            expect(result).toEqual(11);
-          });
-        });
-        it("should return the error if an exception occurs", () -> {
-          final Promise<Integer> promise = async.runPromised("can not be parsed as integer");
-          promise.waitFor();
-          promise.onComplete((error, result) -> {
-            expect(error).toBeNotNull();
-          });
-        });
-      });
-      describe("andThen(ThrowingBiConsumer,ThrowingBiConsumer...)", () -> {
-        final Control.Async<Object, Integer> async = Control
-          .<Object, String>async((a, callback) -> {
-            callback.call(null, a.toString());
-          })
-          .<Integer>andThen(
-            (a, callback) -> {
+    final Executor manyThreads = Executors.newFixedThreadPool(4);
+    final Executor singleThread = Executors.newSingleThreadExecutor();
+    final Executor noThreads = Runnable::run;
+    val tracer = let(Seq::<String>builder);
+    Seq.<Pair<Executor, ThrowingRunnable>>of(
+      pair(noThreads, () -> {
+        val journal = tracer.get().result();
+        expect(journal.forAll(threadName -> Thread.currentThread().getName().equals(threadName))).toBeTrue();
+      }),
+      pair(singleThread, () -> {
+        val journal = tracer.get().result();
+        val distinct = journal.distinct();
+        expect(distinct.size()).toEqual(1);
+        expect(distinct.head().equals(Thread.currentThread().getName())).toBeFalse();
+      }),
+      pair(manyThreads, () -> {
+        val journal = tracer.get().result();
+        expect(journal.forAll(threadName -> !Thread.currentThread().getName().equals(threadName))).toBeTrue();
+      })
+    ).forEach(spec -> {
+      val executor = spec.fst();
+      val checks = spec.snd();
+      describe("async with " + executor.getClass().getName(), () -> {
+        describe("andThen(ThrowingBiConsumer)", () -> {
+          final Control.Async<Object, Integer> async = Control
+            .<Object, String>async((a, callback) -> {
+              tracer.get().add(Thread.currentThread().getName());
+              callback.call(null, a.toString());
+            })
+            .<Integer>andThen((a, callback) -> {
+              tracer.get().add(Thread.currentThread().getName());
               callback.call(null, Integer.parseInt(a));
-            },
-            (a, callback) -> {
-              callback.call(null, Integer.parseInt(a));
-            }
-          )
-          .andThen((a, callback) -> {
-            callback.call(null, a.foldl((a0, a1) -> a0 + a1, 5));
+            })
+            .andThen((a, callback) -> {
+              tracer.get().add(Thread.currentThread().getName());
+              callback.call(null, a + 1);
+            });
+          it("should invoke the async computations and pass results through", () -> {
+            final Promise<Integer> promise = async.runPromised(executor, BigInteger.TEN);
+            promise.waitFor();
+            promise.onComplete((error, result) -> {
+              expect(error).toBeNull();
+              expect(result).toEqual(11);
+            });
+            checks.run();
           });
-        it("should invoke the async computations and pass results through", () -> {
-          final Promise<Integer> promise = async.runPromised(BigInteger.TEN);
-          promise.waitFor();
-          promise.onComplete((error, result) -> {
-            expect(error).toBeNull();
-            expect(result).toEqual(25);
+          it("should return the error if an exception occurs", () -> {
+            final Promise<Integer> promise = async.runPromised(executor, "can not be parsed as integer");
+            promise.waitFor();
+            promise.onComplete((error, result) -> {
+              expect(error).toBeNotNull();
+            });
+            checks.run();
           });
         });
-        it("should return the error if an exception occurs", () -> {
-          final Promise<Integer> promise = async.runPromised("can not be parsed as integer");
-          promise.waitFor();
-          promise.onComplete((error, result) -> {
-            expect(error).toBeNotNull();
+        describe("andThen(ThrowingBiConsumer,ThrowingBiConsumer...)", () -> {
+          final Control.Async<Object, Integer> async = Control
+            .<Object, String>async((a, callback) -> {
+              tracer.get().add(Thread.currentThread().getName());
+              callback.call(null, a.toString());
+            })
+            .<Integer>andThen(
+              (a, callback) -> {
+                tracer.get().add(Thread.currentThread().getName());
+                callback.call(null, Integer.parseInt(a));
+              },
+              (a, callback) -> {
+                tracer.get().add(Thread.currentThread().getName());
+                callback.call(null, Integer.parseInt(a));
+              }
+            )
+            .andThen((a, callback) -> {
+              tracer.get().add(Thread.currentThread().getName());
+              callback.call(null, a.foldl((a0, a1) -> a0 + a1, 5));
+            });
+          it("should invoke the async computations and pass results through", () -> {
+            final Promise<Integer> promise = async.runPromised(executor, BigInteger.TEN);
+            promise.waitFor();
+            promise.onComplete((error, result) -> {
+              expect(error).toBeNull();
+              expect(result).toEqual(25);
+            });
+            checks.run();
           });
-        });
-        it("should return the error if an exception occurs (in first step)", () -> {
-          final Promise<Integer> promise = async.runPromised(new Object() {
-            @Override
-            public String toString() {
-              throw new RuntimeException("I blow up");
-            }
+          it("should return the error if an exception occurs", () -> {
+            final Promise<Integer> promise = async.runPromised(executor, "can not be parsed as integer");
+            promise.waitFor();
+            promise.onComplete((error, result) -> {
+              expect(error).toBeNotNull();
+            });
+            checks.run();
           });
-          promise.waitFor();
-          promise.onComplete((error, result) -> {
-            expect(error).toBeNotNull();
-            expect(error).toBeInstanceOf(RuntimeException.class);
+          it("should return the error if an exception occurs (in first step)", () -> {
+            final Promise<Integer> promise = async.runPromised(executor, new Object() {
+              @Override
+              public String toString() {
+                throw new RuntimeException("I blow up");
+              }
+            });
+            promise.waitFor();
+            promise.onComplete((error, result) -> {
+              expect(error).toBeNotNull();
+              expect(error).toBeInstanceOf(RuntimeException.class);
+            });
+            checks.run();
           });
         });
       });
