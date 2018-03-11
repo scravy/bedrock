@@ -165,9 +165,11 @@ public class Control {
     @Value
     @Wither
     private static class AsyncOptions {
-      private final Executor executor;
 
-      private static final AsyncOptions DEFAULT_OPTIONS = new AsyncOptions(Runnable::run);
+      private final Executor executor;
+      private final Consumer<ThrowingRunnable> callbackHandler;
+
+      private static final AsyncOptions DEFAULT_OPTIONS = new AsyncOptions(Runnable::run, Try::unfailable);
 
       @Nonnull
       public static AsyncOptions defaultOptions() {
@@ -205,7 +207,7 @@ public class Control {
           if (error == null) {
             async(function).runWithOptions(opts, result, callback);
           } else {
-            Try.unfailable(() -> callback.call(opts, error, null));
+            opts.getCallbackHandler().accept(() -> callback.call(opts, error, null));
           }
         });
       }, options);
@@ -251,15 +253,15 @@ public class Control {
                 }
                 if (lastOne) {
                   if (numberOfErrors.getValue() == 0) {
-                    callback.call(opts, null, new SeqSimple<>(results));
+                    opts.getCallbackHandler().accept(() -> callback.call(opts, null, new SeqSimple<>(results)));
                   } else {
-                    callback.call(opts, new SeqSimple<>(errors), new SeqSimple<>(results));
+                    opts.getCallbackHandler().accept(() -> callback.call(opts, new SeqSimple<>(errors), new SeqSimple<>(results)));
                   }
                 }
               });
             }
           } else {
-            callback.call(opts, error, null);
+            opts.getCallbackHandler().accept(() -> callback.call(opts, error, null));
           }
         });
       }, options);
@@ -275,14 +277,14 @@ public class Control {
         options.getExecutor().execute(() -> {
           try {
             function.run(options, argument, (opts, error, result) -> {
-              Try.unfailable(() -> callback.call(opts, error, result));
+              opts.getCallbackHandler().accept(() -> callback.call(opts, error, result));
             });
           } catch (final Exception exc) {
-            Try.unfailable(() -> callback.call(options, exc, null));
+            options.getCallbackHandler().accept(() -> callback.call(options, exc, null));
           }
         });
       } catch (final Exception exc) {
-        Try.unfailable(() -> callback.call(options, exc, null));
+        options.getCallbackHandler().accept(() -> callback.call(options, exc, null));
       }
     }
 
