@@ -200,7 +200,7 @@ public class Control {
     @SuppressWarnings("CodeBlock2Expr")
     public final <T> Async<In, T> andThen(@Nonnull final ThrowingBiConsumer<Out, Callback<T>> function) {
       Objects.requireNonNull(function, "'function' must not be null.");
-      return asyncWithOptions((options, argument, callback) -> {
+      return new Async<>((options, argument, callback) -> {
         runWithOptions(options, argument, (opts, error, result) -> {
           if (error == null) {
             async(function).runWithOptions(opts, result, callback);
@@ -208,7 +208,7 @@ public class Control {
             Try.unfailable(() -> callback.call(opts, error, null));
           }
         });
-      });
+      }, options);
     }
 
     @SuppressWarnings("CodeBlock2Expr")
@@ -227,7 +227,7 @@ public class Control {
         i += 1;
         asyncs[i] = asyncFunction;
       }
-      return asyncWithOptions((options, argument, callback) -> {
+      return new Async<>((options, argument, callback) -> {
         runWithOptions(options, argument, (opts, error, result) -> {
           if (error == null) {
             final Object[] results = new Object[asyncs.length];
@@ -262,7 +262,7 @@ public class Control {
             callback.call(opts, error, null);
           }
         });
-      });
+      }, options);
     }
 
     @SuppressWarnings("CodeBlock2Expr")
@@ -331,12 +331,9 @@ public class Control {
     public Promise<Out> apply(final In in) {
       return runPromised(in);
     }
-
-    private static <In, Out> Async<In, Out> asyncWithOptions(@Nonnull final Async.AsyncFunction<In, Out> function) {
-      return new Async<>(function);
-    }
   }
 
+  @Nonnull
   public static <In, Out> Async<In, Out> async(@Nonnull final ThrowingBiConsumer<In, Callback<Out>> function) {
     Objects.requireNonNull(function, "'function' must not be null.");
     return new Async<>(function);
