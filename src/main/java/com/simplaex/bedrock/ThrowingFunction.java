@@ -2,6 +2,7 @@ package com.simplaex.bedrock;
 
 import lombok.SneakyThrows;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @FunctionalInterface
@@ -13,5 +14,9 @@ public interface ThrowingFunction<A, R> extends Function<A, R> {
   @SneakyThrows
   default R apply(final A a) {
     return execute(a);
+  }
+
+  default Function<A, Try<R>> safe() {
+    return arg -> Try.execute(() -> execute(arg));
   }
 }

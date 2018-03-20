@@ -1,7 +1,27 @@
 package com.simplaex.bedrock;
 
-@FunctionalInterface
-public interface ThrowingRunnable {
+import lombok.SneakyThrows;
 
-  void run() throws Exception;
+import java.util.function.Consumer;
+
+@FunctionalInterface
+public interface ThrowingRunnable extends Runnable {
+
+  void execute() throws Exception;
+
+  @SneakyThrows
+  @Override
+  default void run() {
+    execute();
+  }
+
+  default Runnable safe(final Consumer<? super Exception> errorHandler) {
+    return () -> {
+      try {
+        execute();
+      } catch (final Exception exc) {
+        errorHandler.accept(exc);
+      }
+    };
+  }
 }

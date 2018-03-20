@@ -70,7 +70,7 @@ public class Control {
   public static void forever(@Nonnull final ThrowingRunnable runnable) {
     while (!Thread.currentThread().isInterrupted()) {
       try {
-        runnable.run();
+        runnable.execute();
       } catch (final InterruptedException exc) {
         return;
       } catch (final Exception ignore) {
@@ -84,7 +84,7 @@ public class Control {
   ) {
     while (!Thread.currentThread().isInterrupted()) {
       try {
-        runnable.run();
+        runnable.execute();
       } catch (final InterruptedException exc) {
         return;
       } catch (final Exception exc) {
@@ -95,7 +95,14 @@ public class Control {
 
   @SneakyThrows
   public static void sleep(final Duration duration) {
-    Thread.sleep(duration.toMillis());
+    final long started = System.nanoTime();
+    do {
+      try {
+        Thread.sleep(duration.toMillis());
+        return;
+      } catch (final InterruptedException ignore) {
+      }
+    } while ((System.nanoTime() - started) < duration.toNanos());
   }
 
   public static void parallel(@Nonnull final Executor executor, @Nonnull final ThrowingRunnable... runnables)
@@ -194,12 +201,12 @@ public class Control {
     }
 
     private Async(@Nonnull final ThrowingBiConsumer<In, Callback<Out>> function) {
-      this((opts, arg, callback) -> function.accept(arg, (error, result) -> callback.call(opts, error, result)));
+      this((opts, arg, callback) -> function.consume(arg, (error, result) -> callback.call(opts, error, result)));
     }
 
     @Nonnull
     @SuppressWarnings("CodeBlock2Expr")
-    public final <T> Async<In, T> andThen(@Nonnull final ThrowingBiConsumer<Out, Callback<T>> function) {
+    public final <T> Async<In, T> then(@Nonnull final ThrowingBiConsumer<Out, Callback<T>> function) {
       Objects.requireNonNull(function, "'function' must not be null.");
       return new Async<>((options, argument, callback) -> {
         runWithOptions(options, argument, (opts, error, result) -> {
@@ -215,7 +222,7 @@ public class Control {
     @SuppressWarnings("CodeBlock2Expr")
     @Nonnull
     @SafeVarargs
-    public final <T> Async<In, Seq<T>> andThen(
+    public final <T> Async<In, Seq<T>> then(
       @Nonnull final ThrowingBiConsumer<Out, Callback<T>> function,
       @Nonnull final ThrowingBiConsumer<Out, Callback<T>>... functions
     ) {
@@ -316,14 +323,14 @@ public class Control {
         } else if (error instanceof String) {
           promise.fail(new LightweightRuntimeException((String) error));
         } else {
-          promise.fail(new AsyncException(error));
+          promise.fail(new AsyncExecutionException(error));
         }
       });
       return promise;
     }
 
     @Override
-    public void accept(final In argument, @Nonnull final Callback<Out> callback) {
+    public void consume(final In argument, @Nonnull final Callback<Out> callback) {
       run(argument, callback);
     }
 

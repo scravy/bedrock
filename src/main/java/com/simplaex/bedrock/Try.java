@@ -7,11 +7,9 @@ import lombok.Value;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -54,7 +52,16 @@ public abstract class Try<E> implements Iterable<E> {
   public abstract <F> Try<F> flatMap(@Nonnull final ThrowingFunction<? super E, Try<F>> f);
 
   @Nonnull
-  public abstract Try<E> filter(@Nonnull final Predicate<E> predicate);
+  public final <F> Try<F> flatMapOptional(@Nonnull final ThrowingFunction<? super E, Optional<F>> function) {
+    Objects.requireNonNull(function, "'function' must not be null");
+    return flatMap(value -> {
+      final Try<Optional<F>> result = Try.execute(() -> function.apply(value));
+      return result.flatMap(res -> res.map(Try::success).orElseGet(() -> Try.failure(new NoSuchElementException())));
+    });
+  }
+
+  @Nonnull
+  public abstract Try<E> filter(@Nonnull final Predicate<? super E> predicate);
 
   @Nonnull
   public abstract <F> Try<F> recover(@Nonnull final ThrowingFunction<Exception, F> value);
@@ -86,10 +93,20 @@ public abstract class Try<E> implements Iterable<E> {
   @Nonnull
   public abstract <F> Try<F> transformWith(@Nonnull final ThrowingFunction<Exception, Try<F>> f, final ThrowingFunction<E, Try<F>> g);
 
+  public abstract Try<E> fallback(final E value);
+
+  public abstract <F> F fold(@Nonnull final Function<E, F> ifSuccess, @Nonnull final Function<Exception, F> ifFailure);
+
   @Nonnull
   public abstract Optional<E> toOptional();
 
-  public abstract Try<E> fallback(final E value);
+  @Nonnull
+  public abstract Promise<E> toPromise();
+
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+  public static <E> Try<E> fromOptional(final Optional<E> optional) {
+    return optional.map(Try::success).orElseGet(() -> failure(new NoSuchElementException()));
+  }
 
   @Value
   @EqualsAndHashCode(callSuper = false)
@@ -131,7 +148,7 @@ public abstract class Try<E> implements Iterable<E> {
 
     @Nonnull
     @Override
-    public Try<E> filter(@Nonnull final Predicate<E> predicate) {
+    public Try<E> filter(@Nonnull final Predicate<? super E> predicate) {
       Objects.requireNonNull(predicate, "predicate must not be null");
       if (predicate.test(value)) {
         return this;
@@ -228,9 +245,22 @@ public abstract class Try<E> implements Iterable<E> {
       return Optional.ofNullable(value);
     }
 
+    @Nonnull
+    @Override
+    public Promise<E> toPromise() {
+      return Promise.fulfilled(value);
+    }
+
     @Override
     public Try<E> fallback(final E value) {
       return this;
+    }
+
+    @Override
+    public <F> F fold(@Nonnull final Function<E, F> ifSuccess, @Nonnull final Function<Exception, F> ifFailure) {
+      Objects.requireNonNull(ifSuccess, "'ifSuccess' must not be null");
+      Objects.requireNonNull(ifFailure, "'ifFailure' must not be null");
+      return ifSuccess.apply(value);
     }
 
     @Override
@@ -289,7 +319,7 @@ public abstract class Try<E> implements Iterable<E> {
 
     @Nonnull
     @Override
-    public Try<E> filter(@Nonnull final Predicate<E> predicate) {
+    public Try<E> filter(@Nonnull final Predicate<? super E> predicate) {
       Objects.requireNonNull(predicate, "predicate must not be null");
       return this;
     }
@@ -391,24 +421,27 @@ public abstract class Try<E> implements Iterable<E> {
       return Optional.empty();
     }
 
+    @Nonnull
+    @Override
+    public Promise<E> toPromise() {
+      return Promise.failed(exception);
+    }
+
     @Override
     public Try<E> fallback(final E value) {
       return success(value);
     }
 
     @Override
-    public Iterator<E> iterator() {
-      return new Iterator<E>() {
-        @Override
-        public boolean hasNext() {
-          return false;
-        }
+    public <F> F fold(@Nonnull final Function<E, F> ifSuccess, @Nonnull final Function<Exception, F> ifFailure) {
+      Objects.requireNonNull(ifSuccess,"'ifSuccess' must not be null");
+      Objects.requireNonNull(ifFailure,"'ifFailure' must not be null");
+      return ifFailure.apply(exception);
+    }
 
-        @Override
-        public E next() {
-          return null;
-        }
-      };
+    @Override
+    public Iterator<E> iterator() {
+      return Collections.emptyIterator();
     }
   }
 
@@ -483,6 +516,11 @@ public abstract class Try<E> implements Iterable<E> {
         .ofNullable(Thread.currentThread().getUncaughtExceptionHandler())
         .ifPresent(ueh -> ueh.uncaughtException(Thread.currentThread(), exc));
     }
+  }
+
+  public static <A, R> Function<A, Try<R>> lift(final @Nonnull Function<A, R> function) {
+    Objects.requireNonNull(function, "'function' must not be null");
+    return arg -> execute(() -> function.apply(arg));
   }
 
 }

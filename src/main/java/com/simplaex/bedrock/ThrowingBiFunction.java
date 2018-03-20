@@ -14,4 +14,8 @@ public interface ThrowingBiFunction<A, B, R> extends BiFunction<A, B, R> {
   default R apply(final A a, final B b) {
     return execute(a, b);
   }
+
+  default BiFunction<A, B, Try<R>> safe() {
+    return (a, b) -> Try.execute(() -> execute(a, b));
+  }
 }

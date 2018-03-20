@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class Promise<T> {
+public class Promise<T> implements Callback<T> {
 
   public enum State {
     PENDING,
@@ -303,7 +303,7 @@ public class Promise<T> {
   }
 
   @Nonnull
-  public Optional<T> toOptional() {
+  public final Optional<T> toOptional() {
     waitFor();
     if (isSuccess()) {
       return Optional.ofNullable(getValue());
@@ -311,4 +311,32 @@ public class Promise<T> {
       return Optional.empty();
     }
   }
+
+  @Nonnull
+  public final Try<T> toTry() {
+    waitFor();
+    if (isSuccess()) {
+      return Try.success(getValue());
+    } else {
+      final Throwable exception = getException();
+      if (exception instanceof Exception) {
+        return Try.failure((Exception) exception);
+      }
+      return Try.failure(new AsyncExecutionException(exception));
+    }
+  }
+
+  @Override
+  public final void call(final Object error, final T result) {
+    if (error == null) {
+      fulfill(result);
+    } else {
+      if (error instanceof Throwable) {
+        fail((Throwable) error);
+      } else {
+        fail(new AsyncExecutionException(error));
+      }
+    }
+  }
+
 }

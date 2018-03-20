@@ -202,17 +202,17 @@ public class ControlTest {
       val executor = spec.fst();
       val checks = spec.snd();
       describe("async with " + executor.getClass().getName(), () -> {
-        describe("andThen(ThrowingBiConsumer)", () -> {
+        describe("then(ThrowingBiConsumer)", () -> {
           final Control.Async<Object, Integer> async = Control
             .<Object, String>async((a, callback) -> {
               tracer.get().add(Thread.currentThread().getName());
               callback.call(null, a.toString());
             })
-            .<Integer>andThen((a, callback) -> {
+            .<Integer>then((a, callback) -> {
               tracer.get().add(Thread.currentThread().getName());
               callback.call(null, Integer.parseInt(a));
             })
-            .andThen((a, callback) -> {
+            .then((a, callback) -> {
               tracer.get().add(Thread.currentThread().getName());
               callback.call(null, a + 1);
             });
@@ -234,13 +234,13 @@ public class ControlTest {
             checks.run();
           });
         });
-        describe("andThen(ThrowingBiConsumer,ThrowingBiConsumer...)", () -> {
+        describe("then(ThrowingBiConsumer,ThrowingBiConsumer...)", () -> {
           final Control.Async<Object, Integer> async = Control
             .<Object, String>async((a, callback) -> {
               tracer.get().add(Thread.currentThread().getName());
               callback.call(null, a.toString());
             })
-            .<Integer>andThen(
+            .<Integer>then(
               (a, callback) -> {
                 tracer.get().add(Thread.currentThread().getName());
                 callback.call(null, Integer.parseInt(a));
@@ -250,7 +250,7 @@ public class ControlTest {
                 callback.call(null, Integer.parseInt(a));
               }
             )
-            .andThen((a, callback) -> {
+            .then((a, callback) -> {
               tracer.get().add(Thread.currentThread().getName());
               callback.call(null, a.foldl((a0, a1) -> a0 + a1, 5));
             });
