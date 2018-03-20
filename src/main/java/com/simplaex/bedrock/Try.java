@@ -95,7 +95,15 @@ public abstract class Try<E> implements Iterable<E> {
 
   public abstract Try<E> fallback(final E value);
 
-  public abstract <F> F fold(@Nonnull final Function<E, F> ifSuccess, @Nonnull final Function<Exception, F> ifFailure);
+  public abstract <F> F fold(
+    @Nonnull final ThrowingFunction<? super Exception, F> ifFailure,
+    @Nonnull final ThrowingFunction<E, F> ifSuccess
+  );
+
+  public abstract void consume(
+    @Nonnull final ThrowingConsumer<? super Exception> ifFailure,
+    @Nonnull final ThrowingConsumer<E> ifSuccess
+  );
 
   @Nonnull
   public abstract Optional<E> toOptional();
@@ -257,10 +265,23 @@ public abstract class Try<E> implements Iterable<E> {
     }
 
     @Override
-    public <F> F fold(@Nonnull final Function<E, F> ifSuccess, @Nonnull final Function<Exception, F> ifFailure) {
-      Objects.requireNonNull(ifSuccess, "'ifSuccess' must not be null");
+    public <F> F fold(
+      @Nonnull final ThrowingFunction<? super Exception, F> ifFailure,
+      @Nonnull final ThrowingFunction<E, F> ifSuccess
+    ) {
       Objects.requireNonNull(ifFailure, "'ifFailure' must not be null");
+      Objects.requireNonNull(ifSuccess, "'ifSuccess' must not be null");
       return ifSuccess.apply(value);
+    }
+
+    @Override
+    public void consume(
+      @Nonnull final ThrowingConsumer<? super Exception> ifFailure,
+      @Nonnull final ThrowingConsumer<E> ifSuccess
+    ) {
+      Objects.requireNonNull(ifFailure, "'ifFailure' must not be null");
+      Objects.requireNonNull(ifSuccess, "'ifSuccess' must not be null");
+      ifSuccess.accept(value);
     }
 
     @Override
@@ -433,10 +454,23 @@ public abstract class Try<E> implements Iterable<E> {
     }
 
     @Override
-    public <F> F fold(@Nonnull final Function<E, F> ifSuccess, @Nonnull final Function<Exception, F> ifFailure) {
-      Objects.requireNonNull(ifSuccess,"'ifSuccess' must not be null");
-      Objects.requireNonNull(ifFailure,"'ifFailure' must not be null");
+    public <F> F fold(
+      @Nonnull final ThrowingFunction<? super Exception, F> ifFailure,
+      @Nonnull final ThrowingFunction<E, F> ifSuccess
+    ) {
+      Objects.requireNonNull(ifFailure, "'ifFailure' must not be null");
+      Objects.requireNonNull(ifSuccess, "'ifSuccess' must not be null");
       return ifFailure.apply(exception);
+    }
+
+    @Override
+    public void consume(
+      @Nonnull final ThrowingConsumer<? super Exception> ifFailure,
+      @Nonnull final ThrowingConsumer<E> ifSuccess
+    ) {
+      Objects.requireNonNull(ifFailure, "'ifFailure' must not be null");
+      Objects.requireNonNull(ifSuccess, "'ifSuccess' must not be null");
+      ifFailure.accept(exception);
     }
 
     @Override

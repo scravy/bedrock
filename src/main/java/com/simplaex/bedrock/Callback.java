@@ -8,6 +8,18 @@ public interface Callback<R> {
 
   void call(final Object error, final R result) throws Exception;
 
+  default void call(final Try<R> tryResult) throws Exception {
+    tryResult.consume(this::fail, this::success);
+  }
+
+  default void success(final R result) throws Exception {
+    call(null, result);
+  }
+
+  default void fail(final Object error) throws Exception {
+    call(error, null);
+  }
+
   default <T> Callback<T> after(@Nonnull final ThrowingFunction<T, R> function) {
     Objects.requireNonNull(function, "'function' must not be null.");
     return (err, res) -> {
