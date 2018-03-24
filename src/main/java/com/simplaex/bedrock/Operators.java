@@ -107,6 +107,7 @@ public class Operators {
     }
     return null;
   }
+
   public static int times(final int a, final int b) {
     return a * b;
   }

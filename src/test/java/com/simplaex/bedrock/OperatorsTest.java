@@ -123,7 +123,7 @@ public class OperatorsTest {
         check(bigDecSeqN, Operators::mod, Operators::mod, BigDecimal.valueOf(6), null);
       });
 
-      describe("comparison operators", () ->{
+      describe("comparison operators", () -> {
         describe(Integer.class.toString(), () -> {
           check(3, 2, Operators::gt);
           check(3, 2, Operators::gte);
