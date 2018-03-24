@@ -1,5 +1,5 @@
 language: java
-install: mvn clean -B
+install: mvn initialize -B
 script: mvn test -B
 cache:
   directories:
