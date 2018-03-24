@@ -65,40 +65,6 @@ public class ControlTest {
         expect(finished.get()).toEqual(1);
       });
     });
-    describe("forever(ExceptionHandler,ThrowingRunnable)", () -> {
-      it("should be interruptible", () -> {
-        val sem1 = new Semaphore(0);
-        val sem2 = new Semaphore(0);
-        val counter = new AtomicInteger();
-        val finished = new AtomicInteger(0);
-        val thread = new Thread(() -> {
-          Control.forever(exc -> {
-          }, () -> {
-            sem1.acquire();
-            counter.incrementAndGet();
-            sem2.release();
-          });
-          finished.incrementAndGet();
-        });
-        thread.start();
-
-        sem1.release();
-        sem2.acquire();
-
-        sem1.release();
-        sem2.acquire();
-
-        sem1.release();
-        sem2.acquire();
-
-        thread.interrupt();
-        thread.join();
-
-        expect(counter.get()).toEqual(3);
-        expect(thread.getState()).toEqual(Thread.State.TERMINATED);
-        expect(finished.get()).toEqual(1);
-      });
-    });
     describe("parallel(Executor,ThrowingRunnable...)", () -> {
       it("using an Executor on the same thread", () -> {
         val counter = new AtomicInteger(0);

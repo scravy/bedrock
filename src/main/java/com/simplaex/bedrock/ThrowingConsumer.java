@@ -1,9 +1,6 @@
 package com.simplaex.bedrock;
 
-import lombok.SneakyThrows;
-
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @FunctionalInterface
 public interface ThrowingConsumer<A> extends Consumer<A> {
@@ -11,9 +8,14 @@ public interface ThrowingConsumer<A> extends Consumer<A> {
   void consume(final A arg) throws Exception;
 
   @Override
-  @SneakyThrows
   default void accept(final A arg) {
-    consume(arg);
+    try {
+      consume(arg);
+    } catch (final Error | RuntimeException exc) {
+      throw exc;
+    } catch (final Exception exc) {
+      throw new RuntimeException(exc);
+    }
   }
 
   default Consumer<A> safe(final Consumer<? super Exception> errorHandler) {

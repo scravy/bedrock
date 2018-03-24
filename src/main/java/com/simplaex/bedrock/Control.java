@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Semaphore;
@@ -68,18 +69,14 @@ public class Control {
   }
 
   public static void forever(@Nonnull final ThrowingRunnable runnable) {
-    while (!Thread.currentThread().isInterrupted()) {
-      try {
-        runnable.execute();
-      } catch (final InterruptedException exc) {
-        return;
-      } catch (final Exception ignore) {
-      }
-    }
+    forever(Optional
+      .ofNullable(Thread.currentThread().getUncaughtExceptionHandler())
+      .orElse(NoOp.uncaughtExceptionHandler()), runnable
+    );
   }
 
   public static void forever(
-    @Nonnull final Consumer<Exception> exceptionHandler,
+    @Nonnull final Thread.UncaughtExceptionHandler exceptionHandler,
     @Nonnull final ThrowingRunnable runnable
   ) {
     while (!Thread.currentThread().isInterrupted()) {
@@ -88,12 +85,25 @@ public class Control {
       } catch (final InterruptedException exc) {
         return;
       } catch (final Exception exc) {
-        exceptionHandler.accept(exc);
+        exceptionHandler.uncaughtException(Thread.currentThread(), exc);
       }
     }
   }
 
-  @SneakyThrows
+  @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+  public static boolean wait(final Object monitor) {
+    while (!Thread.currentThread().isInterrupted()) {
+      try {
+        synchronized (monitor) {
+          monitor.wait();
+        }
+      } catch (final InterruptedException exc) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public static void sleep(final Duration duration) {
     final long started = System.nanoTime();
     do {

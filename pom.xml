@@ -11,7 +11,7 @@
   <description>Essential utilities for modern Java.</description>
   <url>https://github.com/simplaex/bedrock</url>
 
-  <version>2018.03.21</version>
+  <version>2018.03.24</version>
   <packaging>jar</packaging>
 
   <properties>

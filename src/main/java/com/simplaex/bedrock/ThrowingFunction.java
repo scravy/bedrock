@@ -1,8 +1,5 @@
 package com.simplaex.bedrock;
 
-import lombok.SneakyThrows;
-
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @FunctionalInterface
@@ -11,9 +8,14 @@ public interface ThrowingFunction<A, R> extends Function<A, R> {
   R execute(final A a) throws Exception;
 
   @Override
-  @SneakyThrows
-  default R apply(final A a) {
-    return execute(a);
+  default R apply(final A arg) {
+    try {
+      return execute(arg);
+    } catch (final Error | RuntimeException exc) {
+      throw exc;
+    } catch (final Exception exc) {
+      throw new RuntimeException(exc);
+    }
   }
 
   default Function<A, Try<R>> safe() {

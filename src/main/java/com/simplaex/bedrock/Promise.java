@@ -1,7 +1,6 @@
 package com.simplaex.bedrock;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
@@ -172,30 +171,36 @@ public class Promise<T> implements Callback<T> {
   }
 
   @SuppressWarnings("unchecked")
-  @SneakyThrows
-  public T get() {
+  public T get() throws AsyncExecutionException {
     for (; ; ) {
       synchronized (children) {
         switch (state) {
           case PENDING:
-            children.wait();
+            try {
+              children.wait();
+            } catch (final InterruptedException exc) {
+              throw new AsyncExecutionException(exc);
+            }
             break;
           case FULFILLED:
             return (T) result;
           case FAILED:
-            throw (Throwable) result;
+            throw new AsyncExecutionException(result);
         }
       }
     }
   }
 
-  @SneakyThrows
   public void waitFor() {
     for (; ; ) {
       synchronized (children) {
         switch (state) {
           case PENDING:
-            children.wait();
+            try {
+              children.wait();
+            } catch (final InterruptedException exc) {
+              throw new AsyncExecutionException(exc);
+            }
             break;
           case FULFILLED:
           case FAILED:

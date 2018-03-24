@@ -38,7 +38,7 @@ public class PromiseTest {
           p.fail(new IndexOutOfBoundsException());
         });
         s.release();
-        expect(p::get).toThrow(IndexOutOfBoundsException.class);
+        expect(p::get).toThrow(AsyncExecutionException.class);
       });
       it("isSuccess", () -> {
         expect(Promise.fulfilled(3).isSuccess()).toBeTrue();
@@ -81,13 +81,13 @@ public class PromiseTest {
           val p = Promise.<Integer>promise();
           p.fulfill(10);
           val p2 = p.map(i -> i - 10).map(i -> 2 / i);
-          expect(p2::get).toThrow(ArithmeticException.class);
+          expect(p2::get).toThrow(AsyncExecutionException.class);
         });
         it("should return a FailedPromise when mapped on a FailedPromise", () -> {
           val p = Promise.<Integer>promise();
           p.fulfill(10);
           val p2 = p.map(i -> i - 10).map(i -> 2 / i).map(i -> i + 1);
-          expect(p2::get).toThrow(ArithmeticException.class);
+          expect(p2::get).toThrow(AsyncExecutionException.class);
         });
       });
     });

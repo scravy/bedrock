@@ -1,12 +1,12 @@
 package com.simplaex.bedrock;
 
-import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -36,10 +36,14 @@ public class UUIDs {
     return UUID.randomUUID();
   }
 
-  @SneakyThrows
   public static UUID v5(final UUID namespace, final String name) {
     val bytes = namespacedBytes(namespace, name);
-    final MessageDigest md = MessageDigest.getInstance("SHA1");
+    final MessageDigest md;
+    try {
+      md = MessageDigest.getInstance("SHA1");
+    } catch (final NoSuchAlgorithmException exc) {
+      throw new RuntimeException(exc);
+    }
     final byte[] resultBytes = md.digest(bytes);
     resultBytes[6] &= 0x0f;
     resultBytes[6] |= 0x50;
