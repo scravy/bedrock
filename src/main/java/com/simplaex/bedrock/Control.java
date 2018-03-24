@@ -116,7 +116,7 @@ public class Control {
   }
 
   public static void parallel(@Nonnull final Executor executor, @Nonnull final ThrowingRunnable... runnables)
-    throws ExecutionException {
+    throws ParallelExecutionException {
     Objects.requireNonNull(executor, "executor must not be null");
     Objects.requireNonNull(runnables, "nullables must not be null");
     val semaphore = new Semaphore(0);
@@ -134,14 +134,14 @@ public class Control {
     }
     semaphore.acquireUninterruptibly(runnables.length);
     if (!exceptions.isEmpty()) {
-      throw new ExecutionException(Seq.ofCollection(exceptions));
+      throw new ParallelExecutionException(Seq.ofCollection(exceptions));
     }
   }
 
   @SuppressWarnings("unchecked")
   @SafeVarargs
   public static <T> Seq<T> parallel(final @Nonnull Executor executor, final @Nonnull Callable<? extends T>... runnables)
-    throws ExecutionException {
+    throws ParallelExecutionException {
     Objects.requireNonNull(executor, "executor must not be null");
     Objects.requireNonNull(runnables, "nullables must not be null");
     val promises = new Promise[runnables.length];
@@ -171,7 +171,7 @@ public class Control {
     if (exceptions.isEmpty()) {
       return results.build();
     }
-    throw new ExecutionException(exceptions.result());
+    throw new ParallelExecutionException(exceptions.result());
   }
 
   @AllArgsConstructor(access = AccessLevel.PRIVATE)

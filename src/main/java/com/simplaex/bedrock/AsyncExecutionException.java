@@ -2,7 +2,7 @@ package com.simplaex.bedrock;
 
 import lombok.Getter;
 
-public class AsyncExecutionException extends LightweightRuntimeException {
+public class AsyncExecutionException extends RuntimeException {
 
   @Getter
   public final Object reason;

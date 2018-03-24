@@ -142,7 +142,7 @@ public class ControlTest {
           () -> {
             throw new IOException();
           }
-        )).toThrow(ExecutionException.class);
+        )).toThrow(ParallelExecutionException.class);
       });
     });
     final Executor manyThreads = Executors.newFixedThreadPool(4);
