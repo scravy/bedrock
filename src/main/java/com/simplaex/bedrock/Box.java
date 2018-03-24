@@ -13,6 +13,14 @@ import java.util.function.LongUnaryOperator;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class Box<T> {
 
+  interface NumberBox {
+
+    void inc();
+
+    void dec();
+
+  }
+
   public abstract T getValue();
 
   public abstract void setValue(T value);
@@ -59,7 +67,7 @@ public abstract class Box<T> {
 
   @EqualsAndHashCode(callSuper = false)
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
-  public static class IntBox extends Box<Integer> {
+  public static class IntBox extends Box<Integer> implements NumberBox {
 
     private int intValue;
 
@@ -78,11 +86,29 @@ public abstract class Box<T> {
       intValue = function.applyAsInt(intValue);
       return intValue;
     }
+
+    @Override
+    public void inc() {
+      intValue = intValue += 1;
+    }
+
+    @Override
+    public void dec() {
+      intValue = intValue -= 1;
+    }
+
+    public void add(final int value) {
+      intValue += value;
+    }
+
+    public void sub(final int value) {
+      intValue -= value;
+    }
   }
 
   @EqualsAndHashCode(callSuper = false)
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
-  public static class LongBox extends Box<Long> {
+  public static class LongBox extends Box<Long> implements NumberBox {
 
     private long longValue;
 
@@ -101,11 +127,37 @@ public abstract class Box<T> {
       longValue = function.applyAsLong(longValue);
       return longValue;
     }
+
+    @Override
+    public void inc() {
+      longValue = longValue += 1;
+    }
+
+    @Override
+    public void dec() {
+      longValue = longValue -= 1;
+    }
+
+    public void add(final int value) {
+      longValue += value;
+    }
+
+    public void sub(final int value) {
+      longValue -= value;
+    }
+
+    public void add(final long value) {
+      longValue += value;
+    }
+
+    public void sub(final long value) {
+      longValue -= value;
+    }
   }
 
   @EqualsAndHashCode(callSuper = false)
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
-  public static class DoubleBox extends Box<Double> {
+  public static class DoubleBox extends Box<Double> implements NumberBox {
 
     private double doubleValue;
 
@@ -123,6 +175,24 @@ public abstract class Box<T> {
     public double update(@Nonnull final DoubleUnaryOperator function) {
       doubleValue = function.applyAsDouble(doubleValue);
       return doubleValue;
+    }
+
+    @Override
+    public void inc() {
+      doubleValue = doubleValue += 1.0;
+    }
+
+    @Override
+    public void dec() {
+      doubleValue = doubleValue -= 1.0;
+    }
+
+    public void add(final double value) {
+      doubleValue += value;
+    }
+
+    public void sub(final double value) {
+      doubleValue -= value;
     }
   }
 }

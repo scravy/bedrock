@@ -230,7 +230,6 @@ public abstract class Seq<E> implements
     return new SeqSimple<>(arr);
   }
 
-  @Nonnull
   public <A> A foldl(@Nonnull final BiFunction<? super A, ? super E, A> function, final A startValue) {
     Objects.requireNonNull(function, "'function' must not be null");
     A acc = startValue;
@@ -240,7 +239,6 @@ public abstract class Seq<E> implements
     return acc;
   }
 
-  @Nonnull
   public <A> A foldr(@Nonnull final BiFunction<? super E, ? super A, ? extends A> function, final A startValue) {
     Objects.requireNonNull(function, "'function' must not be null");
     A acc = startValue;

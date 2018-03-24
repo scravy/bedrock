@@ -17,6 +17,10 @@ import static com.mscharhag.oleaster.matcher.Matchers.expect;
 class SeqPropertyChecks {
 
   void checks(final Seq<Integer> seq) {
+    checks(seq, 1);
+  }
+
+  void checks(final Seq<Integer> seq, final Integer one) {
 
     describe("length + isEmpty", () -> {
       it("length() > 0 == !isEmpty()", () -> expect(seq.length() > 0 == !seq.isEmpty()).toBeTrue());
@@ -79,7 +83,7 @@ class SeqPropertyChecks {
             return 1;
           }
           //noinspection unchecked
-          return ((Comparable) left).compareTo(right);
+          return left.compareTo(right);
         };
         val z = s.zipWith((a, b) -> comparator.compare(a, b) <= 0, s.tail());
         expect(z.forAll(x -> x)).toBeTrue();
@@ -161,8 +165,8 @@ class SeqPropertyChecks {
     });
 
     describe("equals + concat", () -> {
-      it("should not compare as equal to itself concatenated with Seq.of(1)", () -> {
-        expect(Seq.concat(seq, Seq.of(1)).equals(seq)).toBeFalse();
+      it("should not compare as equal to itself concatenated with Seq.of(one)", () -> {
+        expect(Seq.concat(seq, Seq.of(one)).equals(seq)).toBeFalse();
       });
     });
 
@@ -170,6 +174,18 @@ class SeqPropertyChecks {
       it("should reverse a list when provided with cons", () -> {
         val s = seq.foldl((xs, x) -> Seq.concat(Seq.of(x), xs), Seq.empty());
         expect(s).toEqual(seq.reversed());
+      });
+      it("sum", () -> {
+        val s = seq.foldl(Operators::plus, 0);
+        val sum = Box.intBox(0);
+        final Integer result;
+        if (seq.contains(null)) {
+          result = null;
+        } else {
+          seq.forEach(sum::add);
+          result = sum.getValue();
+        }
+        expect(s).toEqual(result);
       });
     });
 

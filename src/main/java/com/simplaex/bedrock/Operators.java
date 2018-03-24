@@ -2,6 +2,10 @@ package com.simplaex.bedrock;
 
 import lombok.experimental.UtilityClass;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+
 @SuppressWarnings("unused")
 @UtilityClass
 public class Operators {
@@ -18,6 +22,43 @@ public class Operators {
     return a + b;
   }
 
+  @SuppressWarnings("unchecked")
+  public static <N extends Number> N plus(final N a, final N b) {
+    if (a instanceof Integer && b instanceof Integer) {
+      return (N) (Integer) (((Integer) a) + ((Integer) b));
+    } else if (a instanceof Long && b instanceof Long) {
+      return (N) (Long) (((Long) a) + ((Long) b));
+    } else if (a instanceof Double && b instanceof Double) {
+      return (N) (Double) (((Double) a) + ((Double) b));
+    } else if (a instanceof BigInteger && b instanceof BigInteger) {
+      return (N) ((BigInteger) a).add((BigInteger) b);
+    } else if (a instanceof BigDecimal && b instanceof BigDecimal) {
+      return (N) ((BigDecimal) a).add((BigDecimal) b);
+    }
+    return null;
+  }
+
+  public static Integer plus(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a + b;
+  }
+
+  public static Long plus(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a + b;
+  }
+
+  public static Double plus(final Double a, final Double b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a + b;
+  }
+
   public static int minus(final int a, final int b) {
     return a - b;
   }
@@ -30,6 +71,42 @@ public class Operators {
     return a - b;
   }
 
+  public static Integer minus(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a - b;
+  }
+
+  public static Long minus(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a - b;
+  }
+
+  public static Double minus(final Double a, final Double b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a - b;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <N extends Number> N minus(final N a, final N b) {
+    if (a instanceof Integer && b instanceof Integer) {
+      return (N) (Integer) (((Integer) a) - ((Integer) b));
+    } else if (a instanceof Long && b instanceof Long) {
+      return (N) (Long) (((Long) a) - ((Long) b));
+    } else if (a instanceof Double && b instanceof Double) {
+      return (N) (Double) (((Double) a) - ((Double) b));
+    } else if (a instanceof BigInteger && b instanceof BigInteger) {
+      return (N) ((BigInteger) a).subtract((BigInteger) b);
+    } else if (a instanceof BigDecimal && b instanceof BigDecimal) {
+      return (N) ((BigDecimal) a).subtract((BigDecimal) b);
+    }
+    return null;
+  }
   public static int times(final int a, final int b) {
     return a * b;
   }
@@ -40,6 +117,43 @@ public class Operators {
 
   public static double times(final double a, final double b) {
     return a * b;
+  }
+
+  public static Integer times(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a * b;
+  }
+
+  public static Long times(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a * b;
+  }
+
+  public static Double times(final Double a, final Double b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a * b;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <N extends Number> N times(final N a, final N b) {
+    if (a instanceof Integer && b instanceof Integer) {
+      return (N) (Integer) (((Integer) a) * ((Integer) b));
+    } else if (a instanceof Long && b instanceof Long) {
+      return (N) (Long) (((Long) a) * ((Long) b));
+    } else if (a instanceof Double && b instanceof Double) {
+      return (N) (Double) (((Double) a) * ((Double) b));
+    } else if (a instanceof BigInteger && b instanceof BigInteger) {
+      return (N) ((BigInteger) a).multiply((BigInteger) b);
+    } else if (a instanceof BigDecimal && b instanceof BigDecimal) {
+      return (N) ((BigDecimal) a).multiply((BigDecimal) b);
+    }
+    return null;
   }
 
   public static int div(final int a, final int b) {
@@ -54,6 +168,43 @@ public class Operators {
     return a / b;
   }
 
+  public static Integer div(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a / b;
+  }
+
+  public static Long div(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a / b;
+  }
+
+  public static Double div(final Double a, final Double b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a / b;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <N extends Number> N div(final N a, final N b) {
+    if (a instanceof Integer && b instanceof Integer) {
+      return (N) (Integer) (((Integer) a) / ((Integer) b));
+    } else if (a instanceof Long && b instanceof Long) {
+      return (N) (Long) (((Long) a) / ((Long) b));
+    } else if (a instanceof Double && b instanceof Double) {
+      return (N) (Double) (((Double) a) / ((Double) b));
+    } else if (a instanceof BigInteger && b instanceof BigInteger) {
+      return (N) ((BigInteger) a).divide((BigInteger) b);
+    } else if (a instanceof BigDecimal && b instanceof BigDecimal) {
+      return (N) ((BigDecimal) a).divide((BigDecimal) b, RoundingMode.HALF_EVEN);
+    }
+    return null;
+  }
+
   public static int mod(final int a, final int b) {
     return a % b;
   }
@@ -64,6 +215,41 @@ public class Operators {
 
   public static double mod(final double a, final double b) {
     return a % b;
+  }
+
+  public static Integer mod(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a % b;
+  }
+
+  public static Long mod(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a % b;
+  }
+
+  public static Double mod(final Double a, final Double b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a % b;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <N extends Number> N mod(final N a, final N b) {
+    if (a instanceof Integer && b instanceof Integer) {
+      return (N) (Integer) (((Integer) a) % ((Integer) b));
+    } else if (a instanceof Long && b instanceof Long) {
+      return (N) (Long) (((Long) a) % ((Long) b));
+    } else if (a instanceof Double && b instanceof Double) {
+      return (N) (Double) (((Double) a) % ((Double) b));
+    } else if (a instanceof BigInteger && b instanceof BigInteger) {
+      return (N) ((BigInteger) a).mod((BigInteger) b);
+    }
+    return null;
   }
 
   public static boolean neq(final boolean a, final boolean b) {
@@ -82,6 +268,13 @@ public class Operators {
     return a != b;
   }
 
+  public static Boolean neq(final Object a, final Object b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return !a.equals(b);
+  }
+
   public static boolean eq(final boolean a, final boolean b) {
     return a == b;
   }
@@ -98,6 +291,13 @@ public class Operators {
     return a == b;
   }
 
+  public static Boolean eq(final Object a, final Object b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a.equals(b);
+  }
+
   public static boolean lt(final int a, final int b) {
     return a < b;
   }
@@ -107,6 +307,27 @@ public class Operators {
   }
 
   public static boolean lt(final double a, final double b) {
+    return a < b;
+  }
+
+  public static Boolean lt(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a < b;
+  }
+
+  public static Boolean lt(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a < b;
+  }
+
+  public static Boolean lt(final Double a, final Double b) {
+    if (a == null || b == null) {
+      return null;
+    }
     return a < b;
   }
 
@@ -122,6 +343,27 @@ public class Operators {
     return a <= b;
   }
 
+  public static Boolean lte(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a <= b;
+  }
+
+  public static Boolean lte(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a <= b;
+  }
+
+  public static Boolean lte(final Double a, final Double b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a <= b;
+  }
+
   public static boolean gt(final int a, final int b) {
     return a > b;
   }
@@ -134,6 +376,27 @@ public class Operators {
     return a > b;
   }
 
+  public static Boolean gt(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a > b;
+  }
+
+  public static Boolean gt(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a > b;
+  }
+
+  public static Boolean gt(final Double a, final Double b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a > b;
+  }
+
   public static boolean gte(final int a, final int b) {
     return a >= b;
   }
@@ -143,6 +406,27 @@ public class Operators {
   }
 
   public static boolean gte(final double a, final double b) {
+    return a >= b;
+  }
+
+  public static Boolean gte(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a >= b;
+  }
+
+  public static Boolean gte(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a >= b;
+  }
+
+  public static Boolean gte(final Double a, final Double b) {
+    if (a == null || b == null) {
+      return null;
+    }
     return a >= b;
   }
 }
