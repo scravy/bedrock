@@ -5,11 +5,10 @@ import lombok.experimental.UtilityClass;
 import javax.annotation.Nonnull;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Callable;
 
+@SuppressWarnings("WeakerAccess")
 @UtilityClass
 public class Reflections {
 
@@ -87,6 +86,42 @@ public class Reflections {
       new Class[]{clazz},
       (proxy, method, args) -> handler.apply(method.getName(), new SeqSimple<>(args))
     );
+  }
+
+  private static final Map<Class<?>, Class<?>> boxedToPrimitiveClassesMap = new HashMap<>();
+
+  static {
+    boxedToPrimitiveClassesMap.put(Void.class, void.class);
+    boxedToPrimitiveClassesMap.put(Boolean.class, boolean.class);
+    boxedToPrimitiveClassesMap.put(Character.class, char.class);
+    boxedToPrimitiveClassesMap.put(Byte.class, byte.class);
+    boxedToPrimitiveClassesMap.put(Short.class, short.class);
+    boxedToPrimitiveClassesMap.put(Integer.class, int.class);
+    boxedToPrimitiveClassesMap.put(Long.class, long.class);
+    boxedToPrimitiveClassesMap.put(Float.class, float.class);
+    boxedToPrimitiveClassesMap.put(Double.class, double.class);
+  }
+
+  public static Class<?> getPrimitiveClassFor(final Class<?> boxedClass) {
+    return boxedToPrimitiveClassesMap.get(boxedClass);
+  }
+
+  private static final Map<Class<?>, Class<?>> primitiveToBoxedClassesMap = new HashMap<>();
+
+  static {
+    primitiveToBoxedClassesMap.put(void.class, Void.class);
+    primitiveToBoxedClassesMap.put(boolean.class, Boolean.class);
+    primitiveToBoxedClassesMap.put(char.class, Character.class);
+    primitiveToBoxedClassesMap.put(byte.class, Byte.class);
+    primitiveToBoxedClassesMap.put(short.class, Short.class);
+    primitiveToBoxedClassesMap.put(int.class, Integer.class);
+    primitiveToBoxedClassesMap.put(long.class, Long.class);
+    primitiveToBoxedClassesMap.put(float.class, Float.class);
+    primitiveToBoxedClassesMap.put(double.class, Double.class);
+  }
+
+  public static Class<?> getBoxedClassFor(final Class<?> primitiveClass) {
+    return primitiveToBoxedClassesMap.get(primitiveClass);
   }
 
 }
