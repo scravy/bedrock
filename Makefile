@@ -7,7 +7,7 @@ clean:
 	rm -rf coverage
 
 publish: clean
-	mvn deploy
+	mvn -Prelease deploy
 
 purge: clean
 	rm -rf .idea *.iml pom.xml.releaseBackup release.properties
