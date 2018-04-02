@@ -364,6 +364,18 @@ class SeqExemplaryChecks {
         expect(seq.asString(", ")).toEqual("1, 2, 2, 4, 3");
       });
     });
+
+    describe("intSum", () -> {
+      it("should return the sum", () -> {
+        expect(Seqs.intSum(seq)).toEqual(12);
+      });
+    });
+
+    describe("intProduct", () -> {
+      it("should return the product", () -> {
+        expect(Seqs.intProduct(seq)).toEqual(48);
+      });
+    });
   }
 
 }
