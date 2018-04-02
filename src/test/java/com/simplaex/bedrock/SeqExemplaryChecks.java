@@ -376,6 +376,18 @@ class SeqExemplaryChecks {
         expect(Seqs.intProduct(seq)).toEqual(48);
       });
     });
+
+    describe("maximum", () -> {
+      it("should return the maximum", () -> {
+        expect(Seqs.maximum(seq)).toEqual(4);
+      });
+    });
+
+    describe("minimum", () -> {
+      it("should return the minimum", () -> {
+        expect(Seqs.minimum(seq)).toEqual(1);
+      });
+    });
   }
 
 }
