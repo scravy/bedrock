@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 /**
  * An immutable sequence.
  *
- * @param <E>
+ * @param <E> The type of the Elements contained in this Sequence.
  */
 @Immutable
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -27,11 +27,7 @@ public abstract class Seq<E> implements
   SequenceMethods<Predicate<? super E>, BiPredicate<? super E, ? super E>, Seq<E>>,
   IntFunction<E> {
 
-  final Object[] backingArray;
-
-  Seq(final Object[] array) {
-    backingArray = array;
-  }
+  private int hashCode = 0;
 
   public abstract E get(@Nonnegative final int index);
 
@@ -230,13 +226,17 @@ public abstract class Seq<E> implements
     return new SeqSimple<>(arr);
   }
 
-  public <A> A foldl(@Nonnull final BiFunction<? super A, ? super E, A> function, final A startValue) {
+  public <A> A foldl(@Nonnull final BiFunction<? super A, ? super E, ? extends A> function, final A startValue) {
     Objects.requireNonNull(function, "'function' must not be null");
     A acc = startValue;
     for (int i = 0; i < length(); i += 1) {
       acc = function.apply(acc, get(i));
     }
     return acc;
+  }
+
+  public E foldl1(@Nonnull final BiFunction<? super E, ? super E, ? extends E> function) {
+    return foldl(function, head());
   }
 
   public <A> A foldr(@Nonnull final BiFunction<? super E, ? super A, ? extends A> function, final A startValue) {
@@ -246,6 +246,10 @@ public abstract class Seq<E> implements
       acc = function.apply(get(i), acc);
     }
     return acc;
+  }
+
+  public E foldr1(@Nonnull final BiFunction<? super E, ? super E, ? extends E> function) {
+    return foldr(function, last());
   }
 
   @Override
@@ -263,6 +267,14 @@ public abstract class Seq<E> implements
       }
     });
     return Pair.of(b1.result(), b2.result());
+  }
+
+  public E maximumBy(final Comparator<? super E> comparator) {
+    return foldl1((left, right) -> comparator.compare(left, right) < 0 ? right : left);
+  }
+
+  public E minimumBy(final Comparator<? super E> comparator) {
+    return foldl1((left, right) -> comparator.compare(left, right) > 0 ? right : left);
   }
 
   @Override
@@ -544,8 +556,19 @@ public abstract class Seq<E> implements
   }
 
   @Override
-  public int hashCode() {
-    return Arrays.hashCode(backingArray);
+  public final int hashCode() {
+    if (hashCode == 0) {
+      hashCode = calculateHashCode();
+    }
+    return hashCode;
+  }
+
+  int calculateHashCode() {
+    int result = 1;
+    for (final E element : this) {
+      result = 31 * result + (element == null ? 0 : element.hashCode());
+    }
+    return result;
   }
 
   @Override
@@ -683,7 +706,7 @@ public abstract class Seq<E> implements
     if (map.isEmpty()) {
       return ArrayMap.empty();
     }
-    final Object[] keys = Seq.ofCollection(map.keySet()).backingArray;
+    final Object[] keys = Seq.ofCollectionInternal(map.keySet()).backingArray;
     final Object[] values = new Object[keys.length];
     for (int i = 0; i < keys.length; i += 1) {
       //noinspection SuspiciousMethodCalls
@@ -723,11 +746,21 @@ public abstract class Seq<E> implements
   }
 
   @Nonnull
+  static <E> SeqSimple<E> ofArrayZeroCopyInternal(@Nonnull final Object[] array) {
+    return new SeqSimple<>(array);
+  }
+
+  @Nonnull
   public static <E> Seq<E> ofCollection(@Nonnull final Collection<? extends E> collection) {
     Objects.requireNonNull(collection);
     if (collection.isEmpty()) {
       return empty();
     }
+    return ofCollectionInternal(collection);
+  }
+
+  @Nonnull
+  static <E> SeqSimple<E> ofCollectionInternal(@Nonnull final Collection<? extends E> collection) {
     final Object[] array = new Object[collection.size()];
     int i = 0;
     for (final E e : collection) {
@@ -820,4 +853,19 @@ public abstract class Seq<E> implements
     return new SeqBuilder<>(sizeHint);
   }
 
+  @Nonnegative
+  public static Seq<Integer> range(@Nonnegative final int size) {
+    return new SeqGenerated<>(x -> x, size);
+  }
+
+  @Nonnegative
+  public static Seq<Integer> rangeStep(@Nonnegative final int size, final int step) {
+    return new SeqGenerated<>(x -> x * step, size * step);
+  }
+
+  @Nonnegative
+  public static <E> Seq<E> ofGenerator(@Nonnull final IntFunction<E> function, @Nonnegative final int length) {
+    Objects.requireNonNull(function, "'function' must not be null.");
+    return new SeqGenerated<>(function, length);
+  }
 }

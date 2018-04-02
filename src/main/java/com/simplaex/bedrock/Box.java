@@ -4,10 +4,7 @@ import lombok.*;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
-import java.util.function.IntUnaryOperator;
-import java.util.function.LongUnaryOperator;
+import java.util.function.*;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -29,6 +26,18 @@ public abstract class Box<T> {
     Objects.requireNonNull(function, "'function' must not be null.");
     setValue(function.apply(getValue()));
     return getValue();
+  }
+
+  public boolean exists(@Nonnull final Predicate<T> predicate) {
+    Objects.requireNonNull(predicate, "'predicate' must not be null.");
+    return predicate.test(getValue());
+  }
+
+  public boolean contains(final T value) {
+    if (value == null) {
+      return getValue() == null;
+    }
+    return value.equals(getValue());
   }
 
   @Nonnull
@@ -104,6 +113,10 @@ public abstract class Box<T> {
     public void sub(final int value) {
       intValue -= value;
     }
+
+    public boolean exists(final IntPredicate predicate) {
+      return predicate.test(intValue);
+    }
   }
 
   @EqualsAndHashCode(callSuper = false)
@@ -153,6 +166,10 @@ public abstract class Box<T> {
     public void sub(final long value) {
       longValue -= value;
     }
+
+    public boolean exists(final LongPredicate predicate) {
+      return predicate.test(longValue);
+    }
   }
 
   @EqualsAndHashCode(callSuper = false)
@@ -193,6 +210,10 @@ public abstract class Box<T> {
 
     public void sub(final double value) {
       doubleValue -= value;
+    }
+
+    public boolean exists(final DoublePredicate predicate) {
+      return predicate.test(doubleValue);
     }
   }
 }

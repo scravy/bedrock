@@ -14,7 +14,7 @@ class SeqEmpty extends Seq<Object> {
   static Seq<Object> EMPTY = new SeqEmpty();
 
   private SeqEmpty() {
-    super(null);
+
   }
 
   @Override
@@ -155,7 +155,7 @@ class SeqEmpty extends Seq<Object> {
   }
 
   @Override
-  public int hashCode() {
+  int calculateHashCode() {
     return 1;
   }
 }

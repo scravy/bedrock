@@ -9,8 +9,10 @@ import java.util.Objects;
 
 class SeqReversed<E> extends Seq<E> {
 
+  private final Object[] backingArray;
+
   SeqReversed(@Nonnull final Object[] array) {
-    super(array);
+    this.backingArray = array;
   }
 
   @SuppressWarnings("unchecked")
@@ -102,4 +104,5 @@ class SeqReversed<E> extends Seq<E> {
   public int length() {
     return backingArray.length;
   }
+
 }

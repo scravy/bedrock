@@ -27,4 +27,5 @@ class SeqSimpleSorted<E extends Comparable<E>> extends SeqSimple<E> {
   public Seq<E> sorted() {
     return this;
   }
+
 }

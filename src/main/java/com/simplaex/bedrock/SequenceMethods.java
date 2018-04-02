@@ -214,5 +214,4 @@ interface SequenceMethods<Predicate, BiPredicate, Sequence extends SequenceMetho
   @Nonnull
   Seq<Sequence> permutations();
 
-
 }

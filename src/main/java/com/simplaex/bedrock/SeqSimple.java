@@ -12,8 +12,10 @@ import java.util.stream.Stream;
 
 class SeqSimple<E> extends Seq<E> {
 
+  final Object[] backingArray;
+
   SeqSimple(@Nonnull final Object[] array) {
-    super(array);
+    this.backingArray = array;
   }
 
   @SuppressWarnings("unchecked")
@@ -33,6 +35,12 @@ class SeqSimple<E> extends Seq<E> {
   @Nonnull
   @Override
   public Seq<E> sorted() {
+    return sortedInternal();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Nonnull
+  SeqSimpleSorted sortedInternal() {
     final Object[] array = backingArray.clone();
     Arrays.sort(array, nullAcceptingComparator);
     return new SeqSimpleSorted(array);
@@ -108,10 +116,5 @@ class SeqSimple<E> extends Seq<E> {
   @Nonnegative
   public int length() {
     return backingArray.length;
-  }
-
-  @Override
-  public int hashCode() {
-    return Arrays.hashCode(backingArray);
   }
 }

@@ -12,8 +12,10 @@ class SeqReversedView<E> extends Seq<E> {
   private final int beginOffset;
   private final int endOffset;
 
+  private final Object[] backingArray;
+
   SeqReversedView(@Nonnull final Object[] array, @Nonnegative final int beginOffset, @Nonnegative final int endOffset) {
-    super(array);
+    this.backingArray = array;
     this.beginOffset = beginOffset;
     this.endOffset = endOffset;
   }
@@ -51,7 +53,7 @@ class SeqReversedView<E> extends Seq<E> {
     final Object[] array = new Object[len];
     System.arraycopy(backingArray, beginOffset, array, 0, len);
     Arrays.sort(array, (Comparator<Object>) comparator);
-    return new SeqSimple<>(array);
+    return Seq.ofArrayZeroCopyInternal(array);
   }
 
   @Nonnull

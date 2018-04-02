@@ -244,7 +244,7 @@ public final class ArrayMap<K extends Comparable<K>, V> implements Mapping<K, V>
       return ofMap((TreeMap<K, V>) pairs);
     }
 
-    final Object[] keys = Seq.ofCollection(pairs.keySet()).sorted().backingArray;
+    final Object[] keys = Seq.ofCollectionInternal(pairs.keySet()).sortedInternal().backingArray;
     final Object[] values = new Object[pairs.size()];
 
     for (int i = 0; i < keys.length; i += 1) {
@@ -257,7 +257,7 @@ public final class ArrayMap<K extends Comparable<K>, V> implements Mapping<K, V>
   @Nonnull
   public static <K extends Comparable<K>, V> ArrayMap<K, V> ofMap(@Nonnull final TreeMap<K, V> pairs) {
 
-    final Object[] keys = Seq.ofCollection(pairs.keySet()).backingArray;
+    final Object[] keys = Seq.ofCollectionInternal(pairs.keySet()).backingArray;
     final Object[] values = new Object[pairs.size()];
 
     for (int i = 0; i < keys.length; i += 1) {
