@@ -40,17 +40,17 @@ public class Seqs {
 
   public static int intProduct(final Seq<Integer> seq) {
     Objects.requireNonNull(seq, "'seq' must not be null");
-    return seq.foldl(Operators::plus, 1);
+    return seq.foldl(Operators::times, 1);
   }
 
   public static long longProduct(final Seq<Long> seq) {
     Objects.requireNonNull(seq, "'seq' must not be null");
-    return seq.foldl(Operators::plus, 1L);
+    return seq.foldl(Operators::times, 1L);
   }
 
   public static double doubleProduct(final Seq<Double> seq) {
     Objects.requireNonNull(seq, "'seq' must not be null");
-    return seq.foldl(Operators::plus, 1.0);
+    return seq.foldl(Operators::times, 1.0);
   }
 
   public static boolean and(final Seq<Boolean> seq) {
