@@ -31,7 +31,7 @@ public class OperatorsTest {
     });
   }
 
-  private <N extends Number> void check(final N a, final N b, final BiFunction<N, N, Boolean> f) {
+  private <N extends Comparable<? super N>> void check(final N a, final N b, final BiFunction<N, N, Boolean> f) {
     it("should apply the comparison operator on " + a + " and " + b, () -> {
       expect(f.apply(a, b)).toEqual(Boolean.TRUE);
       expect(f.apply(b, a)).toEqual(Boolean.FALSE);
@@ -141,6 +141,12 @@ public class OperatorsTest {
           check(3.0, 2.0, Operators::gte);
           check(1.0, 2.0, Operators::lt);
           check(1.0, 2.0, Operators::lte);
+        });
+        describe(String.class.toString(), () -> {
+          check("c", "b", Operators::gt);
+          check("c", "b", Operators::gte);
+          check("a", "b", Operators::lt);
+          check("a", "b", Operators::lte);
         });
       });
 

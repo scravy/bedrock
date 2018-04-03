@@ -5,6 +5,7 @@ import lombok.val;
 import javax.annotation.Nonnull;
 import java.lang.ref.SoftReference;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -89,6 +90,13 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
         return entrySet;
       }
     };
+  }
+
+  default void forEach(final BiConsumer<? super From, ? super To> action) {
+    Objects.requireNonNull(action, "'action' must not be null");
+    for (final Pair<From, To> t : this) {
+      action.accept(t.fst(), t.snd());
+    }
   }
 
   static <From, To> Mapping<From, To> wrap(final Map<From, To> map) {

@@ -63,4 +63,42 @@ public class Seqs {
     return seq.foldr((left, right) -> left || right, false);
   }
 
+  public static <A, B> int commonPrefixLength(final Seq<A> as, final Seq<B> bs) {
+    Objects.requireNonNull(as, "'as' must not be null");
+    Objects.requireNonNull(bs, "'bs' must not be null");
+
+    final int length = Math.min(as.size(), bs.size());
+
+    int commonPrefixLength = 0;
+    for (int i = 0; i < length; i += 1) {
+      final A a = as.get(i);
+      final B b = bs.get(i);
+
+      if (a == null) {
+        if (b == null) {
+          commonPrefixLength += 1;
+          continue;
+        }
+        break;
+      }
+      if (a.equals(b)) {
+        commonPrefixLength += 1;
+        continue;
+      }
+      break;
+    }
+
+    return commonPrefixLength;
+  }
+
+  public static <E, A extends E, B extends E> Seq<A> commonPrefix(final Seq<A> as, final Seq<B> bs) {
+    final int commonPrefixLength = commonPrefixLength(as, bs);
+    return as.subSequence(0, commonPrefixLength);
+  }
+
+  public static <E, A extends E, B extends E> Seq<A> commonPrefixView(final Seq<A> as, final Seq<B> bs) {
+    final int commonPrefixLength = commonPrefixLength(as, bs);
+    return as.subSequenceView(0, commonPrefixLength);
+  }
+
 }

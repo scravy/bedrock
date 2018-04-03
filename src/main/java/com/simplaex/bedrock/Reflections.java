@@ -124,4 +124,22 @@ public class Reflections {
     return primitiveToBoxedClassesMap.get(primitiveClass);
   }
 
+  public static Seq<Class<?>> getParents(final Class<?> clazz) {
+    Class<?> current = clazz;
+    final SeqBuilder<Class<?>> seqBuilder = Seq.builder();
+    do {
+      seqBuilder.add(current);
+      current = current.getSuperclass();
+    } while (!Object.class.equals(current) && current != null);
+    if (current != null) {
+      seqBuilder.add(current);
+    }
+    return seqBuilder.result().reversed();
+  }
+
+  public static Optional<Class<?>> getCommonBaseClass(final Class<?> oneClass, final Class<?> anotherClass) {
+    final Seq<Class<?>> commonAncestors = Seqs.commonPrefix(getParents(oneClass), getParents(anotherClass));
+    return commonAncestors.lastOptional();
+  }
+
 }

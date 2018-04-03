@@ -7,14 +7,12 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Duration;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
-import static com.greghaskins.spectrum.Spectrum.describe;
-import static com.greghaskins.spectrum.Spectrum.it;
-import static com.greghaskins.spectrum.Spectrum.let;
+import static com.greghaskins.spectrum.Spectrum.*;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
 import static com.simplaex.bedrock.Pair.pair;
 
@@ -63,6 +61,24 @@ public class ControlTest {
         expect(counter.get()).toEqual(3);
         expect(thread.getState()).toEqual(Thread.State.TERMINATED);
         expect(finished.get()).toEqual(1);
+      });
+    });
+    describe("parallel(ThrowingConsumer...)", () -> {
+      it("should orchestrate the parallel application of async functions", () -> {
+        final Semaphore semaphore = new Semaphore(0);
+        final ExecutorService executorService = Executors.newWorkStealingPool();
+        final Consumer<Callback<Seq<Integer>>> asyncFunc = Control.parallel(
+          callback -> executorService.submit(() -> callback.success(18)),
+          callback -> executorService.submit(() -> callback.success(91)),
+          callback -> executorService.submit(() -> callback.success(37))
+        );
+        final AtomicReference<Seq<Integer>> promise = new AtomicReference<>();
+        asyncFunc.accept((err, res) -> {
+          promise.set(res);
+          semaphore.release();
+        });
+        expect(semaphore.tryAcquire(2, TimeUnit.SECONDS)).toBeTrue();
+        expect(promise.get()).toEqual(Seq.of(18, 91, 37));
       });
     });
     describe("parallel(Executor,ThrowingRunnable...)", () -> {

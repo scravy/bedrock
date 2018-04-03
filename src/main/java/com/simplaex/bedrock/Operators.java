@@ -332,6 +332,13 @@ public class Operators {
     return a < b;
   }
 
+  public static <E extends Comparable<? super E>> Boolean lt(final E a, final E b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a.compareTo(b) < 0;
+  }
+
   public static boolean lte(final int a, final int b) {
     return a <= b;
   }
@@ -363,6 +370,13 @@ public class Operators {
       return null;
     }
     return a <= b;
+  }
+
+  public static <E extends Comparable<? super E>> Boolean lte(final E a, final E b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a.compareTo(b) <= 0;
   }
 
   public static boolean gt(final int a, final int b) {
@@ -398,6 +412,13 @@ public class Operators {
     return a > b;
   }
 
+  public static <E extends Comparable<? super E>> Boolean gt(final E a, final E b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a.compareTo(b) > 0;
+  }
+
   public static boolean gte(final int a, final int b) {
     return a >= b;
   }
@@ -429,5 +450,12 @@ public class Operators {
       return null;
     }
     return a >= b;
+  }
+
+  public static <E extends Comparable<? super E>> Boolean gte(final E a, final E b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a.compareTo(b) >= 0;
   }
 }

@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -68,11 +69,18 @@ public class Control {
     }
   }
 
-  public static void forever(@Nonnull final ThrowingRunnable runnable) {
-    forever(Optional
+  public static Thread.UncaughtExceptionHandler uncaughtExceptionHandler() {
+    return Optional
       .ofNullable(Thread.currentThread().getUncaughtExceptionHandler())
-      .orElse(NoOp.uncaughtExceptionHandler()), runnable
-    );
+      .orElse(NoOp.uncaughtExceptionHandler());
+  }
+
+  public static void report(@Nonnull final Object err) {
+    uncaughtExceptionHandler().uncaughtException(Thread.currentThread(), toThrowable(err));
+  }
+
+  public static void forever(@Nonnull final ThrowingRunnable runnable) {
+    forever(uncaughtExceptionHandler(), runnable);
   }
 
   public static void forever(
@@ -172,6 +180,47 @@ public class Control {
       return results.build();
     }
     throw new ParallelExecutionException(exceptions.result());
+  }
+
+  @SafeVarargs
+  public static <T> ThrowingConsumer<Callback<Seq<T>>> parallel(@Nonnull final ThrowingConsumer<Callback<T>>... actions) {
+    return (callback) -> {
+      final boolean[] hasResult = new boolean[actions.length];
+      final Object[] results = new Object[actions.length];
+      final Object[] errors = new Object[actions.length];
+      final AtomicInteger outstanding = new AtomicInteger(actions.length);
+      final Function<Integer, Callback<T>> cb = (ix) -> (err, res) -> {
+        synchronized (actions[ix]) {
+          if (hasResult[ix]) {
+            report(new TaskCompletedMoreThanOnceException(actions[ix], errors[ix], results[ix], err, res));
+            return;
+          }
+          hasResult[ix] = true;
+        }
+        errors[ix] = err;
+        results[ix] = res;
+        if (outstanding.decrementAndGet() == 0) {
+          final Seq<Object> errorsSeq = Seq.ofArrayZeroCopyInternal(errors);
+          final Seq<T> resultsSeq = Seq.ofArrayZeroCopyInternal(results);
+          final Object error;
+          if (errorsSeq.exists(Objects::nonNull)) {
+            error = new ParallelExecutionException(errorsSeq.map(Control::toThrowable));
+          } else {
+            error = null;
+          }
+          callback.call(error, resultsSeq);
+        }
+      };
+      int i = 0;
+      for (final ThrowingConsumer<Callback<T>> action : actions) {
+        final int myIndex = i++;
+        try {
+          action.consume(cb.apply(myIndex));
+        } catch (final Exception exc) {
+          cb.apply(myIndex).fail(exc);
+        }
+      }
+    };
   }
 
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -328,12 +377,8 @@ public class Control {
       runWithOptions(options, argument, (opts, error, result) -> {
         if (error == null) {
           promise.fulfill(result);
-        } else if (error instanceof Exception) {
-          promise.fail((Exception) error);
-        } else if (error instanceof String) {
-          promise.fail(new LightweightRuntimeException((String) error));
         } else {
-          promise.fail(new AsyncExecutionException(error));
+          promise.fail(toThrowable(error));
         }
       });
       return promise;
@@ -355,5 +400,22 @@ public class Control {
   public static <In, Out> Async<In, Out> async(@Nonnull final ThrowingBiConsumer<In, Callback<Out>> function) {
     Objects.requireNonNull(function, "'function' must not be null.");
     return new Async<>(function);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Throwable toThrowable(final Object object) {
+    if (object instanceof Throwable) {
+      return (Throwable) object;
+    }
+    if (object instanceof String) {
+      return new LightweightRuntimeException((String) object);
+    }
+    if (object instanceof Seq) {
+      if (((Seq) object).forAll(obj -> obj instanceof Throwable)) {
+        return new ParallelExecutionException((Seq<Throwable>) object);
+      }
+    }
+    return new AsyncExecutionException(object);
+
   }
 }

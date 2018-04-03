@@ -269,6 +269,24 @@ public abstract class Seq<E> implements
     return Pair.of(b1.result(), b2.result());
   }
 
+  @SuppressWarnings("unchecked")
+  public E maximum() {
+    try {
+      return (E) Seqs.maximum((Seq) this);
+    } catch (final ClassCastException exc) {
+      return null;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public E minimum() {
+    try {
+      return (E) Seqs.minimum((Seq) this);
+    } catch (final ClassCastException exc) {
+      return null;
+    }
+  }
+
   public E maximumBy(final Comparator<? super E> comparator) {
     return foldl1((left, right) -> comparator.compare(left, right) < 0 ? right : left);
   }
@@ -803,6 +821,16 @@ public abstract class Seq<E> implements
     return new SeqSimple<>(array);
   }
 
+  public interface WithIndexConsumer<E> {
+    void consume(int index, E element);
+  }
+
+  public void forEach(final WithIndexConsumer<E> consumer) {
+    for (int i = 0; i < size(); i += 1) {
+      consumer.consume(i, get(i));
+    }
+  }
+
   @Nonnull
   public static Seq<Integer> codepointsOfString(@Nonnull final String string) {
     final char[] array = string.toCharArray();
@@ -851,16 +879,6 @@ public abstract class Seq<E> implements
   @Nonnull
   public static <E> SeqBuilder<E> builder(final int sizeHint) {
     return new SeqBuilder<>(sizeHint);
-  }
-
-  @Nonnegative
-  public static Seq<Integer> range(@Nonnegative final int size) {
-    return new SeqGenerated<>(x -> x, size);
-  }
-
-  @Nonnegative
-  public static Seq<Integer> rangeStep(@Nonnegative final int size, final int step) {
-    return new SeqGenerated<>(x -> x * step, size * step);
   }
 
   @Nonnegative

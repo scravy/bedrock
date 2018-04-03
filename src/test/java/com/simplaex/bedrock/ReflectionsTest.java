@@ -3,12 +3,16 @@ package com.simplaex.bedrock;
 import com.greghaskins.spectrum.Spectrum;
 import org.junit.runner.RunWith;
 
+import java.io.DataOutputStream;
+import java.io.FilterOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.zip.GZIPOutputStream;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
@@ -50,6 +54,12 @@ public class ReflectionsTest {
     describe("getFactory(T)", () -> {
       it("should create a factory for Thread", () -> {
         expect(Reflections.getFactory(Thread.class).isPresent()).toBeTrue();
+      });
+    });
+    describe("getCommonBaseClass", () -> {
+      it("should find the common base class of GZIPOutputStream and DataOutputStream", () -> {
+        expect(Reflections.getCommonBaseClass(GZIPOutputStream.class, DataOutputStream.class))
+          .toEqual(Optional.of(FilterOutputStream.class));
       });
     });
   }
