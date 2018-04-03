@@ -138,7 +138,7 @@ public class Reflections {
   }
 
   public static Optional<Class<?>> getCommonBaseClass(final Class<?> oneClass, final Class<?> anotherClass) {
-    final Seq<Class<?>> commonAncestors = Seqs.commonPrefix(getParents(oneClass), getParents(anotherClass));
+    final Seq<Class<?>> commonAncestors = Seqs.commonPrefixView(getParents(oneClass), getParents(anotherClass));
     return commonAncestors.lastOptional();
   }
 
