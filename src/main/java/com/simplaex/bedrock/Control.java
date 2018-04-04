@@ -26,32 +26,32 @@ public class Control {
 
   @Value
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-  public static class DispatchBranch<A, T> {
+  public static class TypeOfBranch<A, T> {
     private final Class<A> clazz;
     private final ThrowingFunction<A, T> callable;
   }
 
   @Value
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-  public static class DispatchVoidBranch<A> {
+  public static class TypeOfVoidBranch<A> {
     private final Class<A> clazz;
     private final ThrowingConsumer<A> callable;
   }
 
   @Nonnull
-  public static <A, T> DispatchBranch<A, T> branch(@Nonnull final Class<A> clazz, @Nonnull final ThrowingFunction<A, T> f) {
-    return new DispatchBranch<>(clazz, f);
+  public static <A, T> TypeOfBranch<A, T> type(@Nonnull final Class<A> clazz, @Nonnull final ThrowingFunction<A, T> f) {
+    return new TypeOfBranch<>(clazz, f);
   }
 
   @Nonnull
-  public static <A> DispatchVoidBranch<A> voidBranch(@Nonnull final Class<A> clazz, @Nonnull final ThrowingConsumer<A> f) {
-    return new DispatchVoidBranch<>(clazz, f);
+  public static <A> TypeOfVoidBranch<A> type_(@Nonnull final Class<A> clazz, @Nonnull final ThrowingConsumer<A> f) {
+    return new TypeOfVoidBranch<>(clazz, f);
   }
 
   @SuppressWarnings("unchecked")
   @SafeVarargs
-  public static <T> T dispatch(final Object value, final DispatchBranch<?, ? extends T>... dispatchBranches) {
-    for (val branch : dispatchBranches) {
+  public static <T> T typeOf(final Object value, final TypeOfBranch<?, ? extends T>... typeOfBranches) {
+    for (val branch : typeOfBranches) {
       if (branch.getClazz().isAssignableFrom(value.getClass())) {
         return Try.execute(() -> (T) ((ThrowingFunction) branch.getCallable()).execute(value)).orElseThrowRuntime();
       }
@@ -60,9 +60,55 @@ public class Control {
   }
 
   @SuppressWarnings("unchecked")
-  public static void dispatch(final Object value, final DispatchVoidBranch<?>... branches) {
+  public static void typeOf(final Object value, final TypeOfVoidBranch<?>... branches) {
     for (val branch : branches) {
       if (branch.getClazz().isAssignableFrom(value.getClass())) {
+        Try.run(() -> ((ThrowingConsumer) branch.getCallable()).accept(value));
+        return;
+      }
+    }
+  }
+
+  @Value
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  public static class ValueOfBranch<A, T> {
+    private final A value;
+    private final ThrowingFunction<A, T> callable;
+  }
+
+  @Value
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  public static class ValueOfVoidBranch<A> {
+    private final A value;
+    private final ThrowingConsumer<A> callable;
+  }
+
+  @Nonnull
+  public static <A, T> ValueOfBranch<A, T> value(@Nonnull final A value, @Nonnull final ThrowingFunction<A, T> f) {
+    return new ValueOfBranch<>(value, f);
+  }
+
+  @Nonnull
+  public static <A> ValueOfVoidBranch<A> value_(@Nonnull final A value, @Nonnull final ThrowingConsumer<A> f) {
+    return new ValueOfVoidBranch<>(value, f);
+  }
+
+
+  @SuppressWarnings("unchecked")
+  @SafeVarargs
+  public static <T> T valueOf(final Object value, final ValueOfBranch<?, ? extends T>... typeOfBranches) {
+    for (val branch : typeOfBranches) {
+      if (Objects.equals(value, branch.getValue())) {
+        return Try.execute(() -> (T) ((ThrowingFunction) branch.getCallable()).execute(value)).orElseThrowRuntime();
+      }
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static void valueOf(final Object value, final ValueOfVoidBranch<?>... branches) {
+    for (val branch : branches) {
+      if (Objects.equals(value, branch.getValue())) {
         Try.run(() -> ((ThrowingConsumer) branch.getCallable()).accept(value));
         return;
       }

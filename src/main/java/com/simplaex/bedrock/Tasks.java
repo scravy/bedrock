@@ -10,8 +10,7 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static com.simplaex.bedrock.Control.dispatch;
-import static com.simplaex.bedrock.Control.voidBranch;
+import static com.simplaex.bedrock.Control.*;
 
 @UtilityClass
 public class Tasks {
@@ -297,20 +296,20 @@ public class Tasks {
 
       @SuppressWarnings("unchecked")
       void run() {
-        dispatch(
+        typeOf(
           task,
-          voidBranch(Task.class, t -> t.run(callback, getArgumentFunction)),
-          voidBranch(Task0.class, t -> t.run(callback)),
-          voidBranch(Task1.class, t -> t.run(callback, a(0))),
-          voidBranch(Task2.class, t -> t.run(callback, a(0), a(1))),
-          voidBranch(Task3.class, t -> t.run(callback, a(0), a(1), a(2))),
-          voidBranch(Task4.class, t -> t.run(callback, a(0), a(1), a(2), a(3))),
-          voidBranch(Task5.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4))),
-          voidBranch(Task6.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4), a(5))),
-          voidBranch(Task7.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4), a(5), a(6))),
-          voidBranch(Task8.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4), a(5), a(6), a(7))),
-          voidBranch(Task9.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4), a(5), a(6), a(7), a(8))),
-          voidBranch(Task10.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4), a(5), a(6), a(7), a(8), a(9)))
+          type_(Task.class, t -> t.run(callback, getArgumentFunction)),
+          type_(Task0.class, t -> t.run(callback)),
+          type_(Task1.class, t -> t.run(callback, a(0))),
+          type_(Task2.class, t -> t.run(callback, a(0), a(1))),
+          type_(Task3.class, t -> t.run(callback, a(0), a(1), a(2))),
+          type_(Task4.class, t -> t.run(callback, a(0), a(1), a(2), a(3))),
+          type_(Task5.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4))),
+          type_(Task6.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4), a(5))),
+          type_(Task7.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4), a(5), a(6))),
+          type_(Task8.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4), a(5), a(6), a(7))),
+          type_(Task9.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4), a(5), a(6), a(7), a(8))),
+          type_(Task10.class, t -> t.run(callback, a(0), a(1), a(2), a(3), a(4), a(5), a(6), a(7), a(8), a(9)))
         );
       }
     }

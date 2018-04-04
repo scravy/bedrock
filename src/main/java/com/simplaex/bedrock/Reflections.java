@@ -103,7 +103,7 @@ public class Reflections {
   }
 
   public static Class<?> getPrimitiveClassFor(final Class<?> boxedClass) {
-    return boxedToPrimitiveClassesMap.get(boxedClass);
+    return boxedToPrimitiveClassesMap.getOrDefault(boxedClass, boxedClass);
   }
 
   private static final Map<Class<?>, Class<?>> primitiveToBoxedClassesMap = new HashMap<>();
@@ -121,7 +121,7 @@ public class Reflections {
   }
 
   public static Class<?> getBoxedClassFor(final Class<?> primitiveClass) {
-    return primitiveToBoxedClassesMap.get(primitiveClass);
+    return primitiveToBoxedClassesMap.getOrDefault(primitiveClass, primitiveClass);
   }
 
   public static Seq<Class<?>> getParents(final Class<?> clazz) {
@@ -138,7 +138,7 @@ public class Reflections {
   }
 
   public static Optional<Class<?>> getCommonBaseClass(final Class<?> oneClass, final Class<?> anotherClass) {
-    final Seq<Class<?>> commonAncestors = Seqs.commonPrefixView(getParents(oneClass), getParents(anotherClass));
+    final Seq<Class<?>> commonAncestors = Seq.commonPrefixView(getParents(oneClass), getParents(anotherClass));
     return commonAncestors.lastOptional();
   }
 

@@ -62,6 +62,22 @@ public class ReflectionsTest {
           .toEqual(Optional.of(FilterOutputStream.class));
       });
     });
+    describe("getBoxedClassFor", () -> {
+      it("should return the boxed class if it does not have a primitve counter part", () -> {
+        expect(Reflections.getBoxedClassFor(String.class)).toEqual(String.class);
+      });
+      it("should return the boxed class for the primitive type int", () -> {
+        expect(Reflections.getBoxedClassFor(int.class)).toEqual(Integer.class);
+      });
+    });
+    describe("getPrimitiveClassFor", () -> {
+      it("should return the boxed class if it does not have a primitve counter part", () -> {
+        expect(Reflections.getPrimitiveClassFor(String.class)).toEqual(String.class);
+      });
+      it("should return the primitive class for the boxed type java.lang.Integer", () -> {
+        expect(Reflections.getPrimitiveClassFor(Integer.class)).toEqual(int.class);
+      });
+    });
   }
 
 }

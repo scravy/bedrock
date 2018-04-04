@@ -3,23 +3,24 @@ package com.simplaex.bedrock;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.util.Comparator;
+import java.util.NoSuchElementException;
 import java.util.function.IntFunction;
 
-public class SeqGenerated<E> extends Seq<E> {
+class SeqGenerated<E> extends Seq<E> {
 
   private final IntFunction<E> backingFunction;
-  private final int limit;
+  private final int length;
   private SeqSimple<E> materializedSeq = null;
 
-  SeqGenerated(@Nonnull final IntFunction<E> function, @Nonnegative final int limit) {
+  SeqGenerated(@Nonnull final IntFunction<E> function, @Nonnegative final int length) {
     this.backingFunction = function;
-    this.limit = limit;
+    this.length = length;
   }
 
   private void materialize() {
     if (materializedSeq == null) {
-      final Object[] array = new Object[limit];
-      for (int i = 0; i < limit; i += 1) {
+      final Object[] array = new Object[length];
+      for (int i = 0; i < length; i += 1) {
         array[i] = backingFunction.apply(i);
       }
       materializedSeq = Seq.ofArrayZeroCopyInternal(array);
@@ -28,6 +29,9 @@ public class SeqGenerated<E> extends Seq<E> {
 
   @Override
   public E get(@Nonnegative final int index) {
+    if (index >= length) {
+      throw new IndexOutOfBoundsException();
+    }
     return backingFunction.apply(index);
   }
 
@@ -54,7 +58,7 @@ public class SeqGenerated<E> extends Seq<E> {
 
   @Override
   public int length() {
-    return limit;
+    return length;
   }
 
   @Nonnull

@@ -151,5 +151,63 @@ public class OperatorsTest {
       });
 
     });
+
+    describe("primitive operators", () -> {
+      describe("plus", () -> {
+        it("1 + 1 (int)", () -> {
+          expect(Operators.plus(1, 1)).toEqual(2);
+        });
+        it("1 + 1 (long)", () -> {
+          expect(Operators.plus(1L, 1L)).toEqual(2);
+        });
+        it("1 + 1 (double)", () -> {
+          expect(Operators.plus(1.0, 1.0)).toEqual(2.0);
+        });
+      });
+      describe("minus", () -> {
+        it("1 - 1 (int)", () -> {
+          expect(Operators.minus(1, 1)).toEqual(0);
+        });
+        it("1 - 1 (long)", () -> {
+          expect(Operators.minus(1L, 1L)).toEqual(0);
+        });
+        it("1 - 1 (double)", () -> {
+          expect(Operators.minus(1.0, 1.0)).toEqual(0.0);
+        });
+      });
+      describe("times", () -> {
+        it("1 * 1 (int)", () -> {
+          expect(Operators.times(1, 1)).toEqual(1);
+        });
+        it("1 * 1 (long)", () -> {
+          expect(Operators.times(1L, 1L)).toEqual(1);
+        });
+        it("1 * 1 (double)", () -> {
+          expect(Operators.times(1.0, 1.0)).toEqual(1.0);
+        });
+      });
+      describe("div", () -> {
+        it("4 / 2 (int)", () -> {
+          expect(Operators.div(4, 2)).toEqual(2);
+        });
+        it("4 / 2 (long)", () -> {
+          expect(Operators.div(4L, 2L)).toEqual(2);
+        });
+        it("4 / 2 (double)", () -> {
+          expect(Operators.div(4.0, 2.0)).toEqual(2.0);
+        });
+      });
+      describe("mod", () -> {
+        it("8 % 2 (int)", () -> {
+          expect(Operators.div(8, 2)).toEqual(4);
+        });
+        it("8 % 2 (long)", () -> {
+          expect(Operators.div(8L, 2L)).toEqual(4);
+        });
+        it("8 % 2 (double)", () -> {
+          expect(Operators.div(8.0, 2.0)).toEqual(4.0);
+        });
+      });
+    });
   }
 }

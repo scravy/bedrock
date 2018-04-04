@@ -169,6 +169,30 @@ public class SeqTest {
         expect(m.contains(Seq.of(1, null))).toBeTrue();
       });
     });
+
+    describe("rangeInclusive", () -> {
+      it("should create a range", () -> {
+        expect(Seq.rangeInclusive(0, 5)).toEqual(Seq.of(0, 1, 2, 3, 4, 5));
+      });
+      it("should create a range starting at a negative value", () -> {
+        expect(Seq.rangeInclusive(-2, 3)).toEqual(Seq.of(-2, -1, 0, 1, 2, 3));
+      });
+      it("should create a descending range", () -> {
+        expect(Seq.rangeInclusive(7, -3)).toEqual(Seq.of(7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3));
+      });
+    });
+
+    describe("rangeExclusive", () -> {
+      it("should create a range", () -> {
+        expect(Seq.rangeExclusive(0, 5)).toEqual(Seq.of(0, 1, 2, 3, 4));
+      });
+      it("should create a range starting at a negative value", () -> {
+        expect(Seq.rangeExclusive(-2, 3)).toEqual(Seq.of(-2, -1, 0, 1, 2));
+      });
+      it("should create a descending range", () -> {
+        expect(Seq.rangeExclusive(7, -3)).toEqual(Seq.of(7, 6, 5, 4, 3, 2, 1, 0, -1, -2));
+      });
+    });
   }
 
 }

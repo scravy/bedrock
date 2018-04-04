@@ -21,13 +21,13 @@ import java.util.stream.Collectors;
  * both mapValues and mapValuesWithKey share the key array with the source
  * ArrayMap.
  *
- * @param <K>
- * @param <V>
+ * @param <K> The type of the keys of this ArrayMap. Must implement Comparable. Does not allow for null values.
+ * @param <V> The type of the values of this ArrayMap. Can be anything. Allows for null values.
  */
 @Immutable
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class ArrayMap<K extends Comparable<K>, V> implements Mapping<K, V> {
+public final class ArrayMap<K extends Comparable<? super K>, V> implements Mapping<K, V> {
 
   private static final ArrayMap EMPTY;
 
@@ -238,10 +238,10 @@ public final class ArrayMap<K extends Comparable<K>, V> implements Mapping<K, V>
   }
 
   @Nonnull
-  public static <K extends Comparable<K>, V> ArrayMap<K, V> ofMap(@Nonnull final Map<K, V> pairs) {
+  public static <K extends Comparable<? super K>, V> ArrayMap<K, V> ofMap(@Nonnull final Map<K, V> pairs) {
 
     if (pairs instanceof TreeMap) {
-      return ofMap((TreeMap<K, V>) pairs);
+      return ofTreeMap((TreeMap<K, V>) pairs);
     }
 
     final Object[] keys = Seq.ofCollectionInternal(pairs.keySet()).sortedInternal().backingArray;
@@ -255,7 +255,7 @@ public final class ArrayMap<K extends Comparable<K>, V> implements Mapping<K, V>
   }
 
   @Nonnull
-  public static <K extends Comparable<K>, V> ArrayMap<K, V> ofMap(@Nonnull final TreeMap<K, V> pairs) {
+  public static <K extends Comparable<? super K>, V> ArrayMap<K, V> ofTreeMap(@Nonnull final TreeMap<K, V> pairs) {
 
     final Object[] keys = Seq.ofCollectionInternal(pairs.keySet()).backingArray;
     final Object[] values = new Object[pairs.size()];
@@ -268,11 +268,11 @@ public final class ArrayMap<K extends Comparable<K>, V> implements Mapping<K, V>
   }
 
   @SuppressWarnings("unchecked")
-  public static <K extends Comparable<K>, V> ArrayMap<K, V> empty() {
+  public static <K extends Comparable<? super K>, V> ArrayMap<K, V> empty() {
     return (ArrayMap<K, V>) EMPTY;
   }
 
-  public static <K extends Comparable<K>, V> Collector<Pair<K, V>, TreeMap<K, V>, ArrayMap<K, V>> collector() {
+  public static <K extends Comparable<? super K>, V> Collector<Pair<K, V>, TreeMap<K, V>, ArrayMap<K, V>> collector() {
     return new Collector<Pair<K, V>, TreeMap<K, V>, ArrayMap<K, V>>() {
       @Override
       public Supplier<TreeMap<K, V>> supplier() {
@@ -302,5 +302,9 @@ public final class ArrayMap<K extends Comparable<K>, V> implements Mapping<K, V>
         return Collections.emptySet();
       }
     };
+  }
+
+  public static <K extends Comparable<? super K>, V> ArrayMapBuilder<K, V> builder() {
+    return new ArrayMapBuilder<>();
   }
 }

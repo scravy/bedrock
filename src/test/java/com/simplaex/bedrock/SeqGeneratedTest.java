@@ -25,7 +25,7 @@ public class SeqGeneratedTest {
           case 4:
             return 3;
         }
-        throw new IndexOutOfBoundsException();
+        return 6;
       }, 5);
       SeqExemplaryChecks.checks(seq);
       SeqPropertyChecks.checks(seq);

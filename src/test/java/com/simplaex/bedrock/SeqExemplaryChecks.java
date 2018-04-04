@@ -367,25 +367,25 @@ class SeqExemplaryChecks {
 
     describe("intSum", () -> {
       it("should return the sum", () -> {
-        expect(Seqs.intSum(seq)).toEqual(12);
+        expect(Seq.intSum(seq)).toEqual(12);
       });
     });
 
     describe("intProduct", () -> {
       it("should return the product", () -> {
-        expect(Seqs.intProduct(seq)).toEqual(48);
+        expect(Seq.intProduct(seq)).toEqual(48);
       });
     });
 
     describe("maximum", () -> {
       it("should return the maximum", () -> {
-        expect(Seqs.maximum(seq)).toEqual(4);
+        expect(Seq.maximum(seq)).toEqual(4);
       });
     });
 
     describe("minimum", () -> {
       it("should return the minimum", () -> {
-        expect(Seqs.minimum(seq)).toEqual(1);
+        expect(Seq.minimum(seq)).toEqual(1);
       });
     });
   }
