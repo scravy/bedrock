@@ -288,7 +288,7 @@ public class Tasks {
     final @Nonnull Function<String, Object> getArgumentFunction,
     final @Nonnull Callback<R> callback
   ) {
-    val task = taskSpec.getTask();
+    final Object task = taskSpec.getTask();
     class Runner {
       private Object a(final int i) {
         return getArgumentFunction.apply(taskSpec.getArguments().get(i));

@@ -1,7 +1,5 @@
 package com.simplaex.bedrock;
 
-import lombok.val;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.lang.reflect.Array;
@@ -42,7 +40,7 @@ class SeqSimple<E> extends Seq<E> {
   @Nonnull
   SeqSimpleSorted sortedInternal() {
     final Object[] array = backingArray.clone();
-    Arrays.sort(array, nullAcceptingComparator);
+    Arrays.sort(array, NULL_ACCEPTING_COMPARATOR);
     return new SeqSimpleSorted(array);
   }
 
@@ -66,7 +64,7 @@ class SeqSimple<E> extends Seq<E> {
   @Override
   public E[] toArray(@Nonnull final Class<E> evidence) {
     Objects.requireNonNull(evidence);
-    val length = backingArray.length;
+    final int length = backingArray.length;
     @SuppressWarnings("unchecked") final E[] array = (E[]) Array.newInstance(evidence, length);
     //noinspection SuspiciousSystemArraycopy
     System.arraycopy(backingArray, 0, array, 0, length);

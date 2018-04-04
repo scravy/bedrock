@@ -6,10 +6,7 @@ import lombok.experimental.Wither;
 
 import javax.annotation.Nonnull;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Semaphore;
@@ -173,9 +170,9 @@ public class Control {
     throws ParallelExecutionException {
     Objects.requireNonNull(executor, "executor must not be null");
     Objects.requireNonNull(runnables, "nullables must not be null");
-    val semaphore = new Semaphore(0);
-    val exceptions = Collections.synchronizedList(new ArrayList<Exception>());
-    for (val runnable : runnables) {
+    final Semaphore semaphore = new Semaphore(0);
+    final List<Exception> exceptions = Collections.synchronizedList(new ArrayList<Exception>());
+    for (final ThrowingRunnable runnable : runnables) {
       executor.execute(() -> {
         try {
           runnable.run();
@@ -198,23 +195,23 @@ public class Control {
     throws ParallelExecutionException {
     Objects.requireNonNull(executor, "executor must not be null");
     Objects.requireNonNull(runnables, "nullables must not be null");
-    val promises = new Promise[runnables.length];
+    final Promise[] promises = new Promise[runnables.length];
     int i = 0;
-    for (val runnable : runnables) {
-      val promise = Promise.<T>promise();
+    for (final Callable<? extends T> runnable : runnables) {
+      final Promise<T> promise = Promise.promise();
       promises[i++] = promise;
       executor.execute(() -> {
         try {
-          val result = runnable.call();
+          final T result = runnable.call();
           promise.fulfill(result);
         } catch (final Exception exc) {
           promise.fail(exc);
         }
       });
     }
-    val results = Seq.<T>builder();
-    val exceptions = Seq.<Throwable>builder();
-    for (val promise : promises) {
+    final SeqBuilder<T> results = Seq.builder();
+    final SeqBuilder<Throwable> exceptions = Seq.builder();
+    for (final Promise promise : promises) {
       promise.waitFor();
       if (promise.isSuccess()) {
         results.add((T) promise.get());

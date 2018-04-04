@@ -187,7 +187,7 @@ public abstract class Seq<E> implements
   public <F> Seq<F> flatMapOptional(@Nonnull final Function<? super E, Optional<F>> function) {
     Objects.requireNonNull(function, "'function' must not be null");
     @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
-    val resultBuilder = Seq.<F>builder();
+    final SeqBuilder<F> resultBuilder = Seq.builder();
     for (final E e : this) {
       final Optional<F> result = function.apply(e);
       result.ifPresent(resultBuilder::add);
@@ -199,7 +199,7 @@ public abstract class Seq<E> implements
   public <F> Seq<F> flatMapIterable(@Nonnull final Function<? super E, ? extends Iterable<F>> function) {
     Objects.requireNonNull(function, "'function' must not be null");
     @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
-    val resultBuilder = Seq.<F>builder();
+    final SeqBuilder<F> resultBuilder = Seq.builder();
     for (final E e : this) {
       resultBuilder.addElements(function.apply(e));
     }
@@ -262,8 +262,8 @@ public abstract class Seq<E> implements
   public Pair<Seq<E>, Seq<E>> partitionBy(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     final int sizeHint = length() / 2 + 1;
-    val b1 = Seq.<E>builder(sizeHint);
-    val b2 = Seq.<E>builder(sizeHint);
+    final SeqBuilder<E> b1 = Seq.builder(sizeHint);
+    final SeqBuilder<E> b2 = Seq.builder(sizeHint);
     forEach(x -> {
       if (predicate.test(x)) {
         b1.add(x);
@@ -313,12 +313,12 @@ public abstract class Seq<E> implements
     if (isEmpty()) {
       return Seq.empty();
     }
-    val b1 = Seq.<Seq<E>>builder();
-    val b2 = Seq.<E>builder();
+    final SeqBuilder<Seq<E>> b1 = Seq.builder();
+    final SeqBuilder<E> b2 = Seq.builder();
     E previous = head();
     b2.add(previous);
     for (int i = 1; i < size(); i += 1) {
-      val current = get(i);
+      final E current = get(i);
       if (!operator.test(previous, current)) {
         b1.add(b2.result());
         b2.clear();
@@ -337,7 +337,7 @@ public abstract class Seq<E> implements
   public Seq<E> filter(@Nonnull final Predicate<? super E> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     final int sizeHint = length() / 2;
-    val b = Seq.<E>builder(sizeHint);
+    final SeqBuilder<E> b = Seq.builder(sizeHint);
     forEach(x -> {
       if (predicate.test(x)) {
         b.add(x);
@@ -512,8 +512,8 @@ public abstract class Seq<E> implements
     if (isEmpty()) {
       return this;
     }
-    val targetSize = (seq.size() + 1) * size() - seq.size();
-    val targetArray = new Object[targetSize];
+    final int targetSize = (seq.size() + 1) * size() - seq.size();
+    final Object[] targetArray = new Object[targetSize];
     targetArray[0] = head();
     int targetIndex = 1;
     for (int i = 1; i < size(); i += 1) {
@@ -530,8 +530,8 @@ public abstract class Seq<E> implements
     if (isEmpty()) {
       return this;
     }
-    val targetSize = size() * 2 - 1;
-    val targetArray = new Object[targetSize];
+    final int targetSize = size() * 2 - 1;
+    final Object[] targetArray = new Object[targetSize];
     targetArray[0] = head();
     int targetIndex = 1;
     for (int i = 1; i < size(); i += 1) {
@@ -544,8 +544,8 @@ public abstract class Seq<E> implements
   @Nonnull
   @Override
   public Seq<E> distinct() {
-    val elements = new HashSet<E>();
-    val builder = Seq.<E>builder(size());
+    final HashSet<E> elements = new HashSet<E>();
+    final SeqBuilder<E> builder = Seq.<E>builder(size());
     forEach(element -> {
       if (!elements.contains(element)) {
         builder.add(element);

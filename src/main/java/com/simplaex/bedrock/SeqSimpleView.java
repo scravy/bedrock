@@ -43,14 +43,14 @@ class SeqSimpleView<E> extends Seq<E> {
   public Seq<E> sorted() {
     final Object[] array = new Object[length()];
     System.arraycopy(backingArray, beginOffset, array, 0, length());
-    Arrays.sort(array, nullAcceptingComparator);
+    Arrays.sort(array, NULL_ACCEPTING_COMPARATOR);
     return new SeqSimpleSorted(array);
   }
 
   @SuppressWarnings("unchecked")
   @Nonnull
   @Override
-  public Seq<E> sortedBy(@Nonnull Comparator<? super E> comparator) {
+  public Seq<E> sortedBy(@Nonnull final Comparator<? super E> comparator) {
     Objects.requireNonNull(comparator);
     final Object[] array = new Object[length()];
     System.arraycopy(backingArray, beginOffset, array, 0, length());

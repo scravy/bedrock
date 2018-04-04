@@ -33,7 +33,7 @@ class SeqReversed<E> extends Seq<E> {
   @Override
   public Seq<E> sorted() {
     final Object[] array = backingArray.clone();
-    Arrays.sort(array, nullAcceptingComparator);
+    Arrays.sort(array, NULL_ACCEPTING_COMPARATOR);
     return new SeqSimpleSorted(array);
   }
 

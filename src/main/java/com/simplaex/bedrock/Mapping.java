@@ -21,7 +21,7 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
 
   @Override
   default To apply(final From key) {
-    val result = get(key);
+    final Optional<To> result = get(key);
     if (result.isPresent()) {
       return result.get();
     } else {
@@ -40,8 +40,8 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
   }
 
   default Seq<To> values() {
-    val builder = Seq.<To>builder();
-    for (val key : keys()) {
+    final SeqBuilder<To> builder = Seq.builder();
+    for (final From key : keys()) {
       builder.add(apply(key));
     }
     return builder.result();
@@ -60,7 +60,7 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
 
       @Override
       public Pair<From, To> next() {
-        val nextKey = underlying.next();
+        final From nextKey = underlying.next();
         return Pair.of(nextKey, apply(nextKey));
       }
     };
@@ -78,10 +78,10 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
       @Override
       @Nonnull
       public Set<Entry<From, To>> entrySet() {
-        val entrySet = this.entrySet.get();
+        final Set<Entry<From, To>> entrySet = this.entrySet.get();
         if (entrySet == null) {
-          val set = new HashSet<Entry<From, To>>();
-          for (val key : keys()) {
+          final HashSet<Entry<From, To>> set = new HashSet<>();
+          for (final From key : keys()) {
             set.add(Pair.of(key, apply(key)));
           }
           this.entrySet = new SoftReference<>(set);
@@ -141,9 +141,9 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
 
       @Override
       public Seq<From> keys() {
-        val keys = this.keys.get();
+        final Seq<From> keys = this.keys.get();
         if (keys == null) {
-          val newKeys = Seq.ofCollection(map.keySet());
+          final Seq<From> newKeys = Seq.ofCollection(map.keySet());
           this.keys = new SoftReference<>(newKeys);
           return newKeys;
         }
@@ -152,9 +152,9 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
 
       @Override
       public Seq<To> values() {
-        val values = this.values.get();
+        final Seq<To> values = this.values.get();
         if (values == null) {
-          val newValues = Seq.ofCollection(map.values());
+          final Seq<To> newValues = Seq.ofCollection(map.values());
           this.values = new SoftReference<>(newValues);
           return newValues;
         }

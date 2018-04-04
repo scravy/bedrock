@@ -40,14 +40,14 @@ class SeqReversedView<E> extends Seq<E> {
     final int len = length();
     final Object[] array = new Object[len];
     System.arraycopy(backingArray, beginOffset, array, 0, len);
-    Arrays.sort(array, nullAcceptingComparator);
+    Arrays.sort(array, NULL_ACCEPTING_COMPARATOR);
     return new SeqSimpleSorted(array);
   }
 
   @SuppressWarnings("unchecked")
   @Nonnull
   @Override
-  public Seq<E> sortedBy(@Nonnull Comparator<? super E> comparator) {
+  public Seq<E> sortedBy(@Nonnull final Comparator<? super E> comparator) {
     Objects.requireNonNull(comparator);
     final int len = length();
     final Object[] array = new Object[len];

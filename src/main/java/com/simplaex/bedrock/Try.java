@@ -181,12 +181,12 @@ public abstract class Try<E> implements Iterable<E> {
     }
 
     @Override
-    public E orElse(E value) {
+    public E orElse(final E value) {
       return this.value;
     }
 
     @Override
-    public E orElseGet(@Nonnull Supplier<? extends E> supplier) {
+    public E orElseGet(@Nonnull final Supplier<? extends E> supplier) {
       Objects.requireNonNull(supplier, "supplier must not be null");
       return this.value;
     }

@@ -20,9 +20,9 @@ public class UUIDs {
   public static final UUID NAMESPACE_X500 = UUID.fromString("6ba7b814-9dad-11d1-80b4-00c04fd430c8");
 
   private byte[] namespacedBytes(final UUID namespace, final String name) {
-    val namespaceBytes = toBytes(namespace);
-    val nameBytes = name.getBytes(StandardCharsets.UTF_8);
-    val buffer = ByteBuffer.wrap(new byte[namespaceBytes.length + nameBytes.length]);
+    final byte[] namespaceBytes = toBytes(namespace);
+    final byte[] nameBytes = name.getBytes(StandardCharsets.UTF_8);
+    final ByteBuffer buffer = ByteBuffer.wrap(new byte[namespaceBytes.length + nameBytes.length]);
     buffer.put(namespaceBytes);
     buffer.put(nameBytes);
     return buffer.array();
@@ -37,7 +37,7 @@ public class UUIDs {
   }
 
   public static UUID v5(final UUID namespace, final String name) {
-    val bytes = namespacedBytes(namespace, name);
+    final byte[] bytes = namespacedBytes(namespace, name);
     final MessageDigest md;
     try {
       md = MessageDigest.getInstance("SHA1");
@@ -54,7 +54,7 @@ public class UUIDs {
 
   public static byte[] toBytes(final UUID uuid) {
     Objects.requireNonNull(uuid);
-    val buffer = ByteBuffer.wrap(new byte[16]);
+    final ByteBuffer buffer = ByteBuffer.wrap(new byte[16]);
     buffer.putLong(uuid.getMostSignificantBits());
     buffer.putLong(uuid.getLeastSignificantBits());
     return buffer.array();
@@ -62,9 +62,9 @@ public class UUIDs {
 
   public static UUID fromBytes(final byte[] bytes) {
     Objects.requireNonNull(bytes);
-    val buffer = ByteBuffer.wrap(bytes);
-    val mostSignificantBits = buffer.getLong();
-    val leastSignificantBits = buffer.getLong();
+    final ByteBuffer buffer = ByteBuffer.wrap(bytes);
+    final long mostSignificantBits = buffer.getLong();
+    final long leastSignificantBits = buffer.getLong();
     return new UUID(mostSignificantBits, leastSignificantBits);
   }
 

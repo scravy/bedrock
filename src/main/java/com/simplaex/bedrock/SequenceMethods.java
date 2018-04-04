@@ -12,7 +12,7 @@ import java.util.stream.StreamSupport;
 interface SequenceMethods<Predicate, BiPredicate, Sequence extends SequenceMethods<Predicate, BiPredicate, Sequence>> {
 
   @SuppressWarnings("unchecked")
-  Comparator<Object> nullAcceptingComparator = (left, right) -> {
+  Comparator<Object> NULL_ACCEPTING_COMPARATOR = (left, right) -> {
     if (left == null && right == null) {
       return 0;
     }

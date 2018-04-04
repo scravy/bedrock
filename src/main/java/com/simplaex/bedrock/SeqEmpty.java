@@ -24,7 +24,7 @@ class SeqEmpty extends Seq<Object> {
   }
 
   @Override
-  public Object get(@Nonnegative int index) {
+  public Object get(@Nonnegative final int index) {
     throw new IndexOutOfBoundsException();
   }
 
