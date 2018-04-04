@@ -226,6 +226,11 @@ public abstract class Seq<E> implements
     return new SeqSimple<>(arr);
   }
 
+  @Nonnull
+  public Seq<Pair<Integer, E>> zipWithIndex() {
+    return Seq.rangeExclusive(0, length()).zip(this);
+  }
+
   public <A> A foldl(@Nonnull final BiFunction<? super A, ? super E, ? extends A> function, final A startValue) {
     Objects.requireNonNull(function, "'function' must not be null");
     A acc = startValue;
@@ -901,6 +906,14 @@ public abstract class Seq<E> implements
     }
     Objects.requireNonNull(seq, "'seq' must not be null");
     return seq.maximumBy(Comparable::compareTo);
+  }
+
+  public static boolean any(final Seq<Boolean> seq) {
+    return seq.exists(x -> x);
+  }
+
+  public static boolean all(final Seq<Boolean> seq) {
+    return seq.forAll(x -> x);
   }
 
   public static int intSum(final Seq<Integer> seq) {

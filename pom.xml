@@ -35,7 +35,6 @@
     <developerConnection>scm:git:ssh://git@github.com:simplaex/bedrock.git
     </developerConnection>
     <url>https://github.com/simplaex/bedrock</url>
-    <tag>v1.0</tag>
   </scm>
 
   <licenses>
