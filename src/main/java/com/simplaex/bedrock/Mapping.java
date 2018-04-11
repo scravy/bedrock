@@ -1,7 +1,5 @@
 package com.simplaex.bedrock;
 
-import lombok.val;
-
 import javax.annotation.Nonnull;
 import java.lang.ref.SoftReference;
 import java.util.*;
@@ -10,10 +8,27 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * A Mapping from keys to values. A Mapping is very much like {@link java.util.Map}, but it precludes mutable operations.
+ * <p>
+ * Every mapping is a function from keys to values that does know about the keys it maps. Hence a minimal
+ * complete definition of a Mapping consists of {@link #get(Object)} and {@link #keys()}.
+ *
+ * @param <From> The type of the keys.
+ * @param <To>   The type of the values.
+ */
 public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<From, To>> {
 
+  /**
+   * Retrieves the value associated with the given key or Optional.empty() if the key is not mapped to any value.
+   *
+   * @param key The key.
+   * @return The value which the given key is mapped to.
+   */
   @Nonnull
   Optional<To> get(From key);
+
+  Seq<From> keys();
 
   default To getOrElse(final From key, final To fallback) {
     return get(key).orElse(fallback);
@@ -28,8 +43,6 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
       throw new NoSuchElementException(Objects.toString(key));
     }
   }
-
-  Seq<From> keys();
 
   default int size() {
     return keys().length();

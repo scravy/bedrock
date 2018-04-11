@@ -84,6 +84,10 @@ public class DateTimes {
       }
       return builder.result();
     }
+
+    public String toString() {
+      return getBegin() + "/" + getEnd();
+    }
   }
 
   public Interval parseInterval(final String string) {
