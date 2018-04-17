@@ -58,6 +58,10 @@ interface SequenceMethods<Predicate, BiPredicate, Sequence extends SequenceMetho
     return length() == 0;
   }
 
+  default boolean nonEmpty() {
+    return !isEmpty();
+  }
+
   @Nonnull
   default String asString() {
     return asString("");

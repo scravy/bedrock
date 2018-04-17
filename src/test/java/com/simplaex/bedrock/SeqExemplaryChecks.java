@@ -388,6 +388,26 @@ class SeqExemplaryChecks {
         expect(Seq.minimum(seq)).toEqual(1);
       });
     });
+
+    describe("without", () -> {
+      it("should form the union", () -> {
+        expect(seq.without(Seq.of(1, 2, 3))).toEqual(Seq.of(4));
+      });
+    });
+
+    describe("union", () -> {
+      it("should form the union", () -> {
+        expect(seq.union(Seq.of(3, 3, 7, 2, 5, 2))).toEqual(Seq.of(1, 2, 4, 3, 7, 5));
+        expect(Seq.of(3, 3, 7, 2, 5, 2).union(seq)).toEqual(Seq.of(3, 7, 2, 5, 1, 4));
+      });
+    });
+
+    describe("intersect", () -> {
+      it("should form the intersection", () -> {
+        expect(seq.intersect(Seq.of(3, 7, 2, 5))).toEqual(Seq.of(2, 3));
+        expect(Seq.of(3, 7, 2, 5).intersect(seq)).toEqual(Seq.of(3, 2));
+      });
+    });
   }
 
 }

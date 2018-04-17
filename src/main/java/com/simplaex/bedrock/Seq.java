@@ -1,7 +1,5 @@
 package com.simplaex.bedrock;
 
-import lombok.val;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -541,11 +539,16 @@ public abstract class Seq<E> implements
     return new SeqSimple<>(targetArray);
   }
 
+  /**
+   * Returns a copy of this Seq with no duplicates.
+   * <p>
+   * Order is maintained.
+   */
   @Nonnull
   @Override
   public Seq<E> distinct() {
-    final HashSet<E> elements = new HashSet<E>();
-    final SeqBuilder<E> builder = Seq.<E>builder(size());
+    final HashSet<E> elements = new HashSet<>();
+    final SeqBuilder<E> builder = Seq.builder(size());
     forEach(element -> {
       if (!elements.contains(element)) {
         builder.add(element);
@@ -553,6 +556,44 @@ public abstract class Seq<E> implements
       }
     });
     return builder.result();
+  }
+
+  /**
+   * Returns a Seq with the elements from the given Seq removed.
+   * <p>
+   * Order is maintained, but the resuling Seq is not distinct; if this Seq contains duplicates then the result
+   * may contain duplicates too.
+   */
+  public Seq<E> without(final Seq<E> seq) {
+    return filter(element -> !seq.contains(element));
+  }
+
+  /**
+   * Returns a distinct Seq that contains the elements from both this Seq and the given Seq.
+   * <p>
+   * Order is maintained, but there are no duplicates.
+   */
+  public Seq<E> union(final Seq<E> seq) {
+    final HashSet<E> elements = new HashSet<>();
+    final SeqBuilder<E> builder = Seq.builder(size());
+    final Consumer<E> appender = element -> {
+      if (!elements.contains(element)) {
+        builder.add(element);
+        elements.add(element);
+      }
+    };
+    forEach(appender);
+    seq.forEach(appender);
+    return builder.result();
+  }
+
+  /**
+   * Returns a distinct Seq that contains only the elements that occur in both sets.
+   * <p>
+   * Order is maintained.
+   */
+  public Seq<E> intersect(final Seq<E> seq) {
+    return union(seq).filter(e -> contains(e) && seq.contains(e));
   }
 
   @Override

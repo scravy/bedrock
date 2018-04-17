@@ -55,12 +55,25 @@ public final class SeqBuilder<E> implements Iterable<E> {
   }
 
   @Nonnull
+  <F extends Comparable<? super F>> Seq<F> resultSortedInternal() {
+    if (arrayList.isEmpty()) {
+      return Seq.empty();
+    }
+    final Object[] array = arrayList.toArray(new Object[arrayList.size()]);
+    return new SeqSimpleSorted<>(array);
+  }
+
+  @Nonnull
   public Seq<E> build() {
     return result();
   }
 
   public boolean isEmpty() {
     return arrayList.isEmpty();
+  }
+
+  public boolean nonEmpty() {
+    return !isEmpty();
   }
 
   @Nonnegative

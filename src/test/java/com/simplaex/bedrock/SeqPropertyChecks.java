@@ -204,6 +204,13 @@ class SeqPropertyChecks {
       });
     });
 
+    describe("concat + distinct", () -> {
+      it("concat something with itself and make it distinct ", () -> {
+        val distinct = seq.distinct();
+        expect(Seq.concat(distinct, distinct).distinct()).toEqual(distinct);
+      });
+    });
+
   }
 
 }
