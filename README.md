@@ -9,6 +9,6 @@ Utilities for modern java development.
     <dependency>
         <groupId>com.simplaex</groupId>
         <artifactId>bedrock</artifactId>
-        <version>2017.04.05</version>
+        <version>2017.04.18</version>
     </dependency>
 
