@@ -36,6 +36,18 @@ public class SeqSimpleSortedTest {
         expect(seq1.union(seq2)).toEqual(Seq.of(-1, 0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 12));
       });
     });
+
+    describe("minimum()", () -> {
+      it("should find minimum in sorted seq", () -> {
+        expect(Seq.of(1, 2, 3).sorted().minimum()).toEqual(1);
+      });
+    });
+
+    describe("maximum()", () -> {
+      it("should find maximum in sorted seq", () -> {
+        expect(Seq.of(1, 2, 3).sorted().maximum()).toEqual(3);
+      });
+    });
   }
 
 }

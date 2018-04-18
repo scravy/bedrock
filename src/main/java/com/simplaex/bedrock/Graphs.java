@@ -14,8 +14,8 @@ public class Graphs {
   @Nonnull
   public static <V> Optional<Seq<V>> topologicalSort(final Seq<Pair<V, V>> edges) {
     final SeqBuilder<V> resultBuilder = Seq.builder();
-    final HashMap<V, Set<V>> incomingEdgesMap = new HashMap<>();
-    final HashMap<V, Set<V>> outgoingEdgesMap = new HashMap<>();
+    final HashMap<V, java.util.Set<V>> incomingEdgesMap = new HashMap<>();
+    final HashMap<V, java.util.Set<V>> outgoingEdgesMap = new HashMap<>();
     edges.forEach(edge -> {
       incomingEdgesMap.computeIfAbsent(edge.getFirst(), __ -> new HashSet<>());
       incomingEdgesMap.computeIfAbsent(edge.getSecond(), __ -> new HashSet<>());
@@ -35,7 +35,7 @@ public class Graphs {
       final V n = nodes.removeFirst();
       resultBuilder.add(n);
       outgoingEdgesMap.get(n).forEach(m -> {
-        final Set<V> incoming = incomingEdgesMap.get(m);
+        final java.util.Set<V> incoming = incomingEdgesMap.get(m);
         incoming.remove(n);
         if (incoming.isEmpty()) {
           nodes.addLast(m);

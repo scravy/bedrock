@@ -103,6 +103,18 @@ public class SeqEmptyTest {
         expect(Seq.empty().lastOptional()).toEqual(Optional.empty());
       });
     });
+
+    describe("intercalate", () -> {
+      it("should return empty", () -> {
+        expect(Seq.empty().intercalate(Seq.of(1, 2, 3))).toEqual(Seq.empty());
+      });
+    });
+
+    describe("intersperce", () -> {
+      it("should return empty", () -> {
+        expect(Seq.empty().intersperse(8)).toEqual(Seq.empty());
+      });
+    });
   }
 
 }

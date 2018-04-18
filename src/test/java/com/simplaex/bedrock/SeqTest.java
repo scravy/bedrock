@@ -186,11 +186,40 @@ public class SeqTest {
       it("should create a range", () -> {
         expect(Seq.rangeExclusive(0, 5)).toEqual(Seq.of(0, 1, 2, 3, 4));
       });
+      it("should create an empty range when from == to", () -> {
+        expect(Seq.rangeExclusive(5, 5)).toEqual(Seq.empty());
+      });
       it("should create a range starting at a negative value", () -> {
         expect(Seq.rangeExclusive(-2, 3)).toEqual(Seq.of(-2, -1, 0, 1, 2));
       });
       it("should create a descending range", () -> {
         expect(Seq.rangeExclusive(7, -3)).toEqual(Seq.of(7, 6, 5, 4, 3, 2, 1, 0, -1, -2));
+      });
+    });
+
+    describe("and", () -> {
+      it("should apply and", () -> {
+        expect(Seq.and(Seq.of(true, true, true))).toBeTrue();
+        expect(Seq.and(Seq.of(true, false, true))).toBeFalse();
+        expect(Seq.and(Seq.of(false, false, true))).toBeFalse();
+        expect(Seq.and(Seq.of(false, false, false))).toBeFalse();
+      });
+    });
+
+    describe("or", () -> {
+      it("should apply or", () -> {
+        expect(Seq.or(Seq.of(true, true, true))).toBeTrue();
+        expect(Seq.or(Seq.of(true, false, true))).toBeTrue();
+        expect(Seq.or(Seq.of(false, false, true))).toBeTrue();
+        expect(Seq.or(Seq.of(false, false, false))).toBeFalse();
+      });
+    });
+
+    describe("commonPrefix", () -> {
+      it("should find a common prefix", () -> {
+        expect(Seq.commonPrefix(Seq.ofString("hello"), Seq.ofString("world"))).toEqual(Seq.empty());
+        expect(Seq.commonPrefix(Seq.ofString("hello"), Seq.ofString("hell"))).toEqual(Seq.ofString("hell"));
+        expect(Seq.commonPrefix(Seq.ofString("hello"), Seq.ofString("help"))).toEqual(Seq.ofString("hel"));
       });
     });
   }

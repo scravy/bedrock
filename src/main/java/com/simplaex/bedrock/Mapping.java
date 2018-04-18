@@ -86,12 +86,12 @@ public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<Fro
   default Map<From, To> toMap() {
     return new AbstractMap<From, To>() {
 
-      private SoftReference<Set<Entry<From, To>>> entrySet = new SoftReference<>(null);
+      private SoftReference<java.util.Set<Entry<From, To>>> entrySet = new SoftReference<>(null);
 
       @Override
       @Nonnull
-      public Set<Entry<From, To>> entrySet() {
-        final Set<Entry<From, To>> entrySet = this.entrySet.get();
+      public java.util.Set<Entry<From, To>> entrySet() {
+        final java.util.Set<Entry<From, To>> entrySet = this.entrySet.get();
         if (entrySet == null) {
           final HashSet<Entry<From, To>> set = new HashSet<>();
           for (final From key : keys()) {

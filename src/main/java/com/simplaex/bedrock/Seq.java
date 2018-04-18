@@ -9,7 +9,6 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * An immutable sequence.
@@ -21,8 +20,8 @@ import java.util.stream.Stream;
 public abstract class Seq<E> implements
   Serializable,
   RandomAccess,
-  Iterable<E>,
   SequenceMethods<Predicate<? super E>, BiPredicate<? super E, ? super E>, Seq<E>>,
+  Container<E>,
   IntFunction<E> {
 
   private int hashCode = 0;
@@ -32,6 +31,11 @@ public abstract class Seq<E> implements
   @Override
   public E apply(@Nonnegative final int index) {
     return get(index);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return length() == 0;
   }
 
   @Override
@@ -729,7 +733,7 @@ public abstract class Seq<E> implements
       }
 
       @Override
-      public Set<Characteristics> characteristics() {
+      public java.util.Set<Characteristics> characteristics() {
         return Collections.emptySet();
       }
     };
@@ -777,11 +781,6 @@ public abstract class Seq<E> implements
       values[i] = map.get(keys[i]).result();
     }
     return new ArrayMap<>(keys, values);
-  }
-
-  @Nonnull
-  public Stream<E> stream() {
-    return toList().stream();
   }
 
   @SuppressWarnings("unchecked")

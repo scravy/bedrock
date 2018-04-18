@@ -254,6 +254,7 @@ public final class ArrayMap<K extends Comparable<? super K>, V> implements Mappi
     return new ArrayMap<>(keys, values);
   }
 
+  @SuppressWarnings("WeakerAccess")
   @Nonnull
   public static <K extends Comparable<? super K>, V> ArrayMap<K, V> ofTreeMap(@Nonnull final TreeMap<K, V> pairs) {
 
@@ -272,6 +273,7 @@ public final class ArrayMap<K extends Comparable<? super K>, V> implements Mappi
     return (ArrayMap<K, V>) EMPTY;
   }
 
+  @SuppressWarnings("WeakerAccess")
   public static <K extends Comparable<? super K>, V> Collector<Pair<K, V>, TreeMap<K, V>, ArrayMap<K, V>> collector() {
     return new Collector<Pair<K, V>, TreeMap<K, V>, ArrayMap<K, V>>() {
       @Override
@@ -298,7 +300,7 @@ public final class ArrayMap<K extends Comparable<? super K>, V> implements Mappi
       }
 
       @Override
-      public Set<Characteristics> characteristics() {
+      public java.util.Set<Characteristics> characteristics() {
         return Collections.emptySet();
       }
     };

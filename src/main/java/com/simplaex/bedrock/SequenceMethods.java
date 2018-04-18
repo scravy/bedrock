@@ -54,23 +54,6 @@ interface SequenceMethods<Predicate, BiPredicate, Sequence extends SequenceMetho
     return length();
   }
 
-  default boolean isEmpty() {
-    return length() == 0;
-  }
-
-  default boolean nonEmpty() {
-    return !isEmpty();
-  }
-
-  @Nonnull
-  default String asString() {
-    return asString("");
-  }
-
-  @Nonnull
-  String asString(String delimiter);
-
-
   default boolean startsWith(@Nonnull final Sequence sequence) {
     return takeView(sequence.length()).equals(sequence);
   }

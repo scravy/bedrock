@@ -1,10 +1,10 @@
-test: clean
+test:
 	mvn verify jacoco:report
+	rm -rf coverage
 	mv target/site/jacoco coverage
 
 clean:
 	mvn clean
-	rm -rf coverage
 
 publish: clean
 	mvn -Prelease deploy

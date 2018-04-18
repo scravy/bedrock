@@ -12,6 +12,7 @@ import java.util.function.*;
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
+import static com.simplaex.bedrock.Pair.pair;
 
 @SuppressWarnings("CodeBlock2Expr")
 @UtilityClass
@@ -261,6 +262,9 @@ class SeqExemplaryChecks {
         expect(seq.breakBy(x -> x == 4)).toEqual(
           Pair.of(Seq.of(1, 2, 2), Seq.of(4, 3))
         );
+        expect(seq.breakBy(x -> x == 1)).toEqual(
+          Pair.of(Seq.empty(), Seq.of(1, 2, 2, 4, 3))
+        );
       });
       it("should return a pair of this and empty when the predicate does not match", () -> {
         val result = seq.breakBy(x -> false);
@@ -273,6 +277,9 @@ class SeqExemplaryChecks {
       it("should break once the predicate is fulfilled", () -> {
         expect(seq.breakByView(x -> x == 4)).toEqual(
           Pair.of(Seq.of(1, 2, 2), Seq.of(4, 3))
+        );
+        expect(seq.breakByView(x -> x == 1)).toEqual(
+          Pair.of(Seq.empty(), Seq.of(1, 2, 2, 4, 3))
         );
       });
       it("should return a pair of this and empty when the predicate does not match", () -> {
@@ -377,15 +384,41 @@ class SeqExemplaryChecks {
       });
     });
 
+    describe("longSum", () -> {
+      it("should return the sum", () -> {
+        expect(Seq.longSum(seq.map(Number::longValue))).toEqual(12);
+      });
+    });
+
+    describe("longProduct", () -> {
+      it("should return the product", () -> {
+        expect(Seq.longProduct(seq.map(Number::longValue))).toEqual(48);
+      });
+    });
+
+    describe("doubleSum", () -> {
+      it("should return the sum", () -> {
+        expect(Seq.doubleSum(seq.map(Number::doubleValue))).toEqual(12.0);
+      });
+    });
+
+    describe("longProduct", () -> {
+      it("should return the product", () -> {
+        expect(Seq.doubleProduct(seq.map(Number::doubleValue))).toEqual(48.0);
+      });
+    });
+
     describe("maximum", () -> {
       it("should return the maximum", () -> {
         expect(Seq.maximum(seq)).toEqual(4);
+        expect(seq.maximum()).toEqual(4);
       });
     });
 
     describe("minimum", () -> {
       it("should return the minimum", () -> {
         expect(Seq.minimum(seq)).toEqual(1);
+        expect(seq.minimum()).toEqual(1);
       });
     });
 
@@ -406,6 +439,18 @@ class SeqExemplaryChecks {
       it("should form the intersection", () -> {
         expect(seq.intersect(Seq.of(3, 7, 2, 5))).toEqual(Seq.of(2, 3));
         expect(Seq.of(3, 7, 2, 5).intersect(seq)).toEqual(Seq.of(3, 2));
+      });
+    });
+
+    describe("zipWithIndex", () -> {
+      it("should create a list of pair zipped with indices", () -> {
+        expect(seq.zipWithIndex()).toEqual(Seq.of(
+          pair(0, 1),
+          pair(1, 2),
+          pair(2, 2),
+          pair(3, 4),
+          pair(4, 3)
+        ));
       });
     });
   }
