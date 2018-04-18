@@ -15,8 +15,8 @@
   <packaging>jar</packaging>
 
   <properties>
-    <coverage.branch.minimum>0.5</coverage.branch.minimum>
-    <coverage.instruction.minimum>0.7</coverage.instruction.minimum>
+    <coverage.branch.minimum>0.8</coverage.branch.minimum>
+    <coverage.instruction.minimum>0.8</coverage.instruction.minimum>
     <coverage.branch.class.minimum>0.0</coverage.branch.class.minimum>
     <coverage.instruction.class.minimum>0.0</coverage.instruction.class.minimum>
     <coverage.branch.method.minimum>0.0</coverage.branch.method.minimum>
