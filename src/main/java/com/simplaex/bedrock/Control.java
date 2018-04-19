@@ -11,8 +11,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Missing control structures for Java.
@@ -459,6 +461,19 @@ public class Control {
       }
     }
     return new AsyncExecutionException(object);
+  }
 
+  public static <A> A iterate(final UnaryOperator<A> operation, final BiPredicate<A, A> exitCriterion, final A startValue) {
+    A previousValue = startValue;
+    A currentValue = startValue;
+    do {
+      previousValue = currentValue;
+      currentValue = operation.apply(currentValue);
+    } while (!exitCriterion.test(previousValue, currentValue));
+    return currentValue;
+  }
+
+  public static <A> A exhaustively(final UnaryOperator<A> operation, final A startValue) {
+    return iterate(operation, Objects::equals, startValue);
   }
 }

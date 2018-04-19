@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.function.DoublePredicate;
 
 @UtilityClass
 public class Numbers {
@@ -66,6 +67,10 @@ public class Numbers {
       return (N) BigDecimal.ONE;
     }
     return null;
+  }
+
+  public static DoublePredicate isApproximately(final double expected, final double error) {
+    return value -> Math.abs(expected - value) < error;
   }
 
 }

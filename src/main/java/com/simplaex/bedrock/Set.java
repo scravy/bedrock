@@ -6,7 +6,8 @@ import javax.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
+import java.util.function.*;
+import java.util.stream.Collector;
 
 @EqualsAndHashCode
 public final class Set<E extends Comparable<? super E>> implements
@@ -107,6 +108,26 @@ public final class Set<E extends Comparable<? super E>> implements
       return this;
     }
     return ofSeqInternal(underlying.without(other.underlying));
+  }
+
+  public <F extends Comparable<? super F>> Set<F> transform(final Function<E, F> f) {
+    return stream().map(f).collect(collector());
+  }
+
+  public E maximum() {
+    return toSeq().lastOptional().orElseThrow(NoSuchElementException::new);
+  }
+
+  public E minimum() {
+    return toSeq().headOptional().orElseThrow(NoSuchElementException::new);
+  }
+
+  public Optional<E> maximumOptional() {
+    return toSeq().lastOptional();
+  }
+
+  public Optional<E> minimumOptional() {
+    return toSeq().headOptional();
   }
 
   @Override
@@ -217,4 +238,38 @@ public final class Set<E extends Comparable<? super E>> implements
   public String toString() {
     return underlying == null ? "∅" : ('{' + underlying.asString(", ") + '}');
   }
+
+  public static <T extends Comparable<? super T>> Collector<T, TreeSet<T>, Set<T>> collector() {
+    return new Collector<T, TreeSet<T>, Set<T>>() {
+
+      @Override
+      public Supplier<TreeSet<T>> supplier() {
+        return TreeSet::new;
+      }
+
+      @Override
+      public BiConsumer<TreeSet<T>, T> accumulator() {
+        return TreeSet::add;
+      }
+
+      @Override
+      public BinaryOperator<TreeSet<T>> combiner() {
+        return (left, right) -> {
+          left.addAll(right);
+          return left;
+        };
+      }
+
+      @Override
+      public Function<TreeSet<T>, Set<T>> finisher() {
+        return Set::ofCollection;
+      }
+
+      @Override
+      public java.util.Set<Characteristics> characteristics() {
+        return Collections.emptySet();
+      }
+    };
+  }
+
 }

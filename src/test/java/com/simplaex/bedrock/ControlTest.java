@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 
 import static com.greghaskins.spectrum.Spectrum.*;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
+import static com.simplaex.bedrock.Numbers.isApproximately;
 import static com.simplaex.bedrock.Pair.pair;
 
 @SuppressWarnings({"ClassInitializerMayBeStatic", "CodeBlock2Expr"})
@@ -28,6 +29,15 @@ public class ControlTest {
         val finished = System.nanoTime();
         val duration = Duration.ofNanos(finished - started);
         expect(duration.toMillis()).toBeGreaterThan(199);
+      });
+    });
+    describe("iterate", () -> {
+      it("should iteratively find the square root of ten", () -> {
+        val result = Control.iterate(
+          value -> value * (value * value > 10.0 ? 0.5 : 1.5),
+          (prev, curr) -> isApproximately(10.0, 0.01).test(curr * curr), 10.0
+        );
+        expect(Math.abs(10.0 - result * result) < 0.01).toBeTrue();
       });
     });
     describe("forever(ThrowingRunnable)", () -> {
