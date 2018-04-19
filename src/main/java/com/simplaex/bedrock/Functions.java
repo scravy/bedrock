@@ -20,6 +20,10 @@ public class Functions {
     return b -> a;
   }
 
+  public static <A, B> Function<A, Function<B, A>> constant() {
+    return a -> b -> a;
+  }
+
   public static <A, B, C> Function<A, C> compose(@Nonnull final Function<B, C> f, @Nonnull final Function<A, B> g) {
     return a -> f.apply(g.apply(a));
   }
@@ -43,6 +47,10 @@ public class Functions {
   public static <T> Predicate<T> not(@Nonnull final Predicate<T> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     return predicate.negate();
+  }
+
+  public static <T> Predicate<T> predicate(@Nonnull final Function<T, Boolean> predicate) {
+    return predicate::apply;
   }
 
 }

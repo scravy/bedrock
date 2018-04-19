@@ -50,6 +50,14 @@ public abstract class Seq<E> implements
     return new SeqSimple<>(array);
   }
 
+  public E draw(final Random random) throws NoSuchElementException {
+    if (isEmpty()) {
+      throw new NoSuchElementException("drawing from an empty set");
+    }
+    final int ix = random.nextInt(size());
+    return get(ix);
+  }
+
   @Nonnull
   public abstract Seq<E> sortedBy(@Nonnull final Comparator<? super E> comparator);
 
@@ -133,6 +141,7 @@ public abstract class Seq<E> implements
     return Optional.empty();
   }
 
+  @Override
   public boolean contains(@Nullable final E e) {
     return find(e) > -1;
   }
@@ -332,6 +341,13 @@ public abstract class Seq<E> implements
       b1.add(b2.result());
     }
     return b1.result();
+  }
+
+  @Nonnull
+  @SuppressWarnings("unchecked")
+  public <F extends E> Seq<F> filter(@Nonnull final Class<F> clazz) {
+    final Seq res = filter(element -> element != null && clazz.isAssignableFrom(element.getClass()));
+    return (Seq<F>) res;
   }
 
   @Override
@@ -797,6 +813,12 @@ public abstract class Seq<E> implements
       return empty();
     }
     return new SeqSimple<>(es);
+  }
+
+  @SafeVarargs
+  @Nonnull
+  public static <E> Seq<E> seq(@Nonnull final E... es) {
+    return ofArray(es);
   }
 
   @Nonnull

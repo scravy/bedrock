@@ -75,6 +75,10 @@ public class SetTest {
         expect(Set.of(1, 2, 3).exists(x -> x % 2 == 0)).toBeTrue();
         expect(Set.of(1, 2, 3).exists(x -> x < 0)).toBeFalse();
       });
+      it("contains", () -> {
+        expect(Set.of(1, 2, 3).contains(2)).toBeTrue();
+        expect(Set.of(1, 2, 3).contains(0)).toBeFalse();
+      });
       it("toSet", () -> {
         expect(Set.of(1, 2, 3).toSet()).toEqual(new HashSet<>(Arrays.asList(1, 2, 3)));
       });

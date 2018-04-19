@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import javax.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.*;
 import java.util.stream.Collector;
 
@@ -50,24 +49,33 @@ public final class Set<E extends Comparable<? super E>> implements
     return false;
   }
 
-  public boolean forAll(final Predicate<E> predicate) {
+  @Override
+  public boolean forAll(@Nonnull final Predicate<? super E> predicate) {
     return underlying == null || underlying.forAll(predicate);
   }
 
-  public boolean exists(final Predicate<E> predicate) {
+  @Override
+  public boolean exists(@Nonnull final Predicate<? super E> predicate) {
     return underlying != null && underlying.exists(predicate);
   }
 
-  public E draw() {
-    return draw(ThreadLocalRandom.current());
-  }
-
-  public E draw(final Random random) {
+  @Override
+  public E draw(final Random random) throws NoSuchElementException {
     if (underlying == null) {
       throw new NoSuchElementException("drawing from an empty set");
     }
     final int ix = random.nextInt(size());
     return underlying.get(ix);
+  }
+
+  @Nonnull
+  @SuppressWarnings("unchecked")
+  public <F extends E> Set<F> filter(@Nonnull final Class<F> clazz) {
+    if (underlying == null) {
+      return empty();
+    }
+    final Set set = filter(element -> element != null && clazz.isAssignableFrom(element.getClass()));
+    return (Set<F>) set;
   }
 
   public Set<E> filter(@Nonnull final Predicate<E> predicate) {
@@ -122,10 +130,12 @@ public final class Set<E extends Comparable<? super E>> implements
     return toSeq().headOptional().orElseThrow(NoSuchElementException::new);
   }
 
+  @Nonnull
   public Optional<E> maximumOptional() {
     return toSeq().lastOptional();
   }
 
+  @Nonnull
   public Optional<E> minimumOptional() {
     return toSeq().headOptional();
   }
@@ -180,6 +190,7 @@ public final class Set<E extends Comparable<? super E>> implements
   /**
    * INTERNAL: Assumes the seq is a sorted, distinct seq.
    */
+  @Nonnull
   private static <E extends Comparable<? super E>> Set<E> ofSeqInternal(final Seq<E> seq) {
     if (seq.isEmpty()) {
       return empty();
@@ -194,14 +205,23 @@ public final class Set<E extends Comparable<? super E>> implements
   }
 
   @SafeVarargs
+  @Nonnull
   public static <E extends Comparable<? super E>> Set<E> of(final E... elements) {
     return ofSeqInternal(Seq.ofArray(elements));
   }
 
+  @SafeVarargs
+  @Nonnull
+  public static <E extends Comparable<? super E>> Set<E> set(final E... elements) {
+    return ofSeqInternal(Seq.ofArray(elements));
+  }
+
+  @Nonnull
   public static <E extends Comparable<? super E>> Set<E> ofSeq(final Seq<E> elements) {
     return ofSeqInternal(elements.distinct());
   }
 
+  @Nonnull
   public static <E extends Comparable<? super E>> Set<E> ofIterable(final Iterable<E> elements) {
     if (elements instanceof Collection) {
       return ofCollection((Collection<E>) elements);
@@ -209,6 +229,7 @@ public final class Set<E extends Comparable<? super E>> implements
     return ofSeqInternal(Seq.ofIterable(elements).distinct());
   }
 
+  @Nonnull
   public static <E extends Comparable<? super E>> Set<E> ofCollection(final Collection<E> elements) {
     if (elements.isEmpty()) {
       return empty();

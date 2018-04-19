@@ -43,6 +43,10 @@ public class SeqSimpleTest {
         expect(m.apply('t')).toEqual(Seq.of("two", "three"));
       });
     });
+    it("filter(Clazz)", () -> {
+      final Seq<Double> seq = Seq.<Number>of(1, 2, 3, 4, 1.0, 2.0).filter(Double.class);
+      expect(seq).toEqual(Seq.of(1.0, 2.0));
+    });
   }
 
 }

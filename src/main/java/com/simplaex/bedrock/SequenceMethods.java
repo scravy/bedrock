@@ -62,10 +62,6 @@ interface SequenceMethods<Predicate, BiPredicate, Sequence extends SequenceMetho
     return takeRightView(sequence.length()).equals(sequence);
   }
 
-  boolean exists(@Nonnull Predicate predicate);
-
-  boolean forAll(@Nonnull Predicate predicate);
-
   @Nonnull
   default Sequence shuffled() {
     return shuffled(ThreadLocalRandom.current());
