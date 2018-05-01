@@ -83,9 +83,12 @@ public class SimpleDirectedGraph {
     for (int i = 0; i < outgoingEdges.length; i += 1) {
       final int[] out = outgoingEdges[i];
       for (int j = 0; j < out.length; j += 1) {
-        incomingEdgesMap.get(j).add(i);
+        final int from = i;
+        final int to = out[j];
+        incomingEdgesMap.get(to).add(from);
       }
     }
+    final int[][] incomingEdges = new int[numberOfVertices][];
     incomingEdgesMap.forEach((to, froms) -> {
       final int[] in = new int[froms.size()];
       int i = 0;

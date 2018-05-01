@@ -93,7 +93,11 @@ public abstract class Try<E> implements Iterable<E> {
   @Nonnull
   public abstract <F> Try<F> transformWith(@Nonnull final ThrowingFunction<Exception, Try<F>> f, final ThrowingFunction<E, Try<F>> g);
 
+  @Nonnull
   public abstract Try<E> fallback(final E value);
+
+  @Nonnull
+  public abstract Try<E> fallbackWith(@Nonnull final Supplier<E> value);
 
   public abstract <F> F fold(
     @Nonnull final ThrowingFunction<? super Exception, F> ifFailure,
@@ -259,8 +263,15 @@ public abstract class Try<E> implements Iterable<E> {
       return Promise.fulfilled(value);
     }
 
+    @Nonnull
     @Override
     public Try<E> fallback(final E value) {
+      return this;
+    }
+
+    @Nonnull
+    @Override
+    public Try<E> fallbackWith(@Nonnull final Supplier<E> value) {
       return this;
     }
 
@@ -448,9 +459,20 @@ public abstract class Try<E> implements Iterable<E> {
       return Promise.failed(exception);
     }
 
+    @Nonnull
     @Override
     public Try<E> fallback(final E value) {
       return success(value);
+    }
+
+    @Nonnull
+    @Override
+    public Try<E> fallbackWith(@Nonnull final Supplier<E> value) {
+      try {
+        return success(value.get());
+      } catch (final Exception exc) {
+        return failure(exc);
+      }
     }
 
     @Override
@@ -552,6 +574,7 @@ public abstract class Try<E> implements Iterable<E> {
     }
   }
 
+  @Nonnull
   public static <A, R> Function<A, Try<R>> lift(final @Nonnull Function<A, R> function) {
     Objects.requireNonNull(function, "'function' must not be null");
     return arg -> execute(() -> function.apply(arg));

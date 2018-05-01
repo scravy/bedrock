@@ -4,57 +4,12 @@ import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
 import java.util.*;
-import java.util.function.ToIntFunction;
 
 /**
  * Graph algorithms.
  */
 @UtilityClass
 public class Graphs {
-
-  static <V> DirectedGraph<V> fromEdges(final Seq<Pair<V, V>> edges) {
-    final Map<V, Integer> verticesToIndicesMap = new HashMap<>();
-    final Map<Integer, TreeSet<Integer>> outgoingEdgesMap = new HashMap<>();
-    final Box.IntBox index = Box.intBox(0);
-    final ToIntFunction<V> add = vertex -> {
-      final int ix;
-      final Integer ixMaybe = verticesToIndicesMap.get(vertex);
-      if (ixMaybe == null) {
-        ix = index.get();
-        outgoingEdgesMap.put(ix, new TreeSet<>());
-        verticesToIndicesMap.put(vertex, ix);
-        index.inc();
-      } else {
-        ix = ixMaybe;
-      }
-      return ix;
-    };
-    edges.forEach(edge -> {
-      final int from = add.applyAsInt(edge.fst());
-      final int to = add.applyAsInt(edge.snd());
-      outgoingEdgesMap.get(from).add(to);
-    });
-    final int numberOfVertices = index.get();
-    final Object[] vertices = new Object[numberOfVertices];
-    verticesToIndicesMap.forEach((vertex, ix) -> vertices[ix] = vertex);
-    final int[][] outgoingEdges = new int[numberOfVertices][];
-    final Box.IntBox numberOfEdges = Box.intBox(0);
-    outgoingEdgesMap.forEach((from, tos) -> {
-      final int[] out = new int[tos.size()];
-      int i = 0;
-      for (final int to : outgoingEdgesMap.get(from)) {
-        out[i++] = to;
-      }
-      numberOfEdges.add(i);
-      outgoingEdges[from] = out;
-    });
-    return new DirectedGraph<>(
-      vertices,
-      verticesToIndicesMap,
-      numberOfEdges.get(),
-      outgoingEdges
-    );
-  }
 
   @Nonnull
   public static <V> Optional<Seq<V>> topologicalSort(final Seq<Pair<V, V>> edges) {
@@ -92,13 +47,13 @@ public class Graphs {
   }
 
   @Nonnull
-  public static <V> Seq<Seq<V>> stronglyConnectedComponents(final Seq<Pair<V, V>> edges) {
-    final DirectedGraph<V> graph = fromEdges(edges);
+  public static <V> Seq<Seq<V>> stronglyConnectedComponents(@Nonnull final Seq<Pair<V, V>> edges) {
+    final DirectedGraph<V> graph = DirectedGraph.fromEdges(edges);
     return stronglyConnectedComponents(graph);
   }
 
   @Nonnull
-  public static <V> Seq<Seq<V>> stronglyConnectedComponents(final DirectedGraph<V> graph) {
+  public static <V> Seq<Seq<V>> stronglyConnectedComponents(@Nonnull final DirectedGraph<V> graph) {
     @SuppressWarnings("WeakerAccess")
     class Algo {
 
