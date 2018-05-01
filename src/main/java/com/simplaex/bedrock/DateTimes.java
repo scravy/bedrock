@@ -85,6 +85,10 @@ public class DateTimes {
       return builder.result();
     }
 
+    public Duration getDuration() {
+      return Duration.between(getBegin(), getEnd());
+    }
+
     public String toString() {
       return getBegin() + "/" + getEnd();
     }

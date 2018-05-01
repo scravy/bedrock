@@ -3,6 +3,7 @@ package com.simplaex.bedrock;
 import com.greghaskins.spectrum.Spectrum;
 import org.junit.runner.RunWith;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -60,6 +61,16 @@ public class DateTimesTest {
           });
         }
       }
+    });
+
+    describe("Interval", () -> {
+      describe("getDuration", () -> {
+        it("shoul calculate a duration for an interval", () -> {
+          final DateTimes.Interval interval = DateTimes.parseInterval("2000-01-03T04:00/2000-02-22T06:30");
+          expect(interval.getDuration())
+            .toEqual(Duration.of(50, ChronoUnit.DAYS).plus(Duration.of(150, ChronoUnit.MINUTES)));
+        });
+      });
     });
   }
 
