@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.function.ToIntFunction;
 
 /**
  * Graph algorithms.
@@ -11,21 +12,65 @@ import java.util.*;
 @UtilityClass
 public class Graphs {
 
+  static <V> DirectedGraph<V> fromEdges(final Seq<Pair<V, V>> edges) {
+    final Map<V, Integer> verticesToIndicesMap = new HashMap<>();
+    final Map<Integer, TreeSet<Integer>> outgoingEdgesMap = new HashMap<>();
+    final Box.IntBox index = Box.intBox(0);
+    final ToIntFunction<V> add = vertex -> {
+      final int ix;
+      final Integer ixMaybe = verticesToIndicesMap.get(vertex);
+      if (ixMaybe == null) {
+        ix = index.get();
+        outgoingEdgesMap.put(ix, new TreeSet<>());
+        verticesToIndicesMap.put(vertex, ix);
+        index.inc();
+      } else {
+        ix = ixMaybe;
+      }
+      return ix;
+    };
+    edges.forEach(edge -> {
+      final int from = add.applyAsInt(edge.fst());
+      final int to = add.applyAsInt(edge.snd());
+      outgoingEdgesMap.get(from).add(to);
+    });
+    final int numberOfVertices = index.get();
+    final Object[] vertices = new Object[numberOfVertices];
+    verticesToIndicesMap.forEach((vertex, ix) -> vertices[ix] = vertex);
+    final int[][] outgoingEdges = new int[numberOfVertices][];
+    final Box.IntBox numberOfEdges = Box.intBox(0);
+    outgoingEdgesMap.forEach((from, tos) -> {
+      final int[] out = new int[tos.size()];
+      int i = 0;
+      for (final int to : outgoingEdgesMap.get(from)) {
+        out[i++] = to;
+      }
+      numberOfEdges.add(i);
+      outgoingEdges[from] = out;
+    });
+    return new DirectedGraph<>(
+      vertices,
+      verticesToIndicesMap,
+      numberOfEdges.get(),
+      outgoingEdges
+    );
+  }
+
   @Nonnull
   public static <V> Optional<Seq<V>> topologicalSort(final Seq<Pair<V, V>> edges) {
     final SeqBuilder<V> resultBuilder = Seq.builder();
     final HashMap<V, java.util.Set<V>> incomingEdgesMap = new HashMap<>();
     final HashMap<V, java.util.Set<V>> outgoingEdgesMap = new HashMap<>();
     edges.forEach(edge -> {
-      incomingEdgesMap.computeIfAbsent(edge.getFirst(), __ -> new HashSet<>());
-      incomingEdgesMap.computeIfAbsent(edge.getSecond(), __ -> new HashSet<>());
-      outgoingEdgesMap.computeIfAbsent(edge.getFirst(), __ -> new HashSet<>());
-      outgoingEdgesMap.computeIfAbsent(edge.getSecond(), __ -> new HashSet<>());
+      incomingEdgesMap.computeIfAbsent(edge.fst(), __ -> new HashSet<>());
+      incomingEdgesMap.computeIfAbsent(edge.snd(), __ -> new HashSet<>());
+      outgoingEdgesMap.computeIfAbsent(edge.fst(), __ -> new HashSet<>());
+      outgoingEdgesMap.computeIfAbsent(edge.snd(), __ -> new HashSet<>());
     });
     edges.forEach(edge -> incomingEdgesMap.get(edge.getSecond()).add(edge.getFirst()));
     edges.forEach(edge -> outgoingEdgesMap.get(edge.getFirst()).add(edge.getSecond()));
     int count = outgoingEdgesMap.size();
-    final Deque<V> nodes = new ArrayDeque<V>();
+    final Deque<V> nodes = new ArrayDeque<>();
     incomingEdgesMap.forEach((to, from) -> {
       if (from.isEmpty()) {
         nodes.addFirst(to);
@@ -44,6 +89,71 @@ public class Graphs {
       count -= 1;
     }
     return count == 0 ? Optional.of(resultBuilder.build()) : Optional.empty();
+  }
+
+  @Nonnull
+  public static <V> Seq<Seq<V>> stronglyConnectedComponents(final Seq<Pair<V, V>> edges) {
+    final DirectedGraph<V> graph = fromEdges(edges);
+    return stronglyConnectedComponents(graph);
+  }
+
+  @Nonnull
+  public static <V> Seq<Seq<V>> stronglyConnectedComponents(final DirectedGraph<V> graph) {
+    @SuppressWarnings("WeakerAccess")
+    class Algo {
+
+      final int[] lowlink = new int[graph.getNumberOfVertices()];
+      final boolean[] onStack = new boolean[graph.getNumberOfVertices()];
+      final int[] indices = new int[graph.getNumberOfVertices()];
+
+      {
+        Arrays.fill(indices, -1);
+      }
+
+      int index = 0;
+
+      final Deque<Integer> stack = new ArrayDeque<>();
+      final SeqBuilder<Seq<V>> result = Seq.builder();
+
+      void strongConnect(final int v) {
+        lowlink[v] = index;
+        indices[v] = index;
+        index += 1;
+        stack.push(v);
+        onStack[v] = true;
+
+        graph.forEachOutgoing(v, w -> {
+          if (indices[w] == -1) {
+            strongConnect(w);
+            lowlink[v] = Math.min(lowlink[v], lowlink[w]);
+          } else if (onStack[w]) {
+            lowlink[v] = Math.min(lowlink[v], indices[w]);
+          }
+        });
+
+        if (lowlink[v] == indices[v]) {
+          final SeqBuilder<V> sccBuilder = Seq.builder();
+          int x;
+          do {
+            x = stack.pop();
+            onStack[x] = false;
+            sccBuilder.add(graph.vertex(x));
+          } while (x != v);
+          result.add(sccBuilder.build());
+        }
+      }
+
+      Seq<Seq<V>> result() {
+        return result.result();
+      }
+    }
+    final Algo algo = new Algo();
+    for (int v = 0; v < graph.getNumberOfVertices(); v += 1) {
+      if (algo.indices[v] == -1) {
+        algo.strongConnect(v);
+      }
+    }
+    return algo.result();
   }
 
 }

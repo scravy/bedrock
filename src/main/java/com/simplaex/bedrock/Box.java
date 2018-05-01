@@ -6,6 +6,11 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.function.*;
 
+/**
+ * A Box holding a mutable value.
+ *
+ * @param <T> The type of the value.
+ */
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class Box<T> {
@@ -117,6 +122,10 @@ public abstract class Box<T> {
     public boolean exists(final IntPredicate predicate) {
       return predicate.test(intValue);
     }
+
+    public int get() {
+      return intValue;
+    }
   }
 
   @EqualsAndHashCode(callSuper = false)
@@ -170,6 +179,10 @@ public abstract class Box<T> {
     public boolean exists(final LongPredicate predicate) {
       return predicate.test(longValue);
     }
+
+    public long get() {
+      return longValue;
+    }
   }
 
   @EqualsAndHashCode(callSuper = false)
@@ -214,6 +227,10 @@ public abstract class Box<T> {
 
     public boolean exists(final DoublePredicate predicate) {
       return predicate.test(doubleValue);
+    }
+
+    public double get() {
+      return doubleValue;
     }
   }
 }

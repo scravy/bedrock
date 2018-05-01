@@ -94,5 +94,31 @@ public class GraphsTest {
         expect(maybeResult.isPresent()).toBeFalse();
       });
     });
+
+    describe("stronglyConnectedComponents", () -> {
+      it("should detect the strongly connected components of a graph", () -> {
+        val result = Graphs.stronglyConnectedComponents(Seq.of(
+          pair("a", "b"),
+          pair("b", "c"),
+          pair("c", "d"),
+          pair("d", "c"),
+          pair("e", "a"),
+          pair("b", "e"),
+          pair("e", "f"),
+          pair("b", "f"),
+          pair("f", "g"),
+          pair("g", "f"),
+          pair("c", "g"),
+          pair("h", "g"),
+          pair("d", "h"),
+          pair("h", "d")
+        )).map(Set::ofSeq);
+        expect(result).toEqual(Seq.of(
+          Set.of("f", "g"),
+          Set.of("c", "d", "h"),
+          Set.of("a", "b", "e")
+        ));
+      });
+    });
   }
 }
