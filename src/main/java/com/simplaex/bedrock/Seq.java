@@ -954,6 +954,139 @@ public abstract class Seq<E> implements
     return new SeqGenerated<>(function, length);
   }
 
+  public static Seq<Character> wrap(@Nonnull final char[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Boolean> wrap(@Nonnull final boolean[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Byte> wrap(@Nonnull final byte[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Short> wrap(@Nonnull final short[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Integer> wrap(@Nonnull final int[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Long> wrap(@Nonnull final long[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Float> wrap(@Nonnull final float[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Double> wrap(@Nonnull final double[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Character> wrap(@Nonnull final Character[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Boolean> wrap(@Nonnull final Boolean[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Byte> wrap(@Nonnull final Byte[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Short> wrap(@Nonnull final Short[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Integer> wrap(@Nonnull final Integer[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Long> wrap(@Nonnull final Long[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Float> wrap(@Nonnull final Float[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static Seq<Double> wrap(@Nonnull final Double[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
+  public static <E> Seq<E> wrap(@Nonnull final List<E> list) {
+    if (list.isEmpty()) {
+      return Seq.empty();
+    }
+    return ofGenerator(list::get, list.size());
+  }
+
+  public static Seq<Boolean> wrap(@Nonnull final BitSet bitSet) {
+    if (bitSet.isEmpty()) {
+      return Seq.empty();
+    }
+    return ofGenerator(bitSet::get, bitSet.length());
+  }
+
+  public static Seq<Character> wrap(@Nonnull final String string) {
+    if (string.isEmpty()) {
+      return Seq.empty();
+    }
+    return ofGenerator(string::charAt, string.length());
+  }
+
   public static <E extends Comparable<? super E>> E minimum(final Seq<E> seq) {
     if (seq instanceof SeqSimpleSorted) {
       return seq.head();
