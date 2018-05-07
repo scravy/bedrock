@@ -11,10 +11,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 
 /**
  * Missing control structures for Java.
@@ -475,5 +472,74 @@ public class Control {
 
   public static <A> A exhaustively(final UnaryOperator<A> operation, final A startValue) {
     return iterate(operation, Objects::equals, startValue);
+  }
+
+  public static <E> void swap(final E[] array, final int i, final int j) {
+    final E src = array[i];
+    array[i] = array[j];
+    array[j] = src;
+  }
+
+  public static void swap(final boolean[] array, final int i, final int j) {
+    final boolean src = array[i];
+    array[i] = array[j];
+    array[j] = src;
+  }
+
+  public static void swap(final char[] array, final int i, final int j) {
+    final char src = array[i];
+    array[i] = array[j];
+    array[j] = src;
+  }
+
+  public static void swap(final byte[] array, final int i, final int j) {
+    final byte src = array[i];
+    array[i] = array[j];
+    array[j] = src;
+  }
+
+  public static void swap(final short[] array, final int i, final int j) {
+    final short src = array[i];
+    array[i] = array[j];
+    array[j] = src;
+  }
+
+  public static void swap(final int[] array, final int i, final int j) {
+    final int src = array[i];
+    array[i] = array[j];
+    array[j] = src;
+  }
+
+  public static void swap(final long[] array, final int i, final int j) {
+    final long src = array[i];
+    array[i] = array[j];
+    array[j] = src;
+  }
+
+  public static void swap(final double[] array, final int i, final int j) {
+    final double src = array[i];
+    array[i] = array[j];
+    array[j] = src;
+  }
+
+  public static void swap(final float[] array, final int i, final int j) {
+    final float src = array[i];
+    array[i] = array[j];
+    array[j] = src;
+  }
+
+  public static <A, R> Function<A, R> caching(final Function<A, R> f) {
+    final HashMap<A, R> cachedValues = new HashMap<>();
+    return arg -> cachedValues.computeIfAbsent(arg, f);
+  }
+
+  public static <R> IntFunction<R> caching(final IntFunction<R> f) {
+    final HashMap<Integer, R> cachedValues = new HashMap<>();
+    return arg -> cachedValues.computeIfAbsent(arg, f::apply);
+  }
+
+  public static <R> LongFunction<R> caching(final LongFunction<R> f) {
+    final HashMap<Long, R> cachedValues = new HashMap<>();
+    return arg -> cachedValues.computeIfAbsent(arg, f::apply);
   }
 }

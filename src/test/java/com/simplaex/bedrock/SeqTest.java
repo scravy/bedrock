@@ -22,7 +22,7 @@ public class SeqTest {
       describe("swap", () -> {
         it("should swap two elements in an array", () -> {
           val arr = new Integer[]{1, 2, 3};
-          Seq.swap(arr, 0, 1);
+          Control.swap(arr, 0, 1);
           expect(arr[0]).toEqual(2);
           expect(arr[1]).toEqual(1);
           expect(arr[2]).toEqual(3);

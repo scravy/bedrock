@@ -175,6 +175,20 @@ class SeqExemplaryChecks {
       it("should return the last element", () -> expect(seq.last()).toEqual(3));
     });
 
+    describe("rotated", () -> {
+      it("should rotate the seq by -4", () -> expect(seq.rotated(-4)).toEqual(Seq.of(3, 1, 2, 2, 4)));
+      it("should rotate the seq by -3", () -> expect(seq.rotated(-3)).toEqual(Seq.of(4, 3, 1, 2, 2)));
+      it("should rotate the seq by -2", () -> expect(seq.rotated(-2)).toEqual(Seq.of(2, 4, 3, 1, 2)));
+      it("should rotate the seq by -1", () -> expect(seq.rotated(-1)).toEqual(Seq.of(2, 2, 4, 3, 1)));
+      it("should rotate the seq by 0", () -> expect(seq.rotated(0)).toEqual(Seq.of(1, 2, 2, 4, 3)));
+      it("should rotate the seq by 1", () -> expect(seq.rotated(1)).toEqual(Seq.of(3, 1, 2, 2, 4)));
+      it("should rotate the seq by 2", () -> expect(seq.rotated(2)).toEqual(Seq.of(4, 3, 1, 2, 2)));
+      it("should rotate the seq by 3", () -> expect(seq.rotated(3)).toEqual(Seq.of(2, 4, 3, 1, 2)));
+      it("should rotate the seq by 4", () -> expect(seq.rotated(4)).toEqual(Seq.of(2, 2, 4, 3, 1)));
+      it("should rotate the seq by 5", () -> expect(seq.rotated(5)).toEqual(Seq.of(1, 2, 2, 4, 3)));
+      it("should rotate the seq by 6", () -> expect(seq.rotated(6)).toEqual(Seq.of(3, 1, 2, 2, 4)));
+    });
+
     final Consumer<Supplier<Seq<Integer>>> tailChecks = f -> {
       it("should return the last four elements", () -> expect(f.get()).toEqual(Seq.of(2, 2, 4, 3)));
     };

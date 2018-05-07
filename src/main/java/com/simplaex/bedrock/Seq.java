@@ -10,6 +10,8 @@ import java.util.function.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import static com.simplaex.bedrock.Control.swap;
+
 /**
  * An immutable sequence.
  *
@@ -660,18 +662,37 @@ public abstract class Seq<E> implements
     return stream().map(Objects::toString).collect(Collectors.joining(", ", "[", "]"));
   }
 
-  static <E> void swap(final E[] array, final int i, final int j) {
-    final E src = array[i];
-    array[i] = array[j];
-    array[j] = src;
-  }
-
   static <E> void reverse(final @Nonnull E[] array) {
     final int len = array.length;
     final int halfLen = len / 2;
     for (int i = 0, j = len - 1; i < halfLen; i += 1, j -= 1) {
       swap(array, i, j);
     }
+  }
+
+  @Nonnull
+  @Override
+  public Seq<E> rotated(final int amount) {
+    final Object[] array = new Object[size()];
+    if (amount == 0) {
+      return this;
+    }
+    if (amount < 0) {
+      return rotated2(-amount);
+    }
+    for (int i = 0; i < size(); i += 1) {
+      array[(i + amount) % size()] = get(i);
+    }
+    return ofArrayZeroCopyInternal(array);
+  }
+
+  @Nonnull
+  private Seq<E> rotated2(final int amount) {
+    final Object[] array = new Object[size()];
+    for (int i = 0; i < size(); i += 1) {
+      array[i] = get((i + amount) % size());
+    }
+    return ofArrayZeroCopyInternal(array);
   }
 
   @Nonnull
@@ -952,6 +973,12 @@ public abstract class Seq<E> implements
   public static <E> Seq<E> ofGenerator(@Nonnull final IntFunction<E> function, @Nonnegative final int length) {
     Objects.requireNonNull(function, "'function' must not be null.");
     return new SeqGenerated<>(function, length);
+  }
+
+  @Nonnegative
+  public static <E> Seq<E> ofGeneratorCaching(@Nonnull final IntFunction<E> function, @Nonnegative final int length) {
+    Objects.requireNonNull(function, "'function' must not be null.");
+    return new SeqGenerated<>(Control.caching(function), length);
   }
 
   public static Seq<Character> wrap(@Nonnull final char[] array) {

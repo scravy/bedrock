@@ -140,6 +140,9 @@ interface SequenceMethods<Predicate, BiPredicate, Sequence extends SequenceMetho
   }
 
   @Nonnull
+  Sequence rotated(final int amount);
+
+  @Nonnull
   Iterator<Sequence> permutationsIterator();
 
   @Nonnull
