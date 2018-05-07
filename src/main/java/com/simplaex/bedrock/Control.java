@@ -528,18 +528,18 @@ public class Control {
     array[j] = src;
   }
 
-  public static <A, R> Function<A, R> caching(final Function<A, R> f) {
+  public static <A, R> Function<A, R> memoizing(final Function<A, R> function) {
     final HashMap<A, R> cachedValues = new HashMap<>();
-    return arg -> cachedValues.computeIfAbsent(arg, f);
+    return arg -> cachedValues.computeIfAbsent(arg, function);
   }
 
-  public static <R> IntFunction<R> caching(final IntFunction<R> f) {
+  public static <R> IntFunction<R> memoizing(final IntFunction<R> function) {
     final HashMap<Integer, R> cachedValues = new HashMap<>();
-    return arg -> cachedValues.computeIfAbsent(arg, f::apply);
+    return arg -> cachedValues.computeIfAbsent(arg, function::apply);
   }
 
-  public static <R> LongFunction<R> caching(final LongFunction<R> f) {
+  public static <R> LongFunction<R> memoizing(final LongFunction<R> function) {
     final HashMap<Long, R> cachedValues = new HashMap<>();
-    return arg -> cachedValues.computeIfAbsent(arg, f::apply);
+    return arg -> cachedValues.computeIfAbsent(arg, function::apply);
   }
 }

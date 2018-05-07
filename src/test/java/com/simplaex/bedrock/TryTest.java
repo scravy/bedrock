@@ -93,21 +93,6 @@ public class TryTest {
           expect(t.isSuccess()).toBeTrue();
         });
       });
-      describe("map", () -> {
-
-      });
-      describe("flatMap", () -> {
-
-      });
-      describe("otherwise", () -> {
-
-      });
-      describe("transform", () -> {
-
-      });
-      describe("transformWith", () -> {
-
-      });
       describe("toOptional", () -> {
         it("should yield an empty optional", () -> {
           expect(t.toOptional()).toEqual(Optional.of(4711));
@@ -152,18 +137,6 @@ public class TryTest {
           expect(r.getException().getCause()).toBeInstanceOf(IndexOutOfBoundsException.class);
         });
       });
-      describe("orElse", () -> {
-
-      });
-      describe("orElseNull", () -> {
-
-      });
-      describe("orElseGet", () -> {
-
-      });
-      describe("orElseThrow", () -> {
-
-      });
       describe("fallback", () -> {
         it("should fallback to the fallback value", () -> {
           expect(t.fallback(42)).toEqual(Try.success(42));
@@ -178,21 +151,6 @@ public class TryTest {
         it("should return false", () -> {
           expect(t.isSuccess()).toBeFalse();
         });
-      });
-      describe("map", () -> {
-
-      });
-      describe("flatMap", () -> {
-
-      });
-      describe("otherwise", () -> {
-
-      });
-      describe("transform", () -> {
-
-      });
-      describe("transformWith", () -> {
-
       });
       describe("toOptional", () -> {
         it("should yield an empty optional", () -> {

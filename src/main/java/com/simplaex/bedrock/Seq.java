@@ -670,6 +670,17 @@ public abstract class Seq<E> implements
     }
   }
 
+  /**
+   * Rotates the list by amount positions.
+   * <p>
+   * Positive values rotate items to the right, negative values to the left.
+   *
+   * <code>Seq.of(1, 2, 3).rotated(1).equals(Seq.of(3, 1, 2))</code>
+   * <code>Seq.of(1, 2, 3).rotated(-1).equals(Seq.of(2, 3, 1))</code>
+   *
+   * @param amount The amount of positions to rotate, positive values to the right, negative values to the left.
+   * @return The rotated sequence.
+   */
   @Nonnull
   @Override
   public Seq<E> rotated(final int amount) {
@@ -678,7 +689,7 @@ public abstract class Seq<E> implements
       return this;
     }
     if (amount < 0) {
-      return rotated2(-amount);
+      return leftRotated(-amount);
     }
     for (int i = 0; i < size(); i += 1) {
       array[(i + amount) % size()] = get(i);
@@ -687,7 +698,7 @@ public abstract class Seq<E> implements
   }
 
   @Nonnull
-  private Seq<E> rotated2(final int amount) {
+  private Seq<E> leftRotated(final int amount) {
     final Object[] array = new Object[size()];
     for (int i = 0; i < size(); i += 1) {
       array[i] = get((i + amount) % size());
@@ -976,9 +987,9 @@ public abstract class Seq<E> implements
   }
 
   @Nonnegative
-  public static <E> Seq<E> ofGeneratorCaching(@Nonnull final IntFunction<E> function, @Nonnegative final int length) {
+  public static <E> Seq<E> ofGeneratorMemoizing(@Nonnull final IntFunction<E> function, @Nonnegative final int length) {
     Objects.requireNonNull(function, "'function' must not be null.");
-    return new SeqGenerated<>(Control.caching(function), length);
+    return new SeqGenerated<>(Control.memoizing(function), length);
   }
 
   public static Seq<Character> wrap(@Nonnull final char[] array) {

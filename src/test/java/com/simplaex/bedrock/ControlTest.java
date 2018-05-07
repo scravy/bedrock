@@ -11,6 +11,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static com.greghaskins.spectrum.Spectrum.*;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
@@ -278,6 +279,22 @@ public class ControlTest {
             checks.run();
           });
         });
+      });
+    });
+    describe("memoizing", () -> {
+      it("should memoize calls and invoke the underlying function only once", () -> {
+        final SeqBuilder<String> invocations = Seq.builder();
+        final Function<String, String> function = arg -> {
+          invocations.add(arg);
+          return Seq.ofString(arg).reversed().asString();
+        };
+        final Function<String, String> cachingFunction = Control.memoizing(function);
+        expect(cachingFunction.apply("hello")).toEqual("olleh");
+        expect(cachingFunction.apply("world")).toEqual("dlrow");
+        expect(cachingFunction.apply("hello")).toEqual("olleh");
+        expect(cachingFunction.apply("world")).toEqual("dlrow");
+        expect(cachingFunction.apply("world")).toEqual("dlrow");
+        expect(invocations.result()).toEqual(Seq.of("hello", "world"));
       });
     });
   }
