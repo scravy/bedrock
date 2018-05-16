@@ -42,7 +42,7 @@ public final class ArrayMap<K extends Comparable<? super K>, V> implements Mappi
   @SuppressWarnings("unchecked")
   @Nonnull
   @Override
-  public Optional<V> get(final K key) {
+  public Optional<V> get(@Nonnull final K key) {
     final int ix = Arrays.binarySearch(keys, key);
     if (ix >= 0) {
       return Optional.ofNullable((V) values[ix]);
