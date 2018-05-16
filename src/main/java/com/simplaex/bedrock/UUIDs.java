@@ -1,7 +1,6 @@
 package com.simplaex.bedrock;
 
 import lombok.experimental.UtilityClass;
-import lombok.val;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;

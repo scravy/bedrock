@@ -9,6 +9,8 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 
+import static com.simplaex.bedrock.Pair.pair;
+
 public class DirectedGraph<V> extends SimpleDirectedGraph {
 
   private final Object[] vertices;
@@ -31,9 +33,13 @@ public class DirectedGraph<V> extends SimpleDirectedGraph {
   public V vertex(final int index) {
     return (V) vertices[index];
   }
-  
+
   public int index(@Nonnull final V vertex) {
     return verticesToIndicesMap.getOrDefault(vertex, -1);
+  }
+
+  public Seq<V> vertices() {
+    return Seq.ofArrayZeroCopyInternal(vertices);
   }
 
   @SuppressWarnings("unchecked")
@@ -66,6 +72,12 @@ public class DirectedGraph<V> extends SimpleDirectedGraph {
 
   public boolean hasIncomingEdges(@Nonnull final V vertex) {
     return countIncomingEdges(vertex) > 0;
+  }
+
+  public Seq<Pair<V, V>> edges() {
+    final SeqBuilder<Pair<V, V>> edgesBuilder = Seq.builder(numberOfEdges);
+    vertices().forEach(v -> forEachOutgoingEdge(v, v2 -> edgesBuilder.add(pair(v, v2))));
+    return edgesBuilder.result();
   }
 
   @Nonnull

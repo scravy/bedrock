@@ -4,13 +4,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.experimental.UtilityClass;
-import lombok.val;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static com.simplaex.bedrock.Control.*;
+import static com.simplaex.bedrock.Control.typeOf;
+import static com.simplaex.bedrock.Control.type_;
 
 @UtilityClass
 public class Tasks {

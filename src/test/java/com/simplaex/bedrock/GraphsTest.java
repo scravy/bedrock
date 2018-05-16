@@ -120,5 +120,19 @@ public class GraphsTest {
         ));
       });
     });
+
+    describe("fromEdges / edges", () -> {
+      it("should construct a seq of edges from a directed graph that was constructed from such a seq", () -> {
+        val edges = Seq.of(
+          pair("A", "B"),
+          pair("B", "C"),
+          pair("C", "D"),
+          pair("D", "A")
+        );
+        val digraph = DirectedGraph.fromEdges(edges);
+        val edges2 = digraph.edges();
+        expect(edges2.sorted()).toEqual(edges.sorted());
+      });
+    });
   }
 }
