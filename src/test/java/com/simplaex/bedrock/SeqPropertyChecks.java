@@ -12,7 +12,7 @@ import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
 
-@SuppressWarnings("CodeBlock2Expr")
+@SuppressWarnings({"CodeBlock2Expr", "ConstantConditions", "ObjectEqualsNull"})
 @UtilityClass
 class SeqPropertyChecks {
 
@@ -101,7 +101,6 @@ class SeqPropertyChecks {
         expect(seq).toEqual(seq);
       });
       it("should not equal null", () -> {
-        //noinspection ObjectEqualsNull
         expect(seq.equals(null)).toBeFalse();
       });
     });

@@ -1,5 +1,7 @@
 package com.simplaex.bedrock;
 
+import lombok.AllArgsConstructor;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.lang.reflect.Array;
@@ -59,10 +61,26 @@ class SeqGenerated<E> extends Seq<E> {
     return length;
   }
 
+  @AllArgsConstructor
+  private static class ReversedFunction<X> implements IntFunction<X> {
+
+    private int length;
+    private IntFunction<X> backingFunction;
+
+    @Override
+    public X apply(final int ix) {
+      return backingFunction.apply(length - ix - 1);
+    }
+  }
+
   @Nonnull
   @Override
   public Seq<E> reversed() {
-    return trimmedToSize().reversed();
+    if (backingFunction instanceof ReversedFunction<?>) {
+      final ReversedFunction<E> f = (ReversedFunction<E>) backingFunction;
+      return Seq.ofGenerator(f.backingFunction, f.length);
+    }
+    return Seq.ofGenerator(new ReversedFunction<>(length, backingFunction), length);
   }
 
   @SuppressWarnings("unchecked")

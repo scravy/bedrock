@@ -5,6 +5,7 @@ import lombok.val;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.function.IntFunction;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
@@ -16,23 +17,25 @@ public class SeqGeneratedTest {
 
   {
     describe("a simple seq", () -> {
-      val seq = Seq.ofGenerator(i -> {
-        switch (i) {
-          case 0:
-            return 1;
-          case 1:
-            return 2;
-          case 2:
-            return 2;
-          case 3:
-            return 4;
-          case 4:
-            return 3;
-        }
-        return 6;
-      }, 5);
-      SeqExemplaryChecks.checks(seq);
-      SeqPropertyChecks.checks(seq);
+      final Integer[] data = new Integer[]{1, 2, 2, 4, 3};
+      final IntFunction<Integer> generator = i -> {
+        return data[i];
+      };
+      val seq = Seq.ofGenerator(generator, data.length);
+      describe("without any modifications", () -> {
+        SeqExemplaryChecks.checks(seq);
+        SeqPropertyChecks.checks(seq);
+      });
+      describe("memoizing generator", () -> {
+        val memoizingSeq = Seq.ofGeneratorMemoizing(generator, data.length);
+        SeqExemplaryChecks.checks(memoizingSeq);
+        SeqPropertyChecks.checks(memoizingSeq);
+      });
+      describe("reversed twice", () -> {
+        val rev = seq.reversed().reversed();
+        SeqExemplaryChecks.checks(rev);
+        SeqPropertyChecks.checks(rev);
+      });
     });
 
     describe("a seq made from an int[] array", () -> {
