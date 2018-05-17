@@ -296,7 +296,7 @@ public class ControlTest {
           int c;
         }
 
-        final Control.Async<Entity, Entity> async = Control.<Entity>waterfall(
+        final Control.Async<Entity, Entity> async = Control.waterfall(
           (e, cb) -> {
             e.setA(13);
             cb.success(e);
