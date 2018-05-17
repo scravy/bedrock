@@ -438,10 +438,30 @@ public class Control {
     }
   }
 
+  public static <A> Async<A, A> async() {
+    return new Async<>((t, cb) -> cb.success(t));
+  }
+
   @Nonnull
   public static <In, Out> Async<In, Out> async(@Nonnull final ThrowingBiConsumer<In, Callback<Out>> function) {
     Objects.requireNonNull(function, "'function' must not be null.");
     return new Async<>(function);
+  }
+
+  @Nonnull
+  public static <A> Async<A, A> waterfall(@Nonnull final List<ThrowingBiConsumer<A, Callback<A>>> fs) {
+    return Seq.wrap(fs).foldl(Async::then, async());
+  }
+
+  @Nonnull
+  public static <A> Async<A, A> waterfall(@Nonnull final Seq<ThrowingBiConsumer<A, Callback<A>>> fs) {
+    return fs.foldl(Async::then, async());
+  }
+
+  @Nonnull
+  @SafeVarargs
+  public static <A> Async<A, A> waterfall(@Nonnull final ThrowingBiConsumer<A, Callback<A>>... fs) {
+    return Seq.<ThrowingBiConsumer<A, Callback<A>>>ofArrayZeroCopyInternal(fs).foldl(Async::then, async());
   }
 
   @SuppressWarnings("unchecked")

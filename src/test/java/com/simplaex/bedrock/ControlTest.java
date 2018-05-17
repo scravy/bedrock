@@ -1,6 +1,9 @@
 package com.simplaex.bedrock;
 
 import com.greghaskins.spectrum.Spectrum;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.val;
 import org.junit.runner.RunWith;
 
@@ -279,6 +282,39 @@ public class ControlTest {
             checks.run();
           });
         });
+      });
+    });
+    describe("waterfall", () -> {
+      it("should execute several tasks one after another", () -> {
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        class Entity {
+          int a;
+          int b;
+          int c;
+        }
+
+        final Control.Async<Entity, Entity> async = Control.<Entity>waterfall(
+          (e, cb) -> {
+            e.setA(13);
+            cb.success(e);
+          },
+          (e, cb) -> {
+            e.setB(15 * e.getA());
+            cb.success(e);
+          },
+          (e, cb) -> {
+            e.setC(e.getB() + e.getA());
+            cb.success(e);
+          }
+        );
+
+        final Promise<Entity> p = async.runPromised(new Entity());
+
+        expect(p.get()).toEqual(new Entity(13, 195, 208));
+
       });
     });
     describe("memoizing", () -> {
