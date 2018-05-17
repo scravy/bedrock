@@ -450,7 +450,7 @@ public class Control {
 
   @Nonnull
   public static <A> Async<A, A> waterfall(@Nonnull final List<ThrowingBiConsumer<A, Callback<A>>> fs) {
-    return Seq.wrap(fs).foldl(Async::then, async());
+    return waterfall(Seq.wrap(fs));
   }
 
   @Nonnull
@@ -461,7 +461,7 @@ public class Control {
   @Nonnull
   @SafeVarargs
   public static <A> Async<A, A> waterfall(@Nonnull final ThrowingBiConsumer<A, Callback<A>>... fs) {
-    return Seq.<ThrowingBiConsumer<A, Callback<A>>>ofArrayZeroCopyInternal(fs).foldl(Async::then, async());
+    return waterfall(Seq.ofArrayZeroCopyInternal(fs));
   }
 
   @SuppressWarnings("unchecked")

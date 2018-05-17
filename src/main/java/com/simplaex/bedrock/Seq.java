@@ -932,23 +932,8 @@ public abstract class Seq<E> implements
 
   @Nonnull
   public static Seq<Integer> codepointsOfString(@Nonnull final String string) {
-    final char[] array = string.toCharArray();
     final SeqBuilder<Integer> b = builder();
-    for (int i = 0; i < array.length; i += 1) {
-      final char c1 = array[i];
-      if (Character.isHighSurrogate(c1)) {
-        i += 1;
-        if (i < array.length) {
-          final char c2 = array[i];
-          if (Character.isLowSurrogate(c2)) {
-            final int codepoint = Character.toCodePoint(c1, c2);
-            b.add(codepoint);
-          }
-        }
-      } else {
-        b.add((int) c1);
-      }
-    }
+    Strings.forEachCodepoint(string, b::add);
     return b.result();
   }
 

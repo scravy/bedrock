@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.IntConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -123,6 +124,30 @@ public class Strings {
         return result.toString();
       }
     };
+  }
+
+  public static void forEach(@Nonnull final String string, @Nonnull final IntConsumer consumer) {
+    for (int i = 0; i < string.length(); i += 1) {
+      consumer.accept(string.charAt(i));
+    }
+  }
+
+  public static void forEachCodepoint(@Nonnull final String string, @Nonnull final IntConsumer consumer) {
+    for (int i = 0; i < string.length(); i += 1) {
+      final char c1 = string.charAt(i);
+      if (Character.isHighSurrogate(c1)) {
+        i += 1;
+        if (i < string.length()) {
+          final char c2 = string.charAt(i);
+          if (Character.isLowSurrogate(c2)) {
+            final int codepoint = Character.toCodePoint(c1, c2);
+            consumer.accept(codepoint);
+          }
+        }
+      } else {
+        consumer.accept(c1);
+      }
+    }
   }
 
 }
