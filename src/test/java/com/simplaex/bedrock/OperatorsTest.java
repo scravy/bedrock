@@ -68,6 +68,16 @@ public class OperatorsTest {
         check(bigDecSeqN, Operators::plus, Operators::plus, BigDecimal.ZERO, null);
       });
 
+      describe("or", () -> {
+        check(intSeq, Operators::or, Operators::or, 0, 3);
+        check(longSeq, Operators::or, Operators::or, 0L, 3L);
+        check(bigIntSeq, Operators::or, Operators::or, BigInteger.ZERO, BigInteger.valueOf(3));
+
+        check(intSeqN, Operators::or, Operators::or, 0, null);
+        check(longSeqN, Operators::or, Operators::or, 0L, null);
+        check(bigIntSeqN, Operators::or, Operators::or, BigInteger.ZERO, null);
+      });
+
       describe("minus", () -> {
         check(intSeq, Operators::minus, Operators::minus, 0, -6);
         check(longSeq, Operators::minus, Operators::minus, 0L, -6L);
@@ -94,6 +104,16 @@ public class OperatorsTest {
         check(doubleSeqN, Operators::times, Operators::times, 1.0, null);
         check(bigIntSeqN, Operators::times, Operators::times, BigInteger.ONE, null);
         check(bigDecSeqN, Operators::times, Operators::times, BigDecimal.ONE, null);
+      });
+
+      describe("and", () -> {
+        check(intSeq, Operators::and, Operators::and, 0, 0);
+        check(longSeq, Operators::and, Operators::and, 0L, 0L);
+        check(bigIntSeq, Operators::and, Operators::and, BigInteger.ZERO, BigInteger.valueOf(0));
+
+        check(intSeqN, Operators::and, Operators::and, 0, null);
+        check(longSeqN, Operators::and, Operators::and, 0L, null);
+        check(bigIntSeqN, Operators::and, Operators::and, BigInteger.ZERO, null);
       });
 
       describe("div", () -> {

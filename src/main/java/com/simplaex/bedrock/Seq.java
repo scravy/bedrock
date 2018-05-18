@@ -1089,6 +1089,13 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  public static <E> Seq<E> wrap(@Nonnull final E[] array) {
+    if (array.length == 0) {
+      return Seq.empty();
+    }
+    return ofGenerator(ix -> array[ix], array.length);
+  }
+
   public static <E> Seq<E> wrap(@Nonnull final List<E> list) {
     if (list.isEmpty()) {
       return Seq.empty();

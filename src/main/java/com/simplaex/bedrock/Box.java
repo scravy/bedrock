@@ -33,6 +33,12 @@ public abstract class Box<T> {
     return getValue();
   }
 
+  public T applyAtomic(@Nonnull final Function<T, T> function) {
+    synchronized (this) {
+      return apply(function);
+    }
+  }
+
   public boolean exists(@Nonnull final Predicate<T> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null.");
     return predicate.test(getValue());
@@ -70,6 +76,21 @@ public abstract class Box<T> {
     return new DoubleBox(value);
   }
 
+  @Nonnull
+  public static IntBox intBox() {
+    return new IntBox(0);
+  }
+
+  @Nonnull
+  public static LongBox longBox() {
+    return new LongBox(0L);
+  }
+
+  @Nonnull
+  public static DoubleBox doubleBox() {
+    return new DoubleBox(0.0);
+  }
+
   @EqualsAndHashCode(callSuper = false)
   @Data
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -98,6 +119,13 @@ public abstract class Box<T> {
 
     public int update(@Nonnull final IntUnaryOperator function) {
       intValue = function.applyAsInt(intValue);
+      return intValue;
+    }
+
+    public int updateAtomic(@Nonnull final IntUnaryOperator function) {
+      synchronized (this) {
+        intValue = function.applyAsInt(intValue);
+      }
       return intValue;
     }
 
@@ -147,6 +175,13 @@ public abstract class Box<T> {
 
     public long update(@Nonnull final LongUnaryOperator function) {
       longValue = function.applyAsLong(longValue);
+      return longValue;
+    }
+
+    public long updateAtomic(@Nonnull final LongUnaryOperator function) {
+      synchronized (this) {
+        longValue = function.applyAsLong(longValue);
+      }
       return longValue;
     }
 
@@ -204,6 +239,13 @@ public abstract class Box<T> {
 
     public double update(@Nonnull final DoubleUnaryOperator function) {
       doubleValue = function.applyAsDouble(doubleValue);
+      return doubleValue;
+    }
+
+    public double updateAtomic(@Nonnull final DoubleUnaryOperator function) {
+      synchronized (this) {
+        doubleValue = function.applyAsDouble(doubleValue);
+      }
       return doubleValue;
     }
 

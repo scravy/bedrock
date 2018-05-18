@@ -285,16 +285,17 @@ public class ControlTest {
       });
     });
     describe("waterfall", () -> {
-      it("should execute several tasks one after another", () -> {
 
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        class Entity {
-          int a;
-          int b;
-          int c;
-        }
+      @Data
+      @NoArgsConstructor
+      @AllArgsConstructor
+      class Entity {
+        int a;
+        int b;
+        int c;
+      }
+
+      it("should execute several tasks one after another", () -> {
 
         final Control.Async<Entity, Entity> async = Control.waterfall(
           (e, cb) -> {
@@ -315,6 +316,62 @@ public class ControlTest {
 
         expect(p.get()).toEqual(new Entity(13, 195, 208));
 
+      });
+      it("should execute several failing tasks one after another", () -> {
+
+        final Box.IntBox executed = Box.intBox();
+
+        final Control.Async<Entity, Entity> async = Control.waterfall(
+          (e, cb) -> {
+            executed.updateAtomic(v -> v | 1);
+            e.setA(13);
+            cb.fail("one");
+          },
+          (e, cb) -> {
+            executed.updateAtomic(v -> v | 2);
+            e.setB(15 * e.getA());
+            cb.fail("two");
+          },
+          (e, cb) -> {
+            executed.updateAtomic(v -> v | 4);
+            e.setC(e.getB() + e.getA());
+            cb.fail("three");
+          }
+        );
+
+        final Promise<Entity> p = async.runPromised(new Entity());
+
+        p.waitFor();
+        expect(p.getState()).toEqual(Promise.State.FAILED);
+        expect(executed.get()).toEqual(1);
+      });
+      it("should execute several tasks that throw exceptions one after another", () -> {
+
+        final Box.IntBox executed = Box.intBox();
+        final int x = Math.random() >= 0 ? 0 : 1;
+        final Control.Async<Entity, Entity> async = Control.waterfall(
+          (e, cb) -> {
+            executed.updateAtomic(v -> v | 1);
+            e.setA(13 / x);
+            cb.success(e);
+          },
+          (e, cb) -> {
+            executed.updateAtomic(v -> v | 2);
+            e.setB(15 * e.getA() / x);
+            cb.success(e);
+          },
+          (e, cb) -> {
+            executed.updateAtomic(v -> v | 4);
+            e.setC(e.getB() + e.getA() / x);
+            cb.success(e);
+          }
+        );
+
+        final Promise<Entity> p = async.runPromised(new Entity());
+
+        p.waitFor();
+        expect(p.getState()).toEqual(Promise.State.FAILED);
+        expect(executed.get()).toEqual(1);
       });
     });
     describe("memoizing", () -> {

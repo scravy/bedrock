@@ -22,22 +22,6 @@ public class Operators {
     return a + b;
   }
 
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> N plus(final N a, final N b) {
-    if (a instanceof Integer && b instanceof Integer) {
-      return (N) (Integer) (((Integer) a) + ((Integer) b));
-    } else if (a instanceof Long && b instanceof Long) {
-      return (N) (Long) (((Long) a) + ((Long) b));
-    } else if (a instanceof Double && b instanceof Double) {
-      return (N) (Double) (((Double) a) + ((Double) b));
-    } else if (a instanceof BigInteger && b instanceof BigInteger) {
-      return (N) ((BigInteger) a).add((BigInteger) b);
-    } else if (a instanceof BigDecimal && b instanceof BigDecimal) {
-      return (N) ((BigDecimal) a).add((BigDecimal) b);
-    }
-    return null;
-  }
-
   public static Integer plus(final Integer a, final Integer b) {
     if (a == null || b == null) {
       return null;
@@ -57,6 +41,56 @@ public class Operators {
       return null;
     }
     return a + b;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <N extends Number> N plus(final N a, final N b) {
+    if (a instanceof Integer && b instanceof Integer) {
+      return (N) (Integer) (((Integer) a) + ((Integer) b));
+    } else if (a instanceof Long && b instanceof Long) {
+      return (N) (Long) (((Long) a) + ((Long) b));
+    } else if (a instanceof Double && b instanceof Double) {
+      return (N) (Double) (((Double) a) + ((Double) b));
+    } else if (a instanceof BigInteger && b instanceof BigInteger) {
+      return (N) ((BigInteger) a).add((BigInteger) b);
+    } else if (a instanceof BigDecimal && b instanceof BigDecimal) {
+      return (N) ((BigDecimal) a).add((BigDecimal) b);
+    }
+    return null;
+  }
+
+  public static int or(final int a, final int b) {
+    return a | b;
+  }
+
+  public static long or(final long a, final long b) {
+    return a | b;
+  }
+
+  public static Integer or(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a | b;
+  }
+
+  public static Long or(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a | b;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <N extends Number> N or(final N a, final N b) {
+    if (a instanceof Integer && b instanceof Integer) {
+      return (N) (Integer) (((Integer) a) | ((Integer) b));
+    } else if (a instanceof Long && b instanceof Long) {
+      return (N) (Long) (((Long) a) | ((Long) b));
+    } else if (a instanceof BigInteger && b instanceof BigInteger) {
+      return (N) ((BigInteger) a).or((BigInteger) b);
+    }
+    return null;
   }
 
   public static int minus(final int a, final int b) {
@@ -157,6 +191,40 @@ public class Operators {
     return null;
   }
 
+  public static int and(final int a, final int b) {
+    return a & b;
+  }
+
+  public static long and(final long a, final long b) {
+    return a & b;
+  }
+
+  public static Integer and(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a & b;
+  }
+
+  public static Long and(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a & b;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <N extends Number> N and(final N a, final N b) {
+    if (a instanceof Integer && b instanceof Integer) {
+      return (N) (Integer) (((Integer) a) & ((Integer) b));
+    } else if (a instanceof Long && b instanceof Long) {
+      return (N) (Long) (((Long) a) & ((Long) b));
+    } else if (a instanceof BigInteger && b instanceof BigInteger) {
+      return (N) ((BigInteger) a).and((BigInteger) b);
+    }
+    return null;
+  }
+
   public static int div(final int a, final int b) {
     return a / b;
   }
@@ -249,6 +317,40 @@ public class Operators {
       return (N) (Double) (((Double) a) % ((Double) b));
     } else if (a instanceof BigInteger && b instanceof BigInteger) {
       return (N) ((BigInteger) a).mod((BigInteger) b);
+    }
+    return null;
+  }
+
+  public static int xor(final int a, final int b) {
+    return a ^ b;
+  }
+
+  public static long xor(final long a, final long b) {
+    return a ^ b;
+  }
+
+  public static Integer xor(final Integer a, final Integer b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a ^ b;
+  }
+
+  public static Long xor(final Long a, final Long b) {
+    if (a == null || b == null) {
+      return null;
+    }
+    return a ^ b;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <N extends Number> N xor(final N a, final N b) {
+    if (a instanceof Integer && b instanceof Integer) {
+      return (N) (Integer) (((Integer) a) ^ ((Integer) b));
+    } else if (a instanceof Long && b instanceof Long) {
+      return (N) (Long) (((Long) a) ^ ((Long) b));
+    } else if (a instanceof BigInteger && b instanceof BigInteger) {
+      return (N) ((BigInteger) a).xor((BigInteger) b);
     }
     return null;
   }
