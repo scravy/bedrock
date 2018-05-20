@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * An immutable tuple.
@@ -15,7 +16,7 @@ import java.util.Map;
  * @param <B> The second component of the tuple.
  */
 @Value
-public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pair<A, B>> {
+public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pair<A, B>>, Tuple2<A, B> {
 
   private final A first;
   private final B second;
@@ -122,23 +123,26 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
   }
 
   public List<Object> toList() {
-    return new AbstractList<Object>() {
-      @Override
-      public Object get(final int index) {
-        switch (index) {
-          case 0:
-            return first;
-          case 1:
-            return second;
-          default:
-            return null;
-        }
-      }
+    return toList(this);
+  }
 
-      @Override
-      public int size() {
-        return 2;
-      }
-    };
+  public <C, D> Pair<C, D> map(final Function<A, C> f, final Function<B, D> g) {
+    return Pair.of(f.apply(fst()), g.apply(snd()));
+  }
+
+  public <C> Pair<C, B> mapFirst(final Function<A, C> f) {
+    return Pair.of(f.apply(fst()), snd());
+  }
+
+  public <C> Pair<A, C> mapSecond(final Function<B, C> f) {
+    return Pair.of(fst(), f.apply(snd()));
+  }
+
+  public <C> Pair<C, B> withFirst(final C v) {
+    return Pair.of(v, snd());
+  }
+
+  public <C> Pair<A, C> withSecond(final C v) {
+    return Pair.of(fst(), v);
   }
 }

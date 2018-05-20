@@ -390,6 +390,57 @@ public class ControlTest {
         expect(invocations.result()).toEqual(Seq.of("hello", "world"));
       });
     });
+    describe("swap", () -> {
+      it("should swap elements in a char array", () -> {
+        final char[] xs = new char[]{1, 2, 3};
+        Control.swap(xs, 0, 2);
+        expect(xs[0]).toEqual(3);
+        expect(xs[1]).toEqual(2);
+        expect(xs[2]).toEqual(1);
+      });
+      it("should swap elements in a byte array", () -> {
+        final byte[] xs = new byte[]{1, 2, 3};
+        Control.swap(xs, 0, 2);
+        expect(xs[0]).toEqual(3);
+        expect(xs[1]).toEqual(2);
+        expect(xs[2]).toEqual(1);
+      });
+      it("should swap elements in a short array", () -> {
+        final short[] xs = new short[]{1, 2, 3};
+        Control.swap(xs, 0, 2);
+        expect(xs[0]).toEqual(3);
+        expect(xs[1]).toEqual(2);
+        expect(xs[2]).toEqual(1);
+      });
+      it("should swap elements in an int array", () -> {
+        final int[] xs = new int[]{1, 2, 3};
+        Control.swap(xs, 0, 2);
+        expect(xs[0]).toEqual(3);
+        expect(xs[1]).toEqual(2);
+        expect(xs[2]).toEqual(1);
+      });
+      it("should swap elements in a long array", () -> {
+        final long[] xs = new long[]{1, 2, 3};
+        Control.swap(xs, 0, 2);
+        expect(xs[0]).toEqual(3);
+        expect(xs[1]).toEqual(2);
+        expect(xs[2]).toEqual(1);
+      });
+      it("should swap elements in a float array", () -> {
+        final float[] xs = new float[]{1, 2, 3};
+        Control.swap(xs, 0, 2);
+        expect(xs[0]).toEqual(3);
+        expect(xs[1]).toEqual(2);
+        expect(xs[2]).toEqual(1);
+      });
+      it("should swap elements in a double array", () -> {
+        final double[] xs = new double[]{1, 2, 3};
+        Control.swap(xs, 0, 2);
+        expect(xs[0]).toEqual(3);
+        expect(xs[1]).toEqual(2);
+        expect(xs[2]).toEqual(1);
+      });
+    });
   }
 
 }
