@@ -151,6 +151,10 @@ public abstract class Box<T> {
       return predicate.test(intValue);
     }
 
+    public void set(final int value) {
+      this.intValue = value;
+    }
+
     public int get() {
       return intValue;
     }
@@ -215,6 +219,10 @@ public abstract class Box<T> {
       return predicate.test(longValue);
     }
 
+    public void set(final long value) {
+      this.longValue = value;
+    }
+
     public long get() {
       return longValue;
     }
@@ -269,6 +277,10 @@ public abstract class Box<T> {
 
     public boolean exists(final DoublePredicate predicate) {
       return predicate.test(doubleValue);
+    }
+
+    public void set(final double value) {
+      this.doubleValue = value;
     }
 
     public double get() {

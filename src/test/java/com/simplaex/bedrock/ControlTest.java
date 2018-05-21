@@ -13,8 +13,7 @@ import java.time.Duration;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.*;
 
 import static com.greghaskins.spectrum.Spectrum.*;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
@@ -388,6 +387,16 @@ public class ControlTest {
         expect(cachingFunction.apply("world")).toEqual("dlrow");
         expect(cachingFunction.apply("world")).toEqual("dlrow");
         expect(invocations.result()).toEqual(Seq.of("hello", "world"));
+      });
+      it("should memoize calls for Supplier<T>", () -> {
+        final Box.IntBox invocations = Box.intBox();
+        final Supplier<String> s = Control.memoizing(() -> {
+          invocations.inc();
+          return "hello";
+        });
+        expect(s.get()).toEqual("hello");
+        expect(s.get()).toEqual("hello");
+        expect(invocations.get()).toEqual(1);
       });
     });
     describe("swap", () -> {

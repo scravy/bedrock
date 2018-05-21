@@ -562,4 +562,24 @@ public class Control {
     final HashMap<Long, R> cachedValues = new HashMap<>();
     return arg -> cachedValues.computeIfAbsent(arg, function::apply);
   }
+
+  @AllArgsConstructor
+  private final class SupplierMemoBox<T> {
+    private Supplier<T> supplier;
+    private T value;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> Supplier<T> memoizing(final Supplier<T> supplier) {
+    final SupplierMemoBox<T> box = new SupplierMemoBox<>(supplier, null);
+    return () -> {
+      synchronized (box) {
+        if (box.supplier != null) {
+          box.value = box.supplier.get();
+          box.supplier = null;
+        }
+      }
+      return box.value;
+    };
+  }
 }

@@ -216,6 +216,43 @@ public class ParserTest {
         expect(r.getValue()).toEqual(Seq.of(1, 3, 5));
       });
     });
-
+    describe("recurse", () -> {
+      it("should parse a tree structure", () -> {
+        class X {
+          final Parser<Integer> p() {
+            return Parser.many(
+              Parser.choice(
+                Parser.satisfies(Integer.class, x -> true),
+                Parser.recurse(Seq.class, x -> true, x -> x, Parser.recursive(this::p))
+              )
+            ).map(Seq::intSum);
+          }
+        }
+        val x = new X();
+        val seq = Seq.of(5, Seq.of(7, 13, Seq.of(5), Seq.of(5, 5)));
+        val res = x.p().parse(seq);
+        expect(res.isSuccess()).toBeTrue();
+        expect(res.getValue()).toEqual(40);
+      });
+    });
+    describe("recurse2", () -> {
+      it("should parse a tree structure", () -> {
+        class X {
+          final Parser<Integer> p() {
+            return Parser.many(
+              Parser.choice(
+                Parser.satisfies(Integer.class, x -> true),
+                Parser.recurse2(Seq.class, x -> x, x -> Parser.recursive(this::p).map(z -> z + x.length()))
+              )
+            ).map(Seq::intSum);
+          }
+        }
+        val x = new X();
+        val seq = Seq.of(5, Seq.of(7, 13, Seq.of(5), Seq.of(5, 5)));
+        val res = x.p().parse(seq);
+        expect(res.isSuccess()).toBeTrue();
+        expect(res.getValue()).toEqual(47);
+      });
+    });
   }
 }

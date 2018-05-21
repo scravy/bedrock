@@ -9,6 +9,7 @@ import lombok.experimental.Wither;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @FunctionalInterface
 public interface Parser<T> {
@@ -182,6 +183,32 @@ public interface Parser<T> {
     };
   }
 
+  static <T, U> Parser<U> recurse2(
+    final Class<T> clazz,
+    final Function<T, Seq<?>> extractor,
+    final Function<T, Parser<U>> parser) {
+
+    return seq -> {
+      if (seq.nonEmpty()) {
+        final Object obj = seq.head();
+        if (clazz.isAssignableFrom(obj.getClass())) {
+          @SuppressWarnings("unchecked") final T t = (T) obj;
+          final Seq<?> rseq = extractor.apply(t);
+          final Result<U> result = parser.apply(t).parse(rseq);
+          if (result.isSuccess()) {
+            if (result.getRemaining().nonEmpty()) {
+              return new Result.NoParse<>(seq);
+            }
+            return result.withRemaining(seq.tailView());
+          }
+          return result.withRemaining(seq);
+
+        }
+      }
+      return new Result.NoParse<>(seq);
+    };
+  }
+
   static <T> Parser<Optional<T>> optional(final Parser<T> parser) {
     return seq -> {
       final Result<T> result = parser.parse(seq);
@@ -341,4 +368,12 @@ public interface Parser<T> {
     };
   }
 
+  /**
+   * Creates a parser that is constructed at first invocation for recursive invocation
+   * of the parser.
+   */
+  static <T> Parser<T> recursive(final Supplier<Parser<T>> supplier) {
+    final Supplier<Parser<T>> parserSupplier = Control.memoizing(supplier);
+    return seq -> parserSupplier.get().parse(seq);
+  }
 }
