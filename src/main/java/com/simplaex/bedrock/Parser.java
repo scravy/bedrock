@@ -227,6 +227,30 @@ public interface Parser<T> {
       Seq<?> remaining = seq;
       Result<T> result;
       for (final Parser<T> p : ps) {
+        if (remaining.isEmpty()) {
+          return new Result.NoParse<>(seq);
+        }
+        result = p.parse(remaining);
+        if (!result.isSuccess()) {
+          return result.withRemaining(seq).as();
+        }
+        remaining = result.getRemaining();
+        seqBuilder.add(result.getValue());
+      }
+      return new Result.Success<>(seqBuilder.result(), remaining);
+    };
+  }
+
+  static <T> Parser<Seq<T>> times(final int n, final Parser<T> p) {
+
+    return seq -> {
+      final SeqBuilder<T> seqBuilder = Seq.builder();
+      Seq<?> remaining = seq;
+      Result<T> result;
+      for (int i = 0; i < n; i += 1) {
+        if (remaining.isEmpty()) {
+          return new Result.NoParse<>(seq);
+        }
         result = p.parse(remaining);
         if (!result.isSuccess()) {
           return result.withRemaining(seq).as();

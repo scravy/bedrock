@@ -131,12 +131,12 @@ public abstract class Box<T> {
 
     @Override
     public void inc() {
-      intValue = intValue += 1;
+      intValue += 1;
     }
 
     @Override
     public void dec() {
-      intValue = intValue -= 1;
+      intValue -= 1;
     }
 
     public void add(final int value) {
@@ -191,12 +191,12 @@ public abstract class Box<T> {
 
     @Override
     public void inc() {
-      longValue = longValue += 1;
+      longValue += 1;
     }
 
     @Override
     public void dec() {
-      longValue = longValue -= 1;
+      longValue -= 1;
     }
 
     public void add(final int value) {
@@ -259,12 +259,12 @@ public abstract class Box<T> {
 
     @Override
     public void inc() {
-      doubleValue = doubleValue += 1.0;
+      doubleValue += 1.0;
     }
 
     @Override
     public void dec() {
-      doubleValue = doubleValue -= 1.0;
+      doubleValue -= 1.0;
     }
 
     public void add(final double value) {

@@ -117,6 +117,12 @@ public class ParserTest {
         val r = p.parse(seq);
         expect(r.isSuccess()).toBeFalse();
       });
+      it("no parse (2)", () -> {
+        val p = Parser.sequence(eq(1), eq(2), eq(3), eq(4), eq(5));
+        val r = p.parse(Seq.rangeInclusive(1, 3));
+        expect(r.isSuccess()).toBeFalse();
+        expect(r.getRemaining()).toEqual(Seq.rangeInclusive(1, 3));
+      });
     });
     describe("seq2", () -> {
       it("success", () -> {
@@ -165,6 +171,27 @@ public class ParserTest {
         val r = p.parse(seq);
         expect(r.isSuccess()).toBeTrue();
         expect(r.getValue()).toEqual(Quadruple.of(1, 2, 3, 4));
+      });
+    });
+    describe("times", () -> {
+      it("success", () -> {
+        val p = Parser.times(5, lt(15));
+        val r = p.parse(seq);
+        expect(r.isSuccess()).toBeTrue();
+        expect(r.getValue()).toEqual(Seq.rangeInclusive(1, 5));
+        expect(r.getRemaining()).toEqual(Seq.rangeInclusive(6, 10));
+      });
+      it("no parse", () -> {
+        val p = Parser.times(7, lt(3));
+        val r = p.parse(seq);
+        expect(r.isSuccess()).toBeFalse();
+        expect(r.getRemaining()).toEqual(seq);
+      });
+      it("no parse", () -> {
+        val p = Parser.times(15, lt(20));
+        val r = p.parse(seq);
+        expect(r.isSuccess()).toBeFalse();
+        expect(r.getRemaining()).toEqual(seq);
       });
     });
     describe("many", () -> {
@@ -219,7 +246,7 @@ public class ParserTest {
     describe("recurse", () -> {
       it("should parse a tree structure", () -> {
         class X {
-          final Parser<Integer> p() {
+          private Parser<Integer> p() {
             return Parser.many(
               Parser.choice(
                 Parser.satisfies(Integer.class, x -> true),
@@ -238,7 +265,7 @@ public class ParserTest {
     describe("recurse2", () -> {
       it("should parse a tree structure", () -> {
         class X {
-          final Parser<Integer> p() {
+          private Parser<Integer> p() {
             return Parser.many(
               Parser.choice(
                 Parser.satisfies(Integer.class, x -> true),
