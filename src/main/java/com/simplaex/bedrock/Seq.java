@@ -230,7 +230,7 @@ public abstract class Seq<E> implements
     final @Nonnull Seq<A> sequence
   ) {
     Objects.requireNonNull(function, "'function' must not be null");
-    Objects.requireNonNull(sequence);
+    Objects.requireNonNull(sequence, "'sequence' must not be null");
     final int len = Math.min(length(), sequence.length());
     final Object[] arr = new Object[len];
     for (int i = 0; i < len; i += 1) {

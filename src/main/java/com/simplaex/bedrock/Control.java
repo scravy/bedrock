@@ -170,7 +170,7 @@ public class Control {
     Objects.requireNonNull(executor, "executor must not be null");
     Objects.requireNonNull(runnables, "nullables must not be null");
     final Semaphore semaphore = new Semaphore(0);
-    final List<Exception> exceptions = Collections.synchronizedList(new ArrayList<Exception>());
+    final List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
     for (final ThrowingRunnable runnable : runnables) {
       executor.execute(() -> {
         try {
@@ -438,6 +438,7 @@ public class Control {
     }
   }
 
+  @Nonnull
   public static <A> Async<A, A> async() {
     return new Async<>((t, cb) -> cb.success(t));
   }
@@ -480,8 +481,38 @@ public class Control {
     return new AsyncExecutionException(object);
   }
 
-  public static <A> A iterate(final UnaryOperator<A> operation, final BiPredicate<A, A> exitCriterion, final A startValue) {
-    A previousValue = startValue;
+  /**
+   * Iterates a function on a given value until a certain exit criterion is met.
+   * <p>
+   * Example: Finding the square root of 10 until the error is less than 0.01.
+   * <pre>
+   * final double squareRoot = Control.iterate(
+   *     value -> value * (value * value > 10.0 ? 0.5 : 1.5),
+   *     (prev, curr) -> Math.abs(10.0 - curr * curr) < 0.01,
+   *     10.0
+   * );
+   * </pre>
+   * <p>
+   * The exit criterion is a predicate that has access to the current value as
+   * well as the value of the previous iteration. This allows for exit criteria
+   * like "iterate until the value does not change much".
+   *
+   * @param operation     The function to iterate on the given value.
+   * @param exitCriterion The predicate that decided when to stop iterating, with
+   *                      respect to the previous' iteration value and the current's
+   *                      iteration value.
+   * @param startValue    The value to start iterating with.
+   * @param <A>           The type of the iterated values.
+   * @return The resulting value.
+   */
+  public static <A> A iterate(
+    @Nonnull final UnaryOperator<A> operation,
+    @Nonnull final BiPredicate<A, A> exitCriterion,
+    final A startValue
+  ) {
+    Objects.requireNonNull(operation, "'operation' must not be null");
+    Objects.requireNonNull(exitCriterion, "'exitCriterion' must not be null");
+    A previousValue;
     A currentValue = startValue;
     do {
       previousValue = currentValue;
@@ -490,96 +521,175 @@ public class Control {
     return currentValue;
   }
 
-  public static <A> A exhaustively(final UnaryOperator<A> operation, final A startValue) {
+  /**
+   * Applies the given function on a value until that value does not change anymore
+   * (i.e. until it reaches a fixed point).
+   *
+   * @param operation  The function to be applied iteratively.
+   * @param startValue The value to start with.
+   * @param <A>        The type of the value to be iterated on.
+   * @return A fixed point of the given operation.
+   */
+  public static <A> A exhaustively(@Nonnull final UnaryOperator<A> operation, final A startValue) {
+    Objects.requireNonNull(operation, "'operation' must not be null");
     return iterate(operation, Objects::equals, startValue);
   }
 
-  public static <E> void swap(final E[] array, final int i, final int j) {
+  public static <E> void swap(@Nonnull final E[] array, final int i, final int j) {
+    Objects.requireNonNull(array, "'array' must not be null");
     final E src = array[i];
     array[i] = array[j];
     array[j] = src;
   }
 
-  public static void swap(final boolean[] array, final int i, final int j) {
+  public static void swap(@Nonnull final boolean[] array, final int i, final int j) {
+    Objects.requireNonNull(array, "'array' must not be null");
     final boolean src = array[i];
     array[i] = array[j];
     array[j] = src;
   }
 
-  public static void swap(final char[] array, final int i, final int j) {
+  public static void swap(@Nonnull final char[] array, final int i, final int j) {
+    Objects.requireNonNull(array, "'array' must not be null");
     final char src = array[i];
     array[i] = array[j];
     array[j] = src;
   }
 
-  public static void swap(final byte[] array, final int i, final int j) {
+  public static void swap(@Nonnull final byte[] array, final int i, final int j) {
+    Objects.requireNonNull(array, "'array' must not be null");
     final byte src = array[i];
     array[i] = array[j];
     array[j] = src;
   }
 
-  public static void swap(final short[] array, final int i, final int j) {
+  public static void swap(@Nonnull final short[] array, final int i, final int j) {
+    Objects.requireNonNull(array, "'array' must not be null");
     final short src = array[i];
     array[i] = array[j];
     array[j] = src;
   }
 
-  public static void swap(final int[] array, final int i, final int j) {
+  public static void swap(@Nonnull final int[] array, final int i, final int j) {
+    Objects.requireNonNull(array, "'array' must not be null");
     final int src = array[i];
     array[i] = array[j];
     array[j] = src;
   }
 
-  public static void swap(final long[] array, final int i, final int j) {
+  public static void swap(@Nonnull final long[] array, final int i, final int j) {
+    Objects.requireNonNull(array, "'array' must not be null");
     final long src = array[i];
     array[i] = array[j];
     array[j] = src;
   }
 
-  public static void swap(final double[] array, final int i, final int j) {
+  public static void swap(@Nonnull final double[] array, final int i, final int j) {
+    Objects.requireNonNull(array, "'array' must not be null");
     final double src = array[i];
     array[i] = array[j];
     array[j] = src;
   }
 
-  public static void swap(final float[] array, final int i, final int j) {
+  public static void swap(@Nonnull final float[] array, final int i, final int j) {
+    Objects.requireNonNull(array, "'array' must not be null");
     final float src = array[i];
     array[i] = array[j];
     array[j] = src;
   }
 
-  public static <A, R> Function<A, R> memoizing(final Function<A, R> function) {
+  /**
+   * Turns a function into a memoizing function which caches result values for the given
+   * arguments.
+   *
+   * <pre>
+   * final Function<A, B> f = Control.memoizing(arg -> expensiveCalculation(arg));
+   * final A one = ...;
+   * final A two = ...;
+   * f.apply(one); // actually invokes expensiveCalculation(one)
+   * f.apply(one); // returns the cached value for the key "one"
+   * f.apply(two); // actually invokes expensiveCalculation(two)
+   * </pre>
+   *
+   * @param function A pure function (a proper function which returns the same value for a given argument every time)
+   * @param <A>      The type of the argument to the function.
+   * @param <R>      The type of the results of the function.
+   * @return The memoizing function.
+   */
+  @Nonnull
+  public static <A, R> Function<A, R> memoizing(@Nonnull final Function<A, R> function) {
+    Objects.requireNonNull(function, "'function' must not be null");
     final HashMap<A, R> cachedValues = new HashMap<>();
     return arg -> cachedValues.computeIfAbsent(arg, function);
   }
 
-  public static <R> IntFunction<R> memoizing(final IntFunction<R> function) {
+  @Nonnull
+  public static <R> IntFunction<R> memoizing(@Nonnull final IntFunction<R> function) {
+    Objects.requireNonNull(function, "'function' must not be null");
     final HashMap<Integer, R> cachedValues = new HashMap<>();
     return arg -> cachedValues.computeIfAbsent(arg, function::apply);
   }
 
-  public static <R> LongFunction<R> memoizing(final LongFunction<R> function) {
+  @Nonnull
+  public static <R> LongFunction<R> memoizing(@Nonnull final LongFunction<R> function) {
+    Objects.requireNonNull(function, "'function' must not be null");
     final HashMap<Long, R> cachedValues = new HashMap<>();
     return arg -> cachedValues.computeIfAbsent(arg, function::apply);
   }
 
   @AllArgsConstructor
-  private final class SupplierMemoBox<T> {
+  private final static class SupplierMemoBox<T> {
     private Supplier<T> supplier;
     private T value;
   }
 
+  /**
+   * Turns a supplier into a memoizing supplier, which invokes the actual supplier only
+   * once, caches the result, and returns that henceforth.
+   *
+   * <pre>
+   * class Thing {
+   *   static Thing expensiveFactory() { ... }
+   * }
+   * final Supplier&lt;Thing> supplier = Control.memoizing(Thing::expensiveFactory);
+   * final Thing thing = supplier.get();
+   * final Thing thing2 = supplier.get(); // returns the same thing
+   * </pre>
+   *
+   * @param supplier The supplier to be turned into a memoizing supplier.
+   * @param <T>      The type of the thing the supplier supplies.
+   * @return A memoizing supplier which calls the given supplier only ever once.
+   */
   @SuppressWarnings("unchecked")
-  public static <T> Supplier<T> memoizing(final Supplier<T> supplier) {
+  @Nonnull
+  public static <T> Supplier<T> memoizing(@Nonnull final Supplier<T> supplier) {
+    Objects.requireNonNull(supplier, "'supplier' must not be null");
     final SupplierMemoBox<T> box = new SupplierMemoBox<>(supplier, null);
     return () -> {
-      synchronized (box) {
-        if (box.supplier != null) {
-          box.value = box.supplier.get();
-          box.supplier = null;
-        }
+      if (box.supplier != null) {
+        box.value = box.supplier.get();
+        box.supplier = null;
       }
       return box.value;
+    };
+  }
+
+  /**
+   * Turns a supplier into a thread safe supplier, that is the invocation of get will be
+   * guarded by synchronization.
+   * <p>
+   * Useful to get a thread-safe version of a memoizing supplier:
+   * <pre>
+   * final Supplier<Thing> thingSupplier = </Thing>Control.atomic(Control.memoizing(Thing::expensiveFactory));
+   * </pre>
+   */
+  @Nonnull
+  public static <T> Supplier<T> atomic(@Nonnull final Supplier<T> supplier) {
+    Objects.requireNonNull(supplier, "'supplier' must not be null");
+    return () -> {
+      synchronized (supplier) {
+        return supplier.get();
+      }
     };
   }
 }
