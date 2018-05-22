@@ -86,6 +86,15 @@ public interface Parser<T> {
     }
   }
 
+  /**
+   * Creates a parser that parses p1 and then p2 but returns the result of p1 (the left one).
+   *
+   * @param p1  The left parser.
+   * @param p2  The right parser.
+   * @param <T> The type parsed by the left parser.
+   * @param <U> The type parsed by the right parser.
+   * @return A parser that parses p1 and then p2 but returns the result of p1 (the left one).
+   */
   static <T, U> Parser<T> left(final Parser<T> p1, final Parser<U> p2) {
     return seq -> {
       final Result<T> r1 = p1.parse(seq);
@@ -100,6 +109,15 @@ public interface Parser<T> {
     };
   }
 
+  /**
+   * Creates a parser that parses p1 and then p2 but returns the result of p2 (the right one).
+   *
+   * @param p1  The left parser.
+   * @param p2  The right parser.
+   * @param <T> The type parsed by the left parser.
+   * @param <U> The type parsed by the right parser.
+   * @return A parser that parses p1 and then p2 but returns the result of p2 (the right one).
+   */
   static <T, U> Parser<U> right(final Parser<T> p1, final Parser<U> p2) {
     return seq -> {
       final Result<T> r1 = p1.parse(seq);
@@ -121,6 +139,16 @@ public interface Parser<T> {
         return r1.as();
       }
       return p2.parse(seq).as();
+    };
+  }
+
+  static <T, U> Parser<Either<T, U>> either(final Parser<T> p1, final Parser<U> p2) {
+    return seq -> {
+      final Result<Either<T, U>> r1 = p1.parse(seq).map(Either::left);
+      if (r1.isSuccess()) {
+        return r1;
+      }
+      return p2.parse(seq).map(Either::right);
     };
   }
 
@@ -230,6 +258,14 @@ public interface Parser<T> {
       }
       return result.map(Optional::of);
     };
+  }
+
+  static <T> Parser<T> option(final T fallback, final Parser<T> parser) {
+    return optional(parser).map(optional -> optional.orElse(fallback));
+  }
+
+  static <T> Parser<T> option(final Supplier<T> fallbackSupplier, final Parser<T> parser) {
+    return optional(parser).map(optional -> optional.orElseGet(fallbackSupplier));
   }
 
   @SafeVarargs
