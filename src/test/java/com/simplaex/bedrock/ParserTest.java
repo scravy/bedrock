@@ -105,6 +105,31 @@ public class ParserTest {
         expect(r.isSuccess()).toBeFalse();
       });
     });
+    describe("oneOf", () -> {
+      it("success", () -> {
+        val p = Parser.oneOf(
+          eq(0),
+          eq(1),
+          eq(2)
+        );
+        val r = p.parse(seq);
+        expect(r.isSuccess()).toBeTrue();
+        expect(r.getValue()).toEqual(1);
+        expect(r.getRemaining()).toEqual(Seq.rangeInclusive(2, 10));
+      });
+      it("success (2)", () -> {
+        val p = Parser.many(Parser.oneOf(
+          eq(0),
+          eq(1),
+          eq(2),
+          eq(3)
+        ));
+        val r = p.parse(seq);
+        expect(r.isSuccess()).toBeTrue();
+        expect(r.getValue()).toEqual(Seq.rangeInclusive(1, 3));
+        expect(r.getRemaining()).toEqual(Seq.rangeInclusive(4, 10));
+      });
+    });
     describe("sequence", () -> {
       it("success", () -> {
         val p = Parser.sequence(eq(1), eq(2), eq(3), eq(4), eq(5));

@@ -124,6 +124,19 @@ public interface Parser<T> {
     };
   }
 
+  @SafeVarargs
+  static <T> Parser<T> oneOf(final Parser<T>... ps) {
+    return seq -> {
+      for (final Parser<T> p : ps) {
+        final Result<T> result = p.parse(seq);
+        if (result.isSuccess()) {
+          return result;
+        }
+      }
+      return new Result.NoParse<>(seq);
+    };
+  }
+
   static <T> Parser<T> satisfies(final Class<T> clazz, final Predicate<T> predicate) {
     return seq -> {
       if (seq.nonEmpty()) {
