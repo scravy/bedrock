@@ -153,12 +153,12 @@ public interface Parser<T> {
   }
 
   @SafeVarargs
-  static <T> Parser<T> oneOf(final Parser<T>... ps) {
+  static <T> Parser<T> oneOf(final Parser<? extends T>... ps) {
     return seq -> {
-      for (final Parser<T> p : ps) {
-        final Result<T> result = p.parse(seq);
+      for (final Parser<? extends T> p : ps) {
+        final Result<? extends T> result = p.parse(seq);
         if (result.isSuccess()) {
-          return result;
+          return result.as();
         }
       }
       return new Result.NoParse<>(seq);
@@ -270,6 +270,27 @@ public interface Parser<T> {
 
   @SafeVarargs
   static <T> Parser<Seq<T>> sequence(final Parser<T>... ps) {
+
+    return seq -> {
+      final SeqBuilder<T> seqBuilder = Seq.builder();
+      Seq<?> remaining = seq;
+      Result<T> result;
+      for (final Parser<T> p : ps) {
+        if (remaining.isEmpty()) {
+          return new Result.NoParse<>(seq);
+        }
+        result = p.parse(remaining);
+        if (!result.isSuccess()) {
+          return result.withRemaining(seq).as();
+        }
+        remaining = result.getRemaining();
+        seqBuilder.add(result.getValue());
+      }
+      return new Result.Success<>(seqBuilder.result(), remaining);
+    };
+  }
+
+  static <T> Parser<Seq<T>> sequence(final Iterable<Parser<T>> ps) {
 
     return seq -> {
       final SeqBuilder<T> seqBuilder = Seq.builder();

@@ -68,6 +68,30 @@ public class Functions {
     return predicate.negate();
   }
 
+  @SafeVarargs
+  public static Predicate<Character> and(final Predicate<Character>... ps) {
+    return c -> {
+      for (final Predicate<Character> p : ps) {
+        if (!p.test(c)) {
+          return false;
+        }
+      }
+      return true;
+    };
+  }
+
+  @SafeVarargs
+  public static Predicate<Character> or(final Predicate<Character>... ps) {
+    return c -> {
+      for (final Predicate<Character> p : ps) {
+        if (p.test(c)) {
+          return true;
+        }
+      }
+      return false;
+    };
+  }
+
   /**
    * Turns a function that results in a boxed Boolean into a Predicate.
    *
