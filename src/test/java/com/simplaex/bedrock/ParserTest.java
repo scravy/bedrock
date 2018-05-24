@@ -11,8 +11,9 @@ import java.util.function.Predicate;
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
+import static com.simplaex.bedrock.Functions.constant;
+import static com.simplaex.bedrock.Functions.or;
 import static com.simplaex.bedrock.Parser.*;
-import static com.simplaex.bedrock.Functions.*;
 
 @SuppressWarnings("CodeBlock2Expr")
 @RunWith(Spectrum.class)
@@ -329,25 +330,61 @@ public class ParserTest {
             return predicate.negate();
           }
 
-          Predicate<Character> any() {
-            return x -> true;
-          }
+          Predicate<Character> nonZeroDigit = c -> c >= '1' && c <= '9';
+
+          Predicate<Character> digit = c -> c >= '0' && c <= '9';
+
+          Predicate<Character> hexDigit = c -> c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F';
+
+          Parser<String> integer =
+            choice(
+              character(eq('0')).map(constant("0")),
+              seq(
+                character(nonZeroDigit),
+                many(character(digit))
+              ).map(p -> p.fst() + p.snd().asString())
+            );
 
           Parser<String> string(final String string) {
             return sequence(Seq.ofString(string).map(this::eq).map(this::character)).map(Seq::asString);
           }
 
-          Parser<Character> openingBrace = character(eq('{'));
+          <T> Parser<T> w(final Parser<T> p) {
+            return left(p, skipMany(character(or(eq(' '), eq('\t'), eq('\n')))));
+          }
 
-          Parser<Character> closingBrace = character(eq('}'));
+          Parser<Character> openingBrace = w(character(eq('{')));
 
-          Parser<Character> openingBracket = character(eq('['));
+          Parser<Character> closingBrace = w(character(eq('}')));
 
-          Parser<Character> closingBracket = character(eq(']'));
+          Parser<Character> openingBracket = w(character(eq('[')));
 
-          Parser<Character> colon = character(eq(':'));
+          Parser<Character> closingBracket = w(character(eq(']')));
 
-          Parser<Character> comma = character(eq(','));
+          Parser<Character> colon = w(character(eq(':')));
+
+          Parser<Character> comma = w(character(eq(',')));
+
+          Parser<Character> escape =
+            right(
+              character(eq('\\')),
+              oneOf(
+                character(eq('\"')),
+                character(eq('\\')),
+                character(eq('/')),
+                character(eq('b')).map(Functions.constant('\b')),
+                character(eq('f')).map(Functions.constant('\f')),
+                character(eq('n')).map(Functions.constant('\n')),
+                character(eq('r')).map(Functions.constant('\r')),
+                character(eq('t')).map(Functions.constant('\t')),
+                right(
+                  character(eq('u')),
+                  times(4, character(hexDigit))
+                    .map(Seq::asString)
+                    .map(s -> Character.toChars(Integer.parseInt(s, 16))[0])
+                )
+              )
+            );
 
           Parser<String> string =
             seq(
@@ -355,10 +392,7 @@ public class ParserTest {
               many(
                 choice(
                   character(not(or(eq('\\'), eq('\"')))),
-                  right(
-                    character(eq('\\')),
-                    character(any())
-                  )
+                  escape
                 )
               ),
               character(eq('"'))
@@ -376,14 +410,14 @@ public class ParserTest {
           Parser<Void> nil = string("null").map(Functions.constant(null));
 
           Parser<Object> jsonValue() {
-            return oneOf(
+            return w(oneOf(
               string,
               number,
               bool,
               nil,
               array,
               object
-            );
+            ));
           }
 
           Parser<Seq<Object>> array = seq(
@@ -417,8 +451,33 @@ public class ParserTest {
 
         }
 
+        val s = "{\n" +
+          "  \"glossary\": {\n" +
+          "    \"title\": \"example glossary\",\n" +
+          "    \"GlossDiv\": {\n" +
+          "      \"title\": \"S\",\n" +
+          "      \"GlossList\": {\n" +
+          "        \"GlossEntry\": {\n" +
+          "          \"ID\": \"SGML\",\n" +
+          "          \"SortAs\": \"SGML\",\n" +
+          "          \"GlossTerm\": \"Standard Generalized Markup Language\",\n" +
+          "          \"Acronym\": \"SGML\",\n" +
+          "          \"Abbrev\": \"ISO 8879:1986\",\n" +
+          "          \"GlossDef\": {\n" +
+          "            \"para\": \"A meta-markup language, used to create markup languages such as DocBook.\",\n" +
+          "            \"GlossSeeAlso\": [\n" +
+          "              \"GML\",\n" +
+          "              \"XML\"\n" +
+          "            ]\n" +
+          "          },\n" +
+          "          \"GlossSee\": \"markup\"\n" +
+          "        }\n" +
+          "      }\n" +
+          "    }\n" +
+          "  }\n" +
+          "}\n";
         val p = new P();
-        val r = p.json.parse(Seq.ofString("{\"glossary\":{\"title\":\"example glossary\",\"GlossDiv\":{\"title\":\"S\",\"GlossList\":{\"GlossEntry\":{\"ID\":\"SGML\",\"SortAs\":\"SGML\",\"GlossTerm\":\"Standard Generalized Markup Language\",\"Acronym\":\"SGML\",\"Abbrev\":\"ISO 8879:1986\",\"GlossDef\":{\"para\":\"A meta-markup language, used to create markup languages such as DocBook.\",\"GlossSeeAlso\":[\"GML\",\"XML\"]},\"GlossSee\":\"markup\"}}}}}"));
+        val r = p.json.parse(Seq.ofString(s));
         expect(r.isSuccess()).toBeTrue();
         expect(r.getValue()).toEqual(Seq.of(
           Pair.<String, Object>of("glossary",

@@ -68,11 +68,19 @@ public class Functions {
     return predicate.negate();
   }
 
+  /**
+   * Combines many predicates into a predicate that accepts its input only if it passes all predicates.
+   *
+   * @param ps  The predicates - if no predicates are given the predicate will return true always.
+   * @param <T> The type of the value to be tested by the predicates.
+   * @return
+   */
+  @SuppressWarnings("unchecked")
   @SafeVarargs
-  public static Predicate<Character> and(final Predicate<Character>... ps) {
+  public static <T> Predicate<T> and(final Predicate<? extends T>... ps) {
     return c -> {
-      for (final Predicate<Character> p : ps) {
-        if (!p.test(c)) {
+      for (final Predicate<? extends T> p : ps) {
+        if (!((Predicate<T>) p).test(c)) {
           return false;
         }
       }
@@ -80,11 +88,19 @@ public class Functions {
     };
   }
 
+  /**
+   * Combines many predicates into a predicate that accepts its input it if it passes one of these.
+   *
+   * @param ps  The predicates - if no predicates are given the predicate will return false always.
+   * @param <T> The type of the value to be tested by the predicates.
+   * @return
+   */
+  @SuppressWarnings("unchecked")
   @SafeVarargs
-  public static Predicate<Character> or(final Predicate<Character>... ps) {
+  public static <T> Predicate<T> or(final Predicate<? extends T>... ps) {
     return c -> {
-      for (final Predicate<Character> p : ps) {
-        if (p.test(c)) {
+      for (final Predicate<? extends T> p : ps) {
+        if (((Predicate<T>) p).test(c)) {
           return true;
         }
       }

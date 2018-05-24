@@ -19,16 +19,6 @@ public class SeqTest {
 
   {
     describe("package private utility methods", () -> {
-      describe("swap", () -> {
-        it("should swap two elements in an array", () -> {
-          val arr = new Integer[]{1, 2, 3};
-          Control.swap(arr, 0, 1);
-          expect(arr[0]).toEqual(2);
-          expect(arr[1]).toEqual(1);
-          expect(arr[2]).toEqual(3);
-        });
-      });
-
       describe("reverse", () -> {
         it("should reverse the elements of an array", () -> {
           val arr = new Integer[]{1, 2, 3};
@@ -126,6 +116,73 @@ public class SeqTest {
         it("should concat two empty sequences", () ->
           expect(Seq.concat(Seq.empty(), Seq.empty())).toEqual(Seq.empty())
         );
+      });
+
+      describe("concatView", () -> {
+        it("should create a view of the underlying seqs", () -> {
+          val s1 = Seq.of(1, 2, 3);
+          val s2 = Seq.of(4, 5, 6);
+          val s3 = Seq.of(7, 8, 9);
+          val s = Seq.concatView(s1, s2, s3);
+          expect(s).toEqual(Seq.rangeInclusive(1, 9));
+        });
+      });
+
+      describe("concat + concatView", () -> {
+        it("1", () -> {
+          val s1 = Seq.concat();
+          val s2 = Seq.concatView();
+          expect(s1).toEqual(s2);
+          expect(s2).toEqual(s1);
+        });
+        it("2", () -> {
+          val s1 = Seq.concat(Seq.empty());
+          val s2 = Seq.concatView(Seq.empty());
+          expect(s1).toEqual(s2);
+          expect(s2).toEqual(s1);
+        });
+        it("3", () -> {
+          val s1 = Seq.concat(Seq.empty(), Seq.empty());
+          val s2 = Seq.concatView(Seq.empty(), Seq.empty());
+          expect(s1).toEqual(s2);
+          expect(s2).toEqual(s1);
+        });
+        it("4", () -> {
+          val s1 = Seq.concat(Seq.of(1), Seq.empty());
+          val s2 = Seq.concatView(Seq.of(1), Seq.empty());
+          expect(s1).toEqual(s2);
+          expect(s2).toEqual(s1);
+        });
+        it("5", () -> {
+          val s1 = Seq.concat(Seq.of(1, 2), Seq.empty());
+          val s2 = Seq.concatView(Seq.of(1, 2), Seq.empty());
+          expect(s1).toEqual(s2);
+          expect(s2).toEqual(s1);
+        });
+        it("6", () -> {
+          val s1 = Seq.concat(Seq.of(1, 2), Seq.of(3));
+          val s2 = Seq.concatView(Seq.of(1, 2), Seq.of(3));
+          expect(s1).toEqual(s2);
+          expect(s2).toEqual(s1);
+        });
+        it("7", () -> {
+          val s1 = Seq.concat(Seq.of(1), Seq.of(3, 4));
+          val s2 = Seq.concatView(Seq.of(1), Seq.of(3, 4));
+          expect(s1).toEqual(s2);
+          expect(s2).toEqual(s1);
+        });
+        it("8", () -> {
+          val s1 = Seq.concat(Seq.of(1), Seq.of(3));
+          val s2 = Seq.concatView(Seq.of(1), Seq.of(3));
+          expect(s1).toEqual(s2);
+          expect(s2).toEqual(s1);
+        });
+        it("9", () -> {
+          val s1 = Seq.concat(Seq.of(1, 2), Seq.of(3, 4));
+          val s2 = Seq.concatView(Seq.of(1, 2), Seq.of(3, 4));
+          expect(s1).toEqual(s2);
+          expect(s2).toEqual(s1);
+        });
       });
 
       describe("builder", () -> {

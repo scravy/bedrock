@@ -631,9 +631,11 @@ public abstract class Seq<E> implements
     if (len != thatSeq.length()) {
       return false;
     }
-    for (int i = 0; i < len; i += 1) {
-      final E thisElement = get(i);
-      final E thatElement = thatSeq.get(i);
+    final Iterator<E> thisIterator = iterator();
+    final Iterator<E> thatIterator = thatSeq.iterator();
+    while (thisIterator.hasNext() && thatIterator.hasNext()) {
+      final E thisElement = thisIterator.next();
+      final E thatElement = thatIterator.next();
       if (!(thisElement == thatElement || thisElement != null && thisElement.equals(thatElement))) {
         return false;
       }
@@ -939,11 +941,70 @@ public abstract class Seq<E> implements
 
   @SafeVarargs
   @Nonnull
+  public static <E> Seq<E> concatView(@Nonnull final Seq<E>... seqs) {
+    Objects.requireNonNull(seqs);
+
+    if (seqs.length == 0) {
+      return Seq.empty();
+    }
+    int size = 0;
+    for (final Seq<E> seq : seqs) {
+      size += seq.length();
+    }
+    if (size == 0) {
+      return Seq.empty();
+    }
+    return new SeqGenerated<E>(
+      ix -> {
+        Seq<E> seq = seqs[0];
+        int i = 1;
+        while (ix >= seq.length() && i < seqs.length) {
+          ix -= seq.length();
+          seq = seqs[i];
+          i += 1;
+        }
+        return seq.get(ix);
+      },
+      size
+    ) {
+      @Nonnull
+      @Override
+      public Iterator<E> iterator() {
+        return new Iterator<E>() {
+
+          private int i = 0;
+          private int j = 0;
+
+          @Override
+          public boolean hasNext() {
+            return i < seqs.length && j < seqs[i].length();
+          }
+
+          @Override
+          public E next() {
+            final E elem = seqs[i].get(j);
+            j += 1;
+            if (j == seqs[i].length()) {
+              j = 0;
+              i += 1;
+            }
+            return elem;
+          }
+        };
+      }
+    };
+  }
+
+  @SafeVarargs
+  @Nonnull
   public static <E> Seq<E> concat(@Nonnull final Seq<E>... seqs) {
     Objects.requireNonNull(seqs);
     int size = 0;
     for (final Seq<E> seq : seqs) {
       size += seq.length();
+    }
+    if (size == 0) {
+      return Seq.empty();
     }
     final Object[] array = new Object[size];
     int i = 0;

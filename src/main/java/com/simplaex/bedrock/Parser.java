@@ -429,6 +429,20 @@ public interface Parser<T> {
     };
   }
 
+  static <T> Parser<Void> skipMany(final Parser<T> parser) {
+    return seq -> {
+      Seq<?> remaining = seq;
+      while (remaining.nonEmpty()) {
+        final Result<T> result = parser.parse(remaining);
+        if (!result.isSuccess()) {
+          return new Result.Success<>(null, remaining);
+        }
+        remaining = result.getRemaining();
+      }
+      return new Result.Success<>(null, remaining);
+    };
+  }
+
   static <T, U> Parser<Seq<T>> sepBy(final Parser<T> parser, final Parser<U> sep) {
     final Parser<T> p = right(sep, parser);
     return seq -> {
