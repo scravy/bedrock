@@ -3,12 +3,14 @@ package com.simplaex.bedrock;
 import lombok.EqualsAndHashCode;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collector;
 
 @EqualsAndHashCode
+@Immutable
 public final class Set<E extends Comparable<? super E>> implements
   Serializable,
   Container<E> {

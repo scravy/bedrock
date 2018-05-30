@@ -744,6 +744,13 @@ public abstract class Seq<E> implements
     return reversed().iterator();
   }
 
+  /**
+   * Create a <code>java.util.List</code> that contains the elements of this sequence.
+   * <p>
+   * This action does not copy any data.
+   *
+   * @return An unmodifiable list that is backed by this Sequence.
+   */
   @Nonnull
   public List<E> toList() {
     return new AbstractList<E>() {
@@ -1026,18 +1033,19 @@ public abstract class Seq<E> implements
     return new SeqBuilder<>(sizeHint);
   }
 
-  @Nonnegative
+  @Nonnull
   public static <E> Seq<E> ofGenerator(@Nonnull final IntFunction<E> function, @Nonnegative final int length) {
     Objects.requireNonNull(function, "'function' must not be null.");
     return new SeqGenerated<>(function, length);
   }
 
-  @Nonnegative
+  @Nonnull
   public static <E> Seq<E> ofGeneratorMemoizing(@Nonnull final IntFunction<E> function, @Nonnegative final int length) {
     Objects.requireNonNull(function, "'function' must not be null.");
     return new SeqGenerated<>(Control.memoizing(function), length);
   }
 
+  @Nonnull
   public static Seq<Character> wrap(@Nonnull final char[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1045,6 +1053,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Boolean> wrap(@Nonnull final boolean[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1052,6 +1061,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Byte> wrap(@Nonnull final byte[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1059,6 +1069,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Short> wrap(@Nonnull final short[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1066,6 +1077,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Integer> wrap(@Nonnull final int[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1073,6 +1085,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Long> wrap(@Nonnull final long[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1080,6 +1093,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Float> wrap(@Nonnull final float[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1087,6 +1101,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Double> wrap(@Nonnull final double[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1094,6 +1109,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Character> wrap(@Nonnull final Character[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1101,6 +1117,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Boolean> wrap(@Nonnull final Boolean[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1108,6 +1125,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Byte> wrap(@Nonnull final Byte[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1115,6 +1133,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Short> wrap(@Nonnull final Short[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1122,6 +1141,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Integer> wrap(@Nonnull final Integer[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1129,6 +1149,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Long> wrap(@Nonnull final Long[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1136,6 +1157,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Float> wrap(@Nonnull final Float[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1143,6 +1165,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static Seq<Double> wrap(@Nonnull final Double[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1150,6 +1173,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static <E> Seq<E> wrap(@Nonnull final E[] array) {
     if (array.length == 0) {
       return Seq.empty();
@@ -1157,6 +1181,7 @@ public abstract class Seq<E> implements
     return ofGenerator(ix -> array[ix], array.length);
   }
 
+  @Nonnull
   public static <E> Seq<E> wrap(@Nonnull final List<E> list) {
     if (list.isEmpty()) {
       return Seq.empty();
@@ -1164,6 +1189,7 @@ public abstract class Seq<E> implements
     return ofGenerator(list::get, list.size());
   }
 
+  @Nonnull
   public static Seq<Boolean> wrap(@Nonnull final BitSet bitSet) {
     if (bitSet.isEmpty()) {
       return Seq.empty();
@@ -1171,6 +1197,7 @@ public abstract class Seq<E> implements
     return ofGenerator(bitSet::get, bitSet.length());
   }
 
+  @Nonnull
   public static Seq<Character> wrap(@Nonnull final String string) {
     if (string.isEmpty()) {
       return Seq.empty();

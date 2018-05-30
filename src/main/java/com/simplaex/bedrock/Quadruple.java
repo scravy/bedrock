@@ -3,12 +3,14 @@ package com.simplaex.bedrock;
 import lombok.Value;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.function.Function;
 
 @Value(staticConstructor = "of")
+@Immutable
 public class Quadruple<A, B, C, D> implements Serializable, Comparable<Quadruple<A, B, C, D>>, Tuple4<A, B, C, D> {
 
   private A first;
@@ -75,6 +77,7 @@ public class Quadruple<A, B, C, D> implements Serializable, Comparable<Quadruple
     }
   }
 
+  @Nonnull
   public static <E, A extends E, B extends E, C extends E, D extends E> List<E> toList(final Quadruple<A, B, C, D> tuple) {
     return new AbstractList<E>() {
       @Override
@@ -100,11 +103,22 @@ public class Quadruple<A, B, C, D> implements Serializable, Comparable<Quadruple
     };
   }
 
+  @Nonnull
   public List<Object> toList() {
     return toList(this);
   }
 
+  @Nonnull
+  public static <E, A extends E, B extends E, C extends E, D extends E> Seq<E> toSeq(final Tuple4<A, B, C, D> quadruple) {
+    return Seq.of(quadruple.getFirst(), quadruple.getSecond(), quadruple.getThird(), quadruple.getFourth());
+  }
 
+  @Nonnull
+  public Seq<Object> toSeq() {
+    return toSeq(this);
+  }
+
+  @Nonnull
   public <E, F, G, H> Quadruple<E, F, G, H> map(
     final Function<A, E> f,
     final Function<B, F> g,
@@ -114,34 +128,42 @@ public class Quadruple<A, B, C, D> implements Serializable, Comparable<Quadruple
     return Quadruple.of(f.apply(getFirst()), g.apply(getSecond()), h.apply(getThird()), i.apply(getFourth()));
   }
 
+  @Nonnull
   public <E> Quadruple<E, B, C, D> mapFirst(final Function<A, E> f) {
     return Quadruple.of(f.apply(getFirst()), getSecond(), getThird(), getFourth());
   }
 
+  @Nonnull
   public <E> Quadruple<A, E, C, D> mapSecond(final Function<B, E> f) {
     return Quadruple.of(getFirst(), f.apply(getSecond()), getThird(), getFourth());
   }
 
+  @Nonnull
   public <E> Quadruple<A, B, E, D> mapThird(final Function<C, E> f) {
     return Quadruple.of(getFirst(), getSecond(), f.apply(getThird()), getFourth());
   }
 
+  @Nonnull
   public <E> Quadruple<A, B, C, E> mapFourth(final Function<D, E> f) {
     return Quadruple.of(getFirst(), getSecond(), getThird(), f.apply(getFourth()));
   }
 
+  @Nonnull
   public <E> Quadruple<E, B, C, D> withFirst(final E v) {
     return Quadruple.of(v, getSecond(), getThird(), getFourth());
   }
 
+  @Nonnull
   public <E> Quadruple<A, E, C, D> withSecond(final E v) {
     return Quadruple.of(getFirst(), v, getThird(), getFourth());
   }
 
+  @Nonnull
   public <E> Quadruple<A, B, E, D> withThird(final E v) {
     return Quadruple.of(getFirst(), getSecond(), v, getFourth());
   }
 
+  @Nonnull
   public <E> Quadruple<A, B, C, E> withFourth(final E v) {
     return Quadruple.of(getFirst(), getSecond(), getThird(), v);
   }

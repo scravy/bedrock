@@ -3,6 +3,7 @@ package com.simplaex.bedrock;
 import lombok.Value;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.function.Function;
  * @param <B> The second component of the tuple.
  */
 @Value
+@Immutable
 public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pair<A, B>>, Tuple2<A, B> {
 
   private final A first;
@@ -101,6 +103,7 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
     return new Pair<>(entry.getKey(), entry.getValue());
   }
 
+  @Nonnull
   public static <C, A extends C, B extends C> List<C> toList(final Pair<A, B> pair) {
     return new AbstractList<C>() {
       @Override
@@ -122,26 +125,42 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
     };
   }
 
+  @Nonnull
   public List<Object> toList() {
     return toList(this);
   }
 
+  @Nonnull
+  public static <C, A extends C, B extends C> Seq<C> toSeq(final Tuple2<A, B> pair) {
+    return Seq.of(pair.getFirst(), pair.getSecond());
+  }
+
+  @Nonnull
+  public Seq<Object> toSeq() {
+    return toSeq(this);
+  }
+
+  @Nonnull
   public <C, D> Pair<C, D> map(final Function<A, C> f, final Function<B, D> g) {
     return Pair.of(f.apply(fst()), g.apply(snd()));
   }
 
+  @Nonnull
   public <C> Pair<C, B> mapFirst(final Function<A, C> f) {
     return Pair.of(f.apply(fst()), snd());
   }
 
+  @Nonnull
   public <C> Pair<A, C> mapSecond(final Function<B, C> f) {
     return Pair.of(fst(), f.apply(snd()));
   }
 
+  @Nonnull
   public <C> Pair<C, B> withFirst(final C v) {
     return Pair.of(v, snd());
   }
 
+  @Nonnull
   public <C> Pair<A, C> withSecond(final C v) {
     return Pair.of(fst(), v);
   }

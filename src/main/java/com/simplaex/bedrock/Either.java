@@ -5,17 +5,20 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
+@Immutable
 public abstract class Either<L, R> implements Serializable, Comparable<Either<L, R>> {
 
   @SuppressWarnings("unchecked")
   @Value
   @EqualsAndHashCode(callSuper = false)
+  @Immutable
   public static class Left<L, R> extends Either<L, R> {
     private L value;
 
@@ -86,6 +89,7 @@ public abstract class Either<L, R> implements Serializable, Comparable<Either<L,
   @SuppressWarnings("unchecked")
   @Value
   @EqualsAndHashCode(callSuper = false)
+  @Immutable
   public static class Right<L, R> extends Either<L, R> {
     private R value;
 

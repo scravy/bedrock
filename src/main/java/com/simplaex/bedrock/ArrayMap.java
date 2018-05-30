@@ -268,11 +268,13 @@ public final class ArrayMap<K extends Comparable<? super K>, V> implements Mappi
     return new ArrayMap<>(keys, values);
   }
 
+  @Nonnull
   @SuppressWarnings("unchecked")
   public static <K extends Comparable<? super K>, V> ArrayMap<K, V> empty() {
     return (ArrayMap<K, V>) EMPTY;
   }
 
+  @Nonnull
   @SuppressWarnings("WeakerAccess")
   public static <K extends Comparable<? super K>, V> Collector<Pair<K, V>, TreeMap<K, V>, ArrayMap<K, V>> collector() {
     return new Collector<Pair<K, V>, TreeMap<K, V>, ArrayMap<K, V>>() {
@@ -306,6 +308,7 @@ public final class ArrayMap<K extends Comparable<? super K>, V> implements Mappi
     };
   }
 
+  @Nonnull
   public static <K extends Comparable<? super K>, V> ArrayMapBuilder<K, V> builder() {
     return new ArrayMapBuilder<>();
   }

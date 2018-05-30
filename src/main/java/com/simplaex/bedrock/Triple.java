@@ -3,12 +3,14 @@ package com.simplaex.bedrock;
 import lombok.Value;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.function.Function;
 
 @Value(staticConstructor = "of")
+@Immutable
 public class Triple<A, B, C> implements Serializable, Comparable<Triple<A, B, C>>, Tuple3<A, B, C> {
 
   private A first;
@@ -60,6 +62,7 @@ public class Triple<A, B, C> implements Serializable, Comparable<Triple<A, B, C>
     }
   }
 
+  @Nonnull
   public static <D, A extends D, B extends D, C extends D> List<D> toList(final Triple<A, B, C> tuple) {
     return new AbstractList<D>() {
       @Override
@@ -83,34 +86,52 @@ public class Triple<A, B, C> implements Serializable, Comparable<Triple<A, B, C>
     };
   }
 
+  @Nonnull
   public List<Object> toList() {
     return toList(this);
   }
 
+  @Nonnull
+  public static <D, A extends D, B extends D, C extends D> Seq<D> toSeq(final Tuple3<A, B, C> triple) {
+    return Seq.of(triple.getFirst(), triple.getSecond(), triple.getThird());
+  }
+
+  @Nonnull
+  public Seq<Object> toSeq() {
+    return toSeq(this);
+  }
+
+  @Nonnull
   public <D, E, F> Triple<D, E, F> map(final Function<A, D> f, final Function<B, E> g, final Function<C, F> h) {
     return Triple.of(f.apply(getFirst()), g.apply(getSecond()), h.apply(getThird()));
   }
 
+  @Nonnull
   public <D> Triple<D, B, C> mapFirst(final Function<A, D> f) {
     return Triple.of(f.apply(getFirst()), getSecond(), getThird());
   }
 
+  @Nonnull
   public <D> Triple<A, D, C> mapSecond(final Function<B, D> f) {
     return Triple.of(getFirst(), f.apply(getSecond()), getThird());
   }
 
+  @Nonnull
   public <D> Triple<A, B, D> mapThird(final Function<C, D> f) {
     return Triple.of(getFirst(), getSecond(), f.apply(getThird()));
   }
 
+  @Nonnull
   public <D> Triple<D, B, C> withFirst(final D v) {
     return Triple.of(v, getSecond(), getThird());
   }
 
+  @Nonnull
   public <D> Triple<A, D, C> withSecond(final D v) {
     return Triple.of(getFirst(), v, getThird());
   }
 
+  @Nonnull
   public <D> Triple<A, B, D> withThird(final D v) {
     return Triple.of(getFirst(), getSecond(), v);
   }

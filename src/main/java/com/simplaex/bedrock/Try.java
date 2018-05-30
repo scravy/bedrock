@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @SuppressWarnings("WeakerAccess")
+@Immutable
 public abstract class Try<E> implements Iterable<E> {
 
   private Try() {

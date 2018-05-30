@@ -18,6 +18,7 @@ public class Functions {
    * @param <A> The type of the argument and return value.
    * @return A function that always returns what is passed into it.
    */
+  @Nonnull
   public static <A> UnaryOperator<A> id() {
     return x -> x;
   }
@@ -31,38 +32,47 @@ public class Functions {
    * @param <B> The type of the returned functions parameter.
    * @return The constant function.
    */
+  @Nonnull
   public static <A, B> Function<B, A> constant(final A a) {
     return b -> a;
   }
 
+  @Nonnull
   public static <A, B> Function<A, Function<B, A>> constant() {
     return a -> b -> a;
   }
 
+  @Nonnull
   public static <A, B, C> Function<A, C> compose(@Nonnull final Function<B, C> f, @Nonnull final Function<A, B> g) {
     return a -> f.apply(g.apply(a));
   }
 
+  @Nonnull
   public static <A, B, C> Function<A, Function<B, C>> curry(@Nonnull final BiFunction<A, B, C> f) {
     return a -> b -> f.apply(a, b);
   }
 
+  @Nonnull
   public static <A, B, C> Function<Pair<A, B>, C> curryPair(@Nonnull final BiFunction<A, B, C> f) {
     return p -> f.apply(p.fst(), p.snd());
   }
 
+  @Nonnull
   public static <A, B, C> Function<A, Function<B, C>> curry(@Nonnull final Function<Pair<A, B>, C> f) {
     return a -> b -> f.apply(Pair.of(a, b));
   }
 
+  @Nonnull
   public static <A, B, C> BiFunction<A, B, C> uncurry(@Nonnull final Function<A, Function<B, C>> f) {
     return (a, b) -> f.apply(a).apply(b);
   }
 
+  @Nonnull
   public static <A, B, C> Function<Pair<A, B>, C> uncurryPair(@Nonnull final Function<A, Function<B, C>> f) {
     return p -> f.apply(p.fst()).apply(p.snd());
   }
 
+  @Nonnull
   public static <T> Predicate<T> not(@Nonnull final Predicate<T> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null");
     return predicate.negate();
@@ -77,6 +87,7 @@ public class Functions {
    */
   @SuppressWarnings("unchecked")
   @SafeVarargs
+  @Nonnull
   public static <T> Predicate<T> and(final Predicate<? extends T>... ps) {
     return c -> {
       for (final Predicate<? extends T> p : ps) {
@@ -97,6 +108,7 @@ public class Functions {
    */
   @SuppressWarnings("unchecked")
   @SafeVarargs
+  @Nonnull
   public static <T> Predicate<T> or(final Predicate<? extends T>... ps) {
     return c -> {
       for (final Predicate<? extends T> p : ps) {
@@ -115,6 +127,7 @@ public class Functions {
    * @param <T>       The type of the argument of the function.
    * @return The same function as a Predicate.
    */
+  @Nonnull
   public static <T> Predicate<T> predicate(@Nonnull final Function<T, Boolean> predicate) {
     return predicate::apply;
   }
