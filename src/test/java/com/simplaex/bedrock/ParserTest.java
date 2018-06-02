@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
@@ -526,7 +527,7 @@ public class ParserTest {
     });
 
     describe("shuntingYard", () -> {
-      it("should resolve operator precedences", () -> {
+      final Function<String, Deque<Double>> calc = string -> {
         final StringBuilder b = new StringBuilder();
         final Mapping<Character, Integer> ps = ArrayMap.of(
           pair('+', 1),
@@ -536,7 +537,7 @@ public class ParserTest {
           pair('^', 3)
         );
         val res = Parser.shuntingYard(
-          Seq.wrap("3^2*4^5*2+3*9-7/2+9*(3+7)/(3^(6-4))"),
+          Seq.wrap(string),
           b::append,
           ps,
           x -> "+-*/".indexOf(x) >= 0,
@@ -578,8 +579,22 @@ public class ParserTest {
             }
           }
         }
-        expect(ns.size()).toEqual(1);
-        expect(ns.pop()).toEqual(18465.5);
+        return ns;
+      };
+      it("should resolve operator precedences (1)", () -> {
+        val que = calc.apply("3^2*4^5*2+3*9-7/2+9*(3+7)/(3^(6-4))");
+        expect(que.size()).toEqual(1);
+        expect(que.pop()).toEqual(18465.5);
+      });
+      it("should resolve operator precedences (2)", () -> {
+        val que = calc.apply("3*2^4");
+        expect(que.size()).toEqual(1);
+        expect(que.pop()).toEqual(48.0);
+      });
+      it("should resolve operator precedences (3)", () -> {
+        val que = calc.apply("3*2^4+10");
+        expect(que.size()).toEqual(1);
+        expect(que.pop()).toEqual(58.0);
       });
     });
   }
