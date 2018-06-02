@@ -592,9 +592,9 @@ public class ParserTest {
         expect(que.pop()).toEqual(48.0);
       });
       it("should resolve operator precedences (3)", () -> {
-        val que = calc.apply("3*2^4+10");
+        val que = calc.apply("3*2^4+2");
         expect(que.size()).toEqual(1);
-        expect(que.pop()).toEqual(58.0);
+        expect(que.pop()).toEqual(50.0);
       });
     });
   }
