@@ -22,7 +22,9 @@ public interface Container<E> extends Iterable<E> {
 
   @Nonnull
   default String asString() {
-    return asString("");
+    final StringBuilder b = new StringBuilder();
+    forEach(b::append);
+    return b.toString();
   }
 
   E draw(Random random) throws NoSuchElementException;

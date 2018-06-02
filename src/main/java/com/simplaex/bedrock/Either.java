@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 
+import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public abstract class Either<L, R> implements Serializable, Comparable<Either<L,
     private L value;
 
     @Override
-    public int compareTo(final Either<L, R> other) {
+    public int compareTo(@Nonnull final Either<L, R> other) {
       if (other instanceof Right) {
         return -1;
       }
@@ -95,7 +96,7 @@ public abstract class Either<L, R> implements Serializable, Comparable<Either<L,
 
     @SuppressWarnings("unchecked")
     @Override
-    public int compareTo(final Either<L, R> other) {
+    public int compareTo(@Nonnull final Either<L, R> other) {
       if (other instanceof Left) {
         return 1;
       }

@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.experimental.Wither;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 @FunctionalInterface
 public interface Parser<T> {
@@ -483,5 +483,69 @@ public interface Parser<T> {
   static <T> Parser<T> recursive(final Supplier<Parser<T>> supplier) {
     final Supplier<Parser<T>> parserSupplier = Control.memoizing(supplier);
     return seq -> parserSupplier.get().parse(seq);
+  }
+
+  static <T> boolean shuntingYard(
+    final Iterable<T> in,
+    final Consumer<T> out,
+    final Mapping<T, Integer> precedenceMap,
+    final Predicate<T> isLeftAssociative,
+    final Predicate<T> isLeftBracket,
+    final Predicate<T> isRightBracket
+  ) {
+    return shuntingYard(
+      in,
+      out,
+      precedenceMap.keys()::contains,
+      (a, b) -> precedenceMap.apply(a) > precedenceMap.apply(b),
+      (a, b) -> precedenceMap.apply(a).equals(precedenceMap.apply(b)),
+      isLeftAssociative,
+      isLeftBracket,
+      isRightBracket
+    );
+  }
+
+  static <T> boolean shuntingYard(
+    final Iterable<T> in,
+    final Consumer<T> out,
+    final Predicate<T> isOperator,
+    final BiPredicate<T, T> hasHigherPrecedenceThan,
+    final BiPredicate<T, T> hasEqualPrecedenceAs,
+    final Predicate<T> isLeftAssociative,
+    final Predicate<T> isLeftBracket,
+    final Predicate<T> isRightBracket
+  ) {
+    final Deque<T> stack = new ArrayDeque<>();
+    for (final T s : in) {
+      if (isOperator.test(s)) {
+        while (!stack.isEmpty() && isOperator.test(stack.peek()) &&
+          (hasHigherPrecedenceThan.test(stack.peek(), s)
+            || (hasEqualPrecedenceAs.test(stack.peek(), s) && isLeftAssociative.test(stack.peek())))) {
+          out.accept(stack.pop());
+        }
+        stack.push(s);
+      } else if (isLeftBracket.test(s)) {
+        stack.push(s);
+      } else if (isRightBracket.test(s)) {
+        while (!stack.isEmpty() && !isLeftBracket.test(stack.peek())) {
+          out.accept(stack.pop());
+        }
+        if (!stack.isEmpty() && isLeftBracket.test(stack.peek())) {
+          stack.pop();
+        } else {
+          return false;
+        }
+      } else {
+        out.accept(s);
+      }
+    }
+    while (!stack.isEmpty()) {
+      final T t = stack.pop();
+      if (!isOperator.test(t)) {
+        return false;
+      }
+      out.accept(t);
+    }
+    return true;
   }
 }

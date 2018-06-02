@@ -5,6 +5,8 @@ import lombok.val;
 import org.junit.runner.RunWith;
 
 import java.math.BigDecimal;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -13,6 +15,7 @@ import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
 import static com.simplaex.bedrock.Functions.constant;
 import static com.simplaex.bedrock.Functions.or;
+import static com.simplaex.bedrock.Pair.pair;
 import static com.simplaex.bedrock.Parser.*;
 
 @SuppressWarnings("CodeBlock2Expr")
@@ -519,6 +522,64 @@ public class ParserTest {
             )
           )
         ));
+      });
+    });
+
+    describe("shuntingYard", () -> {
+      it("should resolve operator precedences", () -> {
+        final StringBuilder b = new StringBuilder();
+        final Mapping<Character, Integer> ps = ArrayMap.of(
+          pair('+', 1),
+          pair('-', 1),
+          pair('*', 2),
+          pair('/', 2),
+          pair('^', 3)
+        );
+        val res = Parser.shuntingYard(
+          Seq.wrap("3^2*4^5*2+3*9-7/2+9*(3+7)/(3^(6-4))"),
+          b::append,
+          ps,
+          x -> "+-*/".indexOf(x) >= 0,
+          x -> x.equals('('),
+          x -> x.equals(')')
+        );
+        expect(res).toBeTrue();
+        final Deque<Double> ns = new ArrayDeque<>();
+        for (val x : Seq.wrap(b.toString())) {
+          if (Character.isDigit(x)) {
+            ns.push(Double.valueOf(x.toString()));
+          } else {
+            switch (x) {
+              case '+':
+                val a2 = ns.pop();
+                val a1 = ns.pop();
+                ns.push(a1 + a2);
+                break;
+              case '-':
+                val b2 = ns.pop();
+                val b1 = ns.pop();
+                ns.push(b1 - b2);
+                break;
+              case '*':
+                val c2 = ns.pop();
+                val c1 = ns.pop();
+                ns.push(c1 * c2);
+                break;
+              case '/':
+                val d2 = ns.pop();
+                val d1 = ns.pop();
+                ns.push(d1 / d2);
+                break;
+              case '^':
+                val e2 = ns.pop();
+                val e1 = ns.pop();
+                ns.push(Math.pow(e1, e2));
+                break;
+            }
+          }
+        }
+        expect(ns.size()).toEqual(1);
+        expect(ns.pop()).toEqual(18465.5);
       });
     });
   }
