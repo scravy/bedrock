@@ -142,8 +142,8 @@
               <goal>jar</goal>
             </goals>
             <configuration>
+              <source>8</source>
               <additionalparam>-Xdoclint:none</additionalparam>
-              <additionalparam>--source 8</additionalparam>
             </configuration>
           </execution>
         </executions>
