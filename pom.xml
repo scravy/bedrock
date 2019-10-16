@@ -113,9 +113,9 @@
           <source>${java.version}</source>
           <target>${java.version}</target>
           <encoding>UTF-8</encoding>
-            <compilerArgs>
-              <arg>-Xlint:all,-options,-path</arg>
-            </compilerArgs>
+          <compilerArgs>
+            <arg>-Xlint:all,-options,-path</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>

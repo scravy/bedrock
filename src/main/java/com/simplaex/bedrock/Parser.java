@@ -1,10 +1,6 @@
 package com.simplaex.bedrock;
 
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Wither;
+import lombok.*;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -52,7 +48,7 @@ public interface Parser<T> {
 
       private final E value;
 
-      @Wither
+      @With
       private final Seq<?> remaining;
 
       @Override
@@ -70,7 +66,7 @@ public interface Parser<T> {
     @EqualsAndHashCode(callSuper = false)
     public static class NoParse<E> extends Result<E> {
 
-      @Wither
+      @With
       private final Seq<?> remaining;
 
       @SuppressWarnings("unchecked")
