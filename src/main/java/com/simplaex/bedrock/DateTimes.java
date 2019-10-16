@@ -16,7 +16,7 @@ public class DateTimes {
 
   @Value
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-  public class Interval {
+  public static class Interval {
 
     private Instant begin;
     private Instant end;
