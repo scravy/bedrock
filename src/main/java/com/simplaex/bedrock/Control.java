@@ -2,7 +2,7 @@ package com.simplaex.bedrock;
 
 import lombok.*;
 import lombok.experimental.UtilityClass;
-import lombok.experimental.Wither;
+import lombok.With;
 
 import javax.annotation.Nonnull;
 import java.time.Duration;
@@ -17,7 +17,6 @@ import java.util.function.*;
  * Missing control structures for Java.
  */
 @UtilityClass
-@SuppressWarnings("WeakerAccess")
 public class Control {
 
   @Value
@@ -266,11 +265,11 @@ public class Control {
   }
 
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
-  @Wither(AccessLevel.PRIVATE)
+  @With(AccessLevel.PRIVATE)
   public static final class Async<In, Out> implements ThrowingBiConsumer<In, Callback<Out>>, Function<In, Promise<Out>> {
 
     @Value
-    @Wither
+    @With
     private static class AsyncOptions {
 
       private final Executor executor;
