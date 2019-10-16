@@ -4,9 +4,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.TreeMap;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -17,21 +18,48 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
 
   @SuppressWarnings("unchecked")
   public <K> Optional<T> get(final Seq<K> key) {
-    return Optional.ofNullable(find(rootNode, (Seq<Object>) key));
+    return Optional.ofNullable(find(rootNode, (Seq<Object>) key, null));
   }
 
-  @SuppressWarnings("unchecked")
   public <K> T get(final Seq<K> key, final T fallback) {
-    final T result = find(rootNode, (Seq<Object>) key);
+    return get(key, fallback, null);
+  }
+
+  public <K> T get(final Seq<K> key, final Supplier<T> fallbackSupplier) {
+    return get(key, fallbackSupplier, null);
+  }
+
+  /**
+   * Lookup a value in the map and trace the path taken to find it.
+   *
+   * @param key The key to look for.
+   * @param fallback The fallback value to use in case there is no value for the given key.
+   * @param trace A mutable list to trace the path taken into.
+   * @param <K> The type of values in the key.
+   * @return The found value or the fallback value.
+   */
+  @SuppressWarnings("unchecked")
+  public <K> T get(final Seq<K> key, @Nullable final T fallback, final List<Object> trace) {
+    final T result = find(rootNode, (Seq<Object>) key, trace);
     if (result == null) {
       return fallback;
     }
     return result;
   }
 
+  /**
+   * Lookup a value in the map and trace the path taken to find it.
+   *
+   * @param key The key to look for.
+   * @param fallbackSupplier A supplier to generate a fallback value in case there is no value for the given key.
+   * @param trace A mutable list to trace the path taken into.
+   * @param <K> The type of values in the key.
+   * @return The found value or the fallback value.
+   */
   @SuppressWarnings("unchecked")
-  public <K> T get(final Seq<K> key, final Supplier<T> fallbackSupplier) {
-    final T result = find(rootNode, (Seq<Object>) key);
+  public <K> T get(final Seq<K> key, @Nonnull final Supplier<T> fallbackSupplier, final List<Object> trace) {
+    Objects.requireNonNull(fallbackSupplier);
+    final T result = find(rootNode, (Seq<Object>) key, trace);
     if (result == null) {
       return fallbackSupplier.get();
     }
@@ -40,7 +68,7 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
 
   @Override
   public T apply(final Seq<Object> key) {
-    return find(rootNode, key);
+    return find(rootNode, key, null);
   }
 
   public static <T> Builder<T> builder() {
@@ -129,22 +157,35 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
 
   }
 
-  private static <T> T find(final Node<T> node, final Seq<Object> key) {
+  private static <T> T find(final Node<T> node, final Seq<Object> key, @Nullable final List<Object> trace) {
 
     Node<T> currentNode = node;
     Node<T> nextNode;
 
+    final Consumer<Object> tracer = trace == null ? NoOp.consumer() : trace::add;
+
     int i = 0;
     for (; i < key.length(); i += 1) {
+      if (trace != null) {
+        trace.add(key.get(i));
+      }
       if (currentNode.keys == null) {
         if (currentNode.fallback == null) {
           break;
         } else {
+          tracer.accept(null);
           nextNode = currentNode.fallback;
         }
       } else {
-        final int ix = key.get(i) == null ? -1 : Arrays.binarySearch(currentNode.keys, key.get(i));
-        nextNode = ix >= 0 ? currentNode.children[ix] : currentNode.fallback;
+        final Object k = key.get(i);
+        final int ix = k == null ? -1 : Arrays.binarySearch(currentNode.keys, k);
+        if (ix >= 0) {
+          tracer.accept(k);
+          nextNode = currentNode.children[ix];
+        } else {
+          tracer.accept(null);
+          nextNode = currentNode.fallback;
+        }
         if (nextNode == null) {
           break;
         }
