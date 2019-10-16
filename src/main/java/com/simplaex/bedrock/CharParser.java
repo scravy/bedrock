@@ -1,10 +1,6 @@
 package com.simplaex.bedrock;
 
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Wither;
+import lombok.*;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -56,7 +52,7 @@ public interface CharParser<T> {
 
       private final E value;
 
-      @Wither
+      @With
       private final Seq<Character> remaining;
 
       @Override
@@ -74,7 +70,7 @@ public interface CharParser<T> {
     @EqualsAndHashCode(callSuper = false)
     public static class NoParse<E> extends CharParser.Result<E> {
 
-      @Wither
+      @With
       private final Seq<Character> remaining;
 
       @SuppressWarnings("unchecked")
