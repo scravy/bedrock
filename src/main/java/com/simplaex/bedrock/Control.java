@@ -486,8 +486,8 @@ public class Control {
    * Example: Finding the square root of 10 until the error is less than 0.01.
    * <pre>
    * final double squareRoot = Control.iterate(
-   *     value -> value * (value * value > 10.0 ? 0.5 : 1.5),
-   *     (prev, curr) -> Math.abs(10.0 - curr * curr) < 0.01,
+   *     value -&gt; value * (value * value &gt; 10.0 ? 0.5 : 1.5),
+   *     (prev, curr) -&gt; Math.abs(10.0 - curr * curr) &lt; 0.01,
    *     10.0
    * );
    * </pre>
@@ -602,7 +602,7 @@ public class Control {
    * arguments.
    *
    * <pre>
-   * final Function<A, B> f = Control.memoizing(arg -> expensiveCalculation(arg));
+   * final Function&lt;A, B&gt; f = Control.memoizing(arg -&gt; expensiveCalculation(arg));
    * final A one = ...;
    * final A two = ...;
    * f.apply(one); // actually invokes expensiveCalculation(one)
@@ -650,7 +650,7 @@ public class Control {
    * class Thing {
    *   static Thing expensiveFactory() { ... }
    * }
-   * final Supplier&lt;Thing> supplier = Control.memoizing(Thing::expensiveFactory);
+   * final Supplier&lt;Thing&gt; supplier = Control.memoizing(Thing::expensiveFactory);
    * final Thing thing = supplier.get();
    * final Thing thing2 = supplier.get(); // returns the same thing
    * </pre>
@@ -679,7 +679,7 @@ public class Control {
    * <p>
    * Useful to get a thread-safe version of a memoizing supplier:
    * <pre>
-   * final Supplier<Thing> thingSupplier = </Thing>Control.atomic(Control.memoizing(Thing::expensiveFactory));
+   * final Supplier&lt;Thing&gt; thingSupplier = &lt;/Thing&gt;Control.atomic(Control.memoizing(Thing::expensiveFactory));
    * </pre>
    */
   @Nonnull
