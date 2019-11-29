@@ -8,7 +8,7 @@ import java.lang.reflect.Proxy;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings("RedundantCast")
 @UtilityClass
 public class Reflections {
 
@@ -46,7 +46,6 @@ public class Reflections {
       .map(method -> (ThrowingFunction<S, T>) (s -> (T) method.invoke(null, s)));
   }
 
-  @SuppressWarnings("unchecked")
   @Nonnull
   public static <S, T> Optional<ThrowingFunction<S, T>> getFactory(
     @Nonnull final Class<S> from,

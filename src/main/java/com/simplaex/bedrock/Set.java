@@ -237,14 +237,23 @@ public final class Set<E extends Comparable<? super E>> implements
       return empty();
     }
     if (elements instanceof SortedSet) {
-      final SortedSet<E> sortedSet = (SortedSet<E>) elements;
-      return ofSeqInternal(new SeqSimpleSorted<E>(sortedSet.toArray()));
+      return ofSortedSet((SortedSet<E>) elements);
     }
     return ofSeqInternal(Seq.ofCollection(elements).distinct());
   }
 
+  @Nonnull
+  public static <E extends Comparable<? super E>> Set<E> ofSortedSet(final SortedSet<E> elements) {
+    return ofSeqInternal(new SeqSimpleSorted<E>(elements.toArray()));
+  }
+
   @SuppressWarnings("unchecked")
   private static final Set EMPTY = new Set(null);
+
+  @Nonnull
+  public static <E extends Comparable<? super E>> SetBuilder<E> builder() {
+    return new SetBuilder<>();
+  }
 
   @Nonnull
   @SuppressWarnings("unchecked")
@@ -258,6 +267,8 @@ public final class Set<E extends Comparable<? super E>> implements
     return underlying == null ? Seq.<E>empty().iterator() : underlying.iterator();
   }
 
+  @Nonnull
+  @Override
   public String toString() {
     return underlying == null ? "∅" : ('{' + underlying.asString(", ") + '}');
   }

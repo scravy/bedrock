@@ -22,7 +22,7 @@ public class SimpleDirectedGraph {
 
   private final int[][] outgoingEdges;
 
-  private int[][] incomingEdges = null;
+  private int[][] incomingEdges;
 
   SimpleDirectedGraph(
     final int numberOfVertices,
@@ -39,8 +39,8 @@ public class SimpleDirectedGraph {
 
   public final void forEachOutgoing(final int index, final IntConsumer consumer) {
     final int[] outgoing = outgoingEdges[index];
-    for (int i = 0; i < outgoing.length; i += 1) {
-      consumer.accept(outgoing[i]);
+    for (int value : outgoing) {
+      consumer.accept(value);
     }
   }
 
@@ -55,8 +55,8 @@ public class SimpleDirectedGraph {
   public final void forEachIncoming(final int index, final IntConsumer consumer) {
     checkIncoming();
     final int[] incoming = incomingEdges[index];
-    for (int i = 0; i < incoming.length; i += 1) {
-      consumer.accept(incoming[i]);
+    for (int value : incoming) {
+      consumer.accept(value);
     }
   }
 
@@ -80,11 +80,9 @@ public class SimpleDirectedGraph {
     for (int i = 0; i < numberOfVertices; i += 1) {
       incomingEdgesMap.put(i, new TreeSet<>());
     }
-    for (int i = 0; i < outgoingEdges.length; i += 1) {
-      final int[] out = outgoingEdges[i];
-      for (int j = 0; j < out.length; j += 1) {
-        final int from = i;
-        final int to = out[j];
+    for (int from = 0; from < outgoingEdges.length; from += 1) {
+      final int[] out = outgoingEdges[from];
+      for (final int to : out) {
         incomingEdgesMap.get(to).add(from);
       }
     }

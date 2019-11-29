@@ -10,7 +10,7 @@ import java.util.Iterator;
  *
  * @param <E> The type of the elements the builder accepts.
  */
-public final class SeqBuilder<E> implements Iterable<E> {
+public final class SeqBuilder<E> extends AbstractBuilder<E, Seq<E>, SeqBuilder<E>> implements Iterable<E> {
 
   private final ArrayList<E> arrayList;
 
@@ -23,34 +23,19 @@ public final class SeqBuilder<E> implements Iterable<E> {
   }
 
   @Nonnull
+  @Override
   public SeqBuilder<E> add(final E elem) {
     arrayList.add(elem);
     return this;
   }
 
-  @SafeVarargs
   @Nonnull
-  public final SeqBuilder<E> addAll(final E... elems) {
-    for (final E elem : elems) {
-      add(elem);
-    }
-    return this;
-  }
-
-  @Nonnull
-  public SeqBuilder<E> addElements(final Iterable<? extends E> elems) {
-    for (final E elem : elems) {
-      add(elem);
-    }
-    return this;
-  }
-
-  @Nonnull
+  @Override
   public Seq<E> result() {
     if (arrayList.isEmpty()) {
       return Seq.empty();
     }
-    final Object[] array = arrayList.toArray(new Object[arrayList.size()]);
+    final Object[] array = arrayList.toArray(new Object[0]);
     return new SeqSimple<>(array);
   }
 
@@ -59,13 +44,8 @@ public final class SeqBuilder<E> implements Iterable<E> {
     if (arrayList.isEmpty()) {
       return Seq.empty();
     }
-    final Object[] array = arrayList.toArray(new Object[arrayList.size()]);
+    final Object[] array = arrayList.toArray(new Object[0]);
     return new SeqSimpleSorted<>(array);
-  }
-
-  @Nonnull
-  public Seq<E> build() {
-    return result();
   }
 
   public boolean isEmpty() {

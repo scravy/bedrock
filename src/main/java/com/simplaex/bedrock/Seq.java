@@ -18,7 +18,7 @@ import static com.simplaex.bedrock.Control.swap;
  * @param <E> The type of the Elements contained in this Sequence.
  */
 @Immutable
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings({"unused"})
 public abstract class Seq<E> implements
   Serializable,
   RandomAccess,
@@ -87,7 +87,7 @@ public abstract class Seq<E> implements
     int c = 0;
     for (int i = 0; i < len; i += 1) {
       final E el = get(i);
-      if (el == e || el != null && el.equals(e)) {
+      if (Objects.equals(el, e)) {
         c += 1;
       }
     }

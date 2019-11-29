@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
 
-public final class ArrayMapBuilder<K extends Comparable<? super K>, V> implements Iterable<Pair<K, V>> {
+public final class ArrayMapBuilder<K extends Comparable<? super K>, V>
+  extends AbstractBuilder<Pair<K, V>, ArrayMap<K, V>, ArrayMapBuilder<K, V>>
+  implements Iterable<Pair<K, V>> {
 
   private final TreeMap<K, V> underlyingMap = new TreeMap<>();
 
@@ -20,19 +22,21 @@ public final class ArrayMapBuilder<K extends Comparable<? super K>, V> implement
     return this;
   }
 
+  public ArrayMapBuilder<K, V> addKeyValue(final K key, final V value) {
+    return add(key, value);
+  }
+
+  public ArrayMapBuilder<K, V> addPair(final Pair<K, V> elem) {
+    return add(elem);
+  }
+
+  @Override
+  public ArrayMapBuilder<K, V> add(final Pair<K, V> elem) {
+    return add(elem.fst(), elem.snd());
+  }
+
   @Nonnull
-  @SafeVarargs
-  public final ArrayMapBuilder<K, V> addAll(final Pair<K, V>... pairs) {
-    for (final Pair<K, V> pair : pairs) {
-      underlyingMap.put(pair.fst(), pair.snd());
-    }
-    return this;
-  }
-
-  public ArrayMap<K, V> build() {
-    return result();
-  }
-
+  @Override
   public ArrayMap<K, V> result() {
     if (underlyingMap.isEmpty()) {
       return ArrayMap.empty();
