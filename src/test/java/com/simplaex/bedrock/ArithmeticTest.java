@@ -18,7 +18,7 @@ public class ArithmeticTest {
   @Test
   public void shouldCompileAndEvaluateExpression() {
 
-    val expression = ArithmeticExpression.compile("foo + 4 * 2 / (1 - 5) ^ 2 ^ 3");
+    val expression = Expression.compile("foo + 4 * 2 / (1 - 5) ^ 2 ^ 3");
     val bindings = new HashMap<String, BigDecimal>();
 
     bindings.put("foo", BigDecimal.ONE);
@@ -95,68 +95,68 @@ public class ArithmeticTest {
 
   @Test
   public void shouldOptimizeExpressions() {
-    val expression = OptimizedArithmeticExpression.compile("foo + 4 * 2 / (1 - 5) ^ 2 ^ 3");
-    Assert.assertTrue(expression instanceof OptimizedArithmeticExpression.BinaryOperation);
-    val op = (OptimizedArithmeticExpression.BinaryOperation) expression;
-    Assert.assertTrue(op.getLeft() instanceof OptimizedArithmeticExpression.VariableReference);
-    Assert.assertTrue(op.getRight() instanceof OptimizedArithmeticExpression.LiteralValue);
+    val expression = OptimizedExpression.compile("foo + 4 * 2 / (1 - 5) ^ 2 ^ 3");
+    Assert.assertTrue(expression instanceof OptimizedExpression.BinaryOperation);
+    val op = (OptimizedExpression.BinaryOperation) expression;
+    Assert.assertTrue(op.getLeft() instanceof OptimizedExpression.VariableReference);
+    Assert.assertTrue(op.getRight() instanceof OptimizedExpression.LiteralValue);
   }
 
   @Test
   public void shouldOptimizeSpecialCaseOneTimesFoo() {
-    val expression = OptimizedArithmeticExpression.compile("1 * foo");
-    Assert.assertTrue(expression instanceof OptimizedArithmeticExpression.VariableReference);
+    val expression = OptimizedExpression.compile("1 * foo");
+    Assert.assertTrue(expression instanceof OptimizedExpression.VariableReference);
   }
 
   @Test
   public void shouldOptimizeSpecialCaseFooTimesOne() {
-    val expression = OptimizedArithmeticExpression.compile("foo * 1");
-    Assert.assertTrue(expression instanceof OptimizedArithmeticExpression.VariableReference);
+    val expression = OptimizedExpression.compile("foo * 1");
+    Assert.assertTrue(expression instanceof OptimizedExpression.VariableReference);
   }
 
   @Test
   public void shouldOptimizeSpecialCaseZeroPlusFoo() {
-    val expression = OptimizedArithmeticExpression.compile("0 + foo");
-    Assert.assertTrue(expression instanceof OptimizedArithmeticExpression.VariableReference);
+    val expression = OptimizedExpression.compile("0 + foo");
+    Assert.assertTrue(expression instanceof OptimizedExpression.VariableReference);
   }
 
   @Test
   public void shouldOptimizeSpecialCaseFooPlusZero() {
-    val expression = OptimizedArithmeticExpression.compile("foo + 0");
-    Assert.assertTrue(expression instanceof OptimizedArithmeticExpression.VariableReference);
+    val expression = OptimizedExpression.compile("foo + 0");
+    Assert.assertTrue(expression instanceof OptimizedExpression.VariableReference);
   }
 
   @Test
   public void shouldOptimizeSpecialCaseFooTimesZero() {
-    val expression = OptimizedArithmeticExpression.compile("(a + b) * 0");
-    Assert.assertTrue(expression instanceof OptimizedArithmeticExpression.LiteralValue);
+    val expression = OptimizedExpression.compile("(a + b) * 0");
+    Assert.assertTrue(expression instanceof OptimizedExpression.LiteralValue);
     Assert.assertEquals(BigDecimal.ZERO, expression.eval(ArrayMap.empty()));
   }
 
   @Test
   public void shouldOptimizeSpecialCaseZeroTimesFoo() {
-    val expression = OptimizedArithmeticExpression.compile("0 * (a + b)");
-    Assert.assertTrue(expression instanceof OptimizedArithmeticExpression.LiteralValue);
+    val expression = OptimizedExpression.compile("0 * (a + b)");
+    Assert.assertTrue(expression instanceof OptimizedExpression.LiteralValue);
     Assert.assertEquals(BigDecimal.ZERO, expression.eval(ArrayMap.empty()));
   }
 
   @Test
   public void shouldOptimizeSpecialCaseFooToThePowerOfZero() {
-    val expression = OptimizedArithmeticExpression.compile("(a + b) ^ 0");
-    Assert.assertTrue(expression instanceof OptimizedArithmeticExpression.LiteralValue);
+    val expression = OptimizedExpression.compile("(a + b) ^ 0");
+    Assert.assertTrue(expression instanceof OptimizedExpression.LiteralValue);
     Assert.assertEquals(BigDecimal.ONE, expression.eval(ArrayMap.empty()));
   }
 
   @Test
   public void shouldOptimizeSpecialCaseFooToThePowerOfOne() {
-    val expression = OptimizedArithmeticExpression.compile("foo ^ 1");
-    Assert.assertTrue(expression instanceof OptimizedArithmeticExpression.VariableReference);
+    val expression = OptimizedExpression.compile("foo ^ 1");
+    Assert.assertTrue(expression instanceof OptimizedExpression.VariableReference);
   }
 
   @Test
   public void shouldEvaluateOptimizedExpressions() {
 
-    val expression = ArithmeticExpression.compile("foo + 4 * 2 / (1 - 5) ^ 2 ^ 3").optimize();
+    val expression = Expression.compile("foo + 4 * 2 / (1 - 5) ^ 2 ^ 3").optimize();
     val bindings = new HashMap<String, BigDecimal>();
 
     bindings.put("foo", BigDecimal.ONE);

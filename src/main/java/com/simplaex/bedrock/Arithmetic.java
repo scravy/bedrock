@@ -306,22 +306,22 @@ public class Arithmetic {
 
   }
 
-  interface ArithmeticExpression {
+  public interface Expression {
 
     BigDecimal eval(final Function<String, BigDecimal> variableBindings);
 
-    OptimizedArithmeticExpression optimize(final Map<String, BigDecimal> constants);
+    OptimizedExpression optimize(final Map<String, BigDecimal> constants);
 
-    default OptimizedArithmeticExpression optimize() {
+    default OptimizedExpression optimize() {
       return optimize(Collections.emptyMap());
     }
 
     @Value(staticConstructor = "of")
-    class BinaryOperation implements ArithmeticExpression {
+    class BinaryOperation implements Expression {
       private String operation;
       private BinaryOperator<BigDecimal> operator;
-      private ArithmeticExpression left;
-      private ArithmeticExpression right;
+      private Expression left;
+      private Expression right;
 
       @Override
       public BigDecimal eval(final Function<String, BigDecimal> variableBindings) {
@@ -329,62 +329,62 @@ public class Arithmetic {
       }
 
       @Override
-      public OptimizedArithmeticExpression optimize(final Map<String, BigDecimal> constants) {
-        final OptimizedArithmeticExpression oleft = left.optimize(constants);
-        final OptimizedArithmeticExpression oright = right.optimize(constants);
-        if (oleft instanceof OptimizedArithmeticExpression.LiteralValue && oright instanceof OptimizedArithmeticExpression.LiteralValue) {
+      public OptimizedExpression optimize(final Map<String, BigDecimal> constants) {
+        final OptimizedExpression oleft = left.optimize(constants);
+        final OptimizedExpression oright = right.optimize(constants);
+        if (oleft instanceof OptimizedExpression.LiteralValue && oright instanceof OptimizedExpression.LiteralValue) {
           final BigDecimal result = operator.apply(
-            ((OptimizedArithmeticExpression.LiteralValue) oleft).getValue(),
-            ((OptimizedArithmeticExpression.LiteralValue) oright).getValue()
+            ((OptimizedExpression.LiteralValue) oleft).getValue(),
+            ((OptimizedExpression.LiteralValue) oright).getValue()
           );
-          return OptimizedArithmeticExpression.LiteralValue.of(result);
+          return OptimizedExpression.LiteralValue.of(result);
         }
         switch (operation) {
           case "+":
-            if (oleft instanceof OptimizedArithmeticExpression.LiteralValue &&
-              ((OptimizedArithmeticExpression.LiteralValue) oleft).getValue().equals(BigDecimal.ZERO)) {
+            if (oleft instanceof OptimizedExpression.LiteralValue &&
+              ((OptimizedExpression.LiteralValue) oleft).getValue().equals(BigDecimal.ZERO)) {
               return oright;
             }
-            if (oright instanceof OptimizedArithmeticExpression.LiteralValue &&
-              ((OptimizedArithmeticExpression.LiteralValue) oright).getValue().equals(BigDecimal.ZERO)) {
+            if (oright instanceof OptimizedExpression.LiteralValue &&
+              ((OptimizedExpression.LiteralValue) oright).getValue().equals(BigDecimal.ZERO)) {
               return oleft;
             }
             break;
           case "*":
-            if (oleft instanceof OptimizedArithmeticExpression.LiteralValue &&
-              ((OptimizedArithmeticExpression.LiteralValue) oleft).getValue().equals(BigDecimal.ONE)) {
+            if (oleft instanceof OptimizedExpression.LiteralValue &&
+              ((OptimizedExpression.LiteralValue) oleft).getValue().equals(BigDecimal.ONE)) {
               return oright;
             }
-            if (oright instanceof OptimizedArithmeticExpression.LiteralValue &&
-              ((OptimizedArithmeticExpression.LiteralValue) oright).getValue().equals(BigDecimal.ONE)) {
+            if (oright instanceof OptimizedExpression.LiteralValue &&
+              ((OptimizedExpression.LiteralValue) oright).getValue().equals(BigDecimal.ONE)) {
               return oleft;
             }
-            if (oleft instanceof OptimizedArithmeticExpression.LiteralValue &&
-              ((OptimizedArithmeticExpression.LiteralValue) oleft).getValue().equals(BigDecimal.ZERO)) {
-              return OptimizedArithmeticExpression.LiteralValue.of(BigDecimal.ZERO);
+            if (oleft instanceof OptimizedExpression.LiteralValue &&
+              ((OptimizedExpression.LiteralValue) oleft).getValue().equals(BigDecimal.ZERO)) {
+              return OptimizedExpression.LiteralValue.of(BigDecimal.ZERO);
             }
-            if (oright instanceof OptimizedArithmeticExpression.LiteralValue &&
-              ((OptimizedArithmeticExpression.LiteralValue) oright).getValue().equals(BigDecimal.ZERO)) {
-              return OptimizedArithmeticExpression.LiteralValue.of(BigDecimal.ZERO);
+            if (oright instanceof OptimizedExpression.LiteralValue &&
+              ((OptimizedExpression.LiteralValue) oright).getValue().equals(BigDecimal.ZERO)) {
+              return OptimizedExpression.LiteralValue.of(BigDecimal.ZERO);
             }
             break;
           case "^":
-            if (oright instanceof OptimizedArithmeticExpression.LiteralValue &&
-              ((OptimizedArithmeticExpression.LiteralValue) oright).getValue().equals(BigDecimal.ZERO)) {
-              return OptimizedArithmeticExpression.LiteralValue.of(BigDecimal.ONE);
+            if (oright instanceof OptimizedExpression.LiteralValue &&
+              ((OptimizedExpression.LiteralValue) oright).getValue().equals(BigDecimal.ZERO)) {
+              return OptimizedExpression.LiteralValue.of(BigDecimal.ONE);
             }
-            if (oright instanceof OptimizedArithmeticExpression.LiteralValue &&
-              ((OptimizedArithmeticExpression.LiteralValue) oright).getValue().equals(BigDecimal.ONE)) {
+            if (oright instanceof OptimizedExpression.LiteralValue &&
+              ((OptimizedExpression.LiteralValue) oright).getValue().equals(BigDecimal.ONE)) {
               return oleft;
             }
             break;
         }
-        return OptimizedArithmeticExpression.BinaryOperation.of(operator, oleft, oright);
+        return OptimizedExpression.BinaryOperation.of(operator, oleft, oright);
       }
     }
 
     @Value(staticConstructor = "of")
-    class LiteralValue implements ArithmeticExpression {
+    class LiteralValue implements Expression {
       private BigDecimal value;
 
       @Override
@@ -393,13 +393,13 @@ public class Arithmetic {
       }
 
       @Override
-      public OptimizedArithmeticExpression optimize(final Map<String, BigDecimal> constants) {
-        return OptimizedArithmeticExpression.LiteralValue.of(value);
+      public OptimizedExpression optimize(final Map<String, BigDecimal> constants) {
+        return OptimizedExpression.LiteralValue.of(value);
       }
     }
 
     @Value(staticConstructor = "of")
-    class VariableReference implements ArithmeticExpression {
+    class VariableReference implements Expression {
       private String name;
 
       @Override
@@ -408,15 +408,15 @@ public class Arithmetic {
       }
 
       @Override
-      public OptimizedArithmeticExpression optimize(final Map<String, BigDecimal> constants) {
+      public OptimizedExpression optimize(final Map<String, BigDecimal> constants) {
         if (constants.containsKey(name)) {
-          return OptimizedArithmeticExpression.LiteralValue.of(constants.get(name));
+          return OptimizedExpression.LiteralValue.of(constants.get(name));
         }
-        return OptimizedArithmeticExpression.VariableReference.of(name);
+        return OptimizedExpression.VariableReference.of(name);
       }
     }
 
-    static ArithmeticExpression compile(final String expression) {
+    static Expression compile(final String expression) {
 
       @Value
       class Operator {
@@ -434,18 +434,18 @@ public class Arithmetic {
           return super.identify(lexeme);
         }
       });
-      final Deque<ArithmeticExpression> stack = new ArrayDeque<>();
+      final Deque<Expression> stack = new ArrayDeque<>();
       parser.parse(expression, token -> {
         final Object value = token.getValue();
         if (value instanceof BigDecimal) {
-          stack.push(ArithmeticExpression.LiteralValue.of((BigDecimal) value));
+          stack.push(Expression.LiteralValue.of((BigDecimal) value));
         } else if (value instanceof String) {
-          stack.push(ArithmeticExpression.VariableReference.of((String) value));
+          stack.push(Expression.VariableReference.of((String) value));
         } else {
-          final ArithmeticExpression snd = stack.pop();
-          final ArithmeticExpression fst = stack.pop();
+          final Expression snd = stack.pop();
+          final Expression fst = stack.pop();
           final Operator op = (Operator) value;
-          stack.push(ArithmeticExpression.BinaryOperation.of(op.getOperation(), op.getOperator(), fst, snd));
+          stack.push(Expression.BinaryOperation.of(op.getOperation(), op.getOperator(), fst, snd));
         }
       });
 
@@ -458,15 +458,15 @@ public class Arithmetic {
 
   }
 
-  interface OptimizedArithmeticExpression {
+  public interface OptimizedExpression {
 
     BigDecimal eval(final Function<String, BigDecimal> variableBindings);
 
     @Value(staticConstructor = "of")
-    class BinaryOperation implements OptimizedArithmeticExpression {
+    class BinaryOperation implements OptimizedExpression {
       private BinaryOperator<BigDecimal> operator;
-      private OptimizedArithmeticExpression left;
-      private OptimizedArithmeticExpression right;
+      private OptimizedExpression left;
+      private OptimizedExpression right;
 
       @Override
       public BigDecimal eval(final Function<String, BigDecimal> variableBindings) {
@@ -479,7 +479,7 @@ public class Arithmetic {
     }
 
     @Value(staticConstructor = "of")
-    class LiteralValue implements OptimizedArithmeticExpression {
+    class LiteralValue implements OptimizedExpression {
       private BigDecimal value;
 
       @Override
@@ -493,7 +493,7 @@ public class Arithmetic {
     }
 
     @Value(staticConstructor = "of")
-    class VariableReference implements OptimizedArithmeticExpression {
+    class VariableReference implements OptimizedExpression {
       private String name;
 
       @Override
@@ -506,8 +506,8 @@ public class Arithmetic {
       }
     }
 
-    static OptimizedArithmeticExpression compile(final String expression) {
-      return ArithmeticExpression.compile(expression).optimize();
+    static OptimizedExpression compile(final String expression) {
+      return Expression.compile(expression).optimize();
     }
 
   }
