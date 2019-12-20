@@ -20,6 +20,10 @@ public class NoOp {
     return (a, b) -> a;
   }
 
+  public static <T, U> Function<U, T> constant(final T argToBeReturned) {
+    return (ignored) -> argToBeReturned;
+  }
+
   public static <T> Callable<T> callable(final T argToBeReturned) {
     return () -> argToBeReturned;
   }

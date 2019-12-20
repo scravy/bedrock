@@ -2,7 +2,6 @@ package com.simplaex.bedrock;
 
 import lombok.*;
 import lombok.experimental.UtilityClass;
-import lombok.With;
 
 import javax.annotation.Nonnull;
 import java.time.Duration;
@@ -358,7 +357,7 @@ public class Control {
                   lastOne = numberOfReturns.update(n -> n + 1) == asyncs.length;
                 }
                 if (lastOne) {
-                  if (numberOfErrors.getValue() == 0) {
+                  if (numberOfErrors.get() == 0) {
                     opts.getCallbackHandler().accept(() -> callback.call(opts, null, new SeqSimple<>(results)));
                   } else {
                     opts.getCallbackHandler().accept(() -> callback.call(opts, new SeqSimple<>(errors), new SeqSimple<>(results)));
@@ -661,15 +660,24 @@ public class Control {
    */
   @SuppressWarnings("unchecked")
   @Nonnull
-  public static <T> Supplier<T> memoizing(@Nonnull final Supplier<T> supplier) {
+  public static <T> Function0<T> memoizing(@Nonnull final Supplier<T> supplier) {
     Objects.requireNonNull(supplier, "'supplier' must not be null");
-    final SupplierMemoBox<T> box = new SupplierMemoBox<>(supplier, null);
-    return () -> {
-      if (box.supplier != null) {
-        box.value = box.supplier.get();
-        box.supplier = null;
+    return new Function0<T>() {
+      private final SupplierMemoBox<T> box = new SupplierMemoBox<>(supplier, null);
+
+      @Override
+      public T get() {
+        if (box.supplier != null) {
+          box.value = box.supplier.get();
+          box.supplier = null;
+        }
+        return box.value;
       }
-      return box.value;
+
+      @Override
+      public Function0<T> memoizing() {
+        return this;
+      }
     };
   }
 

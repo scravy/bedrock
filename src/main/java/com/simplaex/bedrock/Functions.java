@@ -4,10 +4,7 @@ import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 
 @UtilityClass
 public class Functions {
@@ -34,7 +31,37 @@ public class Functions {
    */
   @Nonnull
   public static <A, B> Function<B, A> constant(final A a) {
-    return b -> a;
+    return ignored -> a;
+  }
+
+  @Nonnull
+  public static <A> ToIntFunction<A> constantInt(final int a) {
+    return ignored -> a;
+  }
+
+  @Nonnull
+  public static <A> ToLongFunction<A> constantLong(final long a) {
+    return ignored -> a;
+  }
+
+  @Nonnull
+  public static <A> ToDoubleFunction<A> constantDouble(final double a) {
+    return ignored -> a;
+  }
+
+  @Nonnull
+  public static <A> IntFunction<A> intConstant(final A a) {
+    return ignored -> a;
+  }
+
+  @Nonnull
+  public static <A> LongFunction<A> longConstant(final A a) {
+    return ignored -> a;
+  }
+
+  @Nonnull
+  public static <A> DoubleFunction<A> doubleConstant(final A a) {
+    return ignored -> a;
   }
 
   @Nonnull
@@ -132,4 +159,7 @@ public class Functions {
     return predicate::apply;
   }
 
+  public static <A, B, R> Function<B, R> bind(@Nonnull final BiFunction<A, B, R> f, final A a) {
+    return b -> f.apply(a, b);
+  }
 }

@@ -8,11 +8,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
+public class MultiValuedKeyMap<T> implements Function1<Seq<Object>, T> {
 
   private final Node<T> rootNode;
 
@@ -32,10 +31,10 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
   /**
    * Lookup a value in the map and trace the path taken to find it.
    *
-   * @param key The key to look for.
+   * @param key      The key to look for.
    * @param fallback The fallback value to use in case there is no value for the given key.
-   * @param trace A mutable list to trace the path taken into.
-   * @param <K> The type of values in the key.
+   * @param trace    A mutable list to trace the path taken into.
+   * @param <K>      The type of values in the key.
    * @return The found value or the fallback value.
    */
   @SuppressWarnings("unchecked")
@@ -50,10 +49,10 @@ public class MultiValuedKeyMap<T> implements Function<Seq<Object>, T> {
   /**
    * Lookup a value in the map and trace the path taken to find it.
    *
-   * @param key The key to look for.
+   * @param key              The key to look for.
    * @param fallbackSupplier A supplier to generate a fallback value in case there is no value for the given key.
-   * @param trace A mutable list to trace the path taken into.
-   * @param <K> The type of values in the key.
+   * @param trace            A mutable list to trace the path taken into.
+   * @param <K>              The type of values in the key.
    * @return The found value or the fallback value.
    */
   @SuppressWarnings("unchecked")

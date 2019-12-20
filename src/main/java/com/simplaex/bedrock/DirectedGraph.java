@@ -90,7 +90,7 @@ public class DirectedGraph<V> extends SimpleDirectedGraph {
       final int ix;
       final Integer ixMaybe = verticesToIndicesMap.get(vertex);
       if (ixMaybe == null) {
-        ix = index.get();
+        ix = index.getValue();
         outgoingEdgesMap.put(ix, new TreeSet<>());
         verticesToIndicesMap.put(vertex, ix);
         index.inc();
@@ -104,7 +104,7 @@ public class DirectedGraph<V> extends SimpleDirectedGraph {
       final int to = add.applyAsInt(edge.snd());
       outgoingEdgesMap.get(from).add(to);
     });
-    final int numberOfVertices = index.get();
+    final int numberOfVertices = index.getValue();
     final Object[] vertices = new Object[numberOfVertices];
     verticesToIndicesMap.forEach((vertex, ix) -> vertices[ix] = vertex);
     final int[][] outgoingEdges = new int[numberOfVertices][];
@@ -121,7 +121,7 @@ public class DirectedGraph<V> extends SimpleDirectedGraph {
     return new DirectedGraph<>(
       vertices,
       verticesToIndicesMap,
-      numberOfEdges.get(),
+      numberOfEdges.getValue(),
       outgoingEdges
     );
   }

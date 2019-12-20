@@ -13,7 +13,7 @@ import java.util.function.*;
  */
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public abstract class Box<T> {
+public abstract class Box<T> implements Function0<T>, Consumer<T> {
 
   interface NumberBox {
 
@@ -23,14 +23,10 @@ public abstract class Box<T> {
 
   }
 
-  public abstract T getValue();
-
-  public abstract void setValue(T value);
-
   public T apply(@Nonnull final Function<T, T> function) {
     Objects.requireNonNull(function, "'function' must not be null.");
-    setValue(function.apply(getValue()));
-    return getValue();
+    accept(function.apply(get()));
+    return get();
   }
 
   public T applyAtomic(@Nonnull final Function<T, T> function) {
@@ -41,14 +37,14 @@ public abstract class Box<T> {
 
   public boolean exists(@Nonnull final Predicate<T> predicate) {
     Objects.requireNonNull(predicate, "'predicate' must not be null.");
-    return predicate.test(getValue());
+    return predicate.test(get());
   }
 
   public boolean contains(final T value) {
     if (value == null) {
-      return getValue() == null;
+      return get() == null;
     }
-    return value.equals(getValue());
+    return value.equals(get());
   }
 
   @Nonnull
@@ -98,6 +94,13 @@ public abstract class Box<T> {
 
     private T value;
 
+    public T get() {
+      return value;
+    }
+
+    public void accept(final T value) {
+      setValue(value);
+    }
   }
 
   @EqualsAndHashCode(callSuper = false)
@@ -108,12 +111,12 @@ public abstract class Box<T> {
 
     @Nonnull
     @Override
-    public Integer getValue() {
+    public Integer get() {
       return intValue;
     }
 
     @Override
-    public void setValue(@Nonnull final Integer value) {
+    public void accept(@Nonnull final Integer value) {
       intValue = value;
     }
 
@@ -151,11 +154,11 @@ public abstract class Box<T> {
       return predicate.test(intValue);
     }
 
-    public void set(final int value) {
+    public void setValue(final int value) {
       this.intValue = value;
     }
 
-    public int get() {
+    public int getValue() {
       return intValue;
     }
   }
@@ -168,12 +171,12 @@ public abstract class Box<T> {
 
     @Nonnull
     @Override
-    public Long getValue() {
+    public Long get() {
       return longValue;
     }
 
     @Override
-    public void setValue(@Nonnull final Long value) {
+    public void accept(@Nonnull final Long value) {
       longValue = value;
     }
 
@@ -219,11 +222,11 @@ public abstract class Box<T> {
       return predicate.test(longValue);
     }
 
-    public void set(final long value) {
+    public void setValue(final long value) {
       this.longValue = value;
     }
 
-    public long get() {
+    public long getValue() {
       return longValue;
     }
   }
@@ -236,12 +239,12 @@ public abstract class Box<T> {
 
     @Nonnull
     @Override
-    public Double getValue() {
+    public Double get() {
       return doubleValue;
     }
 
     @Override
-    public void setValue(@Nonnull final Double value) {
+    public void accept(@Nonnull final Double value) {
       doubleValue = value;
     }
 
@@ -279,11 +282,11 @@ public abstract class Box<T> {
       return predicate.test(doubleValue);
     }
 
-    public void set(final double value) {
+    public void setValue(final double value) {
       this.doubleValue = value;
     }
 
-    public double get() {
+    public double getValue() {
       return doubleValue;
     }
   }

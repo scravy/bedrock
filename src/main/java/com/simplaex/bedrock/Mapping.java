@@ -17,7 +17,7 @@ import java.util.stream.StreamSupport;
  * @param <From> The type of the keys.
  * @param <To>   The type of the values.
  */
-public interface Mapping<From, To> extends Function<From, To>, Iterable<Pair<From, To>> {
+public interface Mapping<From, To> extends Function1<From, To>, Iterable<Pair<From, To>> {
 
   /**
    * Retrieves the value associated with the given key or Optional.empty() if the key is not mapped to any value.

@@ -3,9 +3,7 @@ package com.simplaex.bedrock;
 import com.greghaskins.spectrum.Spectrum;
 import org.junit.runner.RunWith;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
@@ -70,6 +68,52 @@ public class DateTimesTest {
           expect(interval.getDuration())
             .toEqual(Duration.of(50, ChronoUnit.DAYS).plus(Duration.of(150, ChronoUnit.MINUTES)));
         });
+      });
+    });
+
+    describe("DateTimeUtil", () -> {
+      describe("parseDateTime(String)", () -> {
+        it("should parse 20120101", () ->
+          expect(DateTimes.parseDateTime("20120101").toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-01-01T00:00:00Z")));
+        it("should parse 2012-01-01-235959", () ->
+          expect(DateTimes.parseDateTime("2012-01-01-235959").toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-01-01T23:59:59Z")));
+        it("should parse 20120101.235959", () ->
+          expect(DateTimes.parseDateTime("20120101.235959").toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-01-01T23:59:59Z")));
+        it("should parse 2012-05-30T23:59:59", () ->
+          expect(DateTimes.parseDateTime("2012-05-30T23:59:59").toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-05-30T23:59:59Z")));
+        it("should parse 2012-05-30 23:59:59", () ->
+          expect(DateTimes.parseDateTime("2012-05-30 23:59:59").toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-05-30T23:59:59Z")));
+        it("should parse 2012-05-30-23-59-59", () ->
+          expect(DateTimes.parseDateTime("2012-05-30-23-59-59").toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-05-30T23:59:59Z")));
+        final Instant someInstant = Instant.parse("2019-12-19T22:41:49Z");
+        it("should parse " + someInstant, () ->
+          expect(DateTimes.parseDateTime(someInstant.toString()).toInstant(ZoneOffset.UTC)).toEqual(someInstant));
+      });
+      describe("parseDateTime(String,4)", () -> {
+        it("should parse 20120101", () ->
+          expect(DateTimes.parseDateTime("20120101", 4).toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-01-01T00:00:00Z")));
+        it("should parse 2012-01-01-235959", () ->
+          expect(DateTimes.parseDateTime("2012-01-01-235959", 4).toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-01-01T23:00:00Z")));
+        it("should parse 20120101.235959", () ->
+          expect(DateTimes.parseDateTime("20120101.235959", 4).toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-01-01T23:00:00Z")));
+        it("should parse 2012-05-30T23:59:59", () ->
+          expect(DateTimes.parseDateTime("2012-05-30T23:59:59", 4).toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-05-30T23:00:00Z")));
+        it("should parse 2012-05-30 23:59:59", () ->
+          expect(DateTimes.parseDateTime("2012-05-30 23:59:59", 4).toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-05-30T23:00:00Z")));
+        it("should parse 2012-05-30-23-59-59", () ->
+          expect(DateTimes.parseDateTime("2012-05-30-23-59-59", 4).toInstant(ZoneOffset.UTC))
+            .toEqual(Instant.parse("2012-05-30T23:00:00Z")));
       });
     });
   }

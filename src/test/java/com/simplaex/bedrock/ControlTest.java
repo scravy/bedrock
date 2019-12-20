@@ -342,7 +342,7 @@ public class ControlTest {
 
         p.waitFor();
         expect(p.getState()).toEqual(Promise.State.FAILED);
-        expect(executed.get()).toEqual(1);
+        expect(executed.getValue()).toEqual(1);
       });
       it("should execute several tasks that throw exceptions one after another", () -> {
 
@@ -370,7 +370,7 @@ public class ControlTest {
 
         p.waitFor();
         expect(p.getState()).toEqual(Promise.State.FAILED);
-        expect(executed.get()).toEqual(1);
+        expect(executed.getValue()).toEqual(1);
       });
     });
     describe("memoizing", () -> {
@@ -396,7 +396,7 @@ public class ControlTest {
         });
         expect(s.get()).toEqual("hello");
         expect(s.get()).toEqual("hello");
-        expect(invocations.get()).toEqual(1);
+        expect(invocations.getValue()).toEqual(1);
       });
     });
     describe("swap", () -> {

@@ -1325,4 +1325,43 @@ public abstract class Seq<E> implements
     final int length = from - to;
     return ofGenerator(index -> to + (length - index), length);
   }
+
+  public static <A, B, C, D> Seq<Quadruple<A, B, C, D>> zip(
+    final Seq<A> as,
+    final Seq<B> bs,
+    final Seq<C> cs,
+    final Seq<D> ds
+  ) {
+    final int length = Arithmetic.minimum(as.length(), bs.length(), cs.length(), ds.length());
+    final SeqBuilder<Quadruple<A, B, C, D>> builder = Seq.builder(length);
+    for (int i = 0; i < length; i += 1) {
+      builder.add(Quadruple.of(as.get(i), bs.get(i), cs.get(i), ds.get(i)));
+    }
+    return builder.result();
+  }
+
+  public static <A, B, C> Seq<Triple<A, B, C>> zip(
+    final Seq<A> as,
+    final Seq<B> bs,
+    final Seq<C> cs
+  ) {
+    final int length = Arithmetic.minimum(as.length(), bs.length(), cs.length());
+    final SeqBuilder<Triple<A, B, C>> builder = Seq.builder(length);
+    for (int i = 0; i < length; i += 1) {
+      builder.add(Triple.of(as.get(i), bs.get(i), cs.get(i)));
+    }
+    return builder.result();
+  }
+
+  public static <A, B, C> Seq<Pair<A, B>> zip(
+    final Seq<A> as,
+    final Seq<B> bs
+  ) {
+    final int length = Arithmetic.minimum(as.length(), bs.length());
+    final SeqBuilder<Pair<A, B>> builder = Seq.builder(length);
+    for (int i = 0; i < length; i += 1) {
+      builder.add(Pair.of(as.get(i), bs.get(i)));
+    }
+    return builder.result();
+  }
 }

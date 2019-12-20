@@ -1,8 +1,6 @@
 package com.simplaex.bedrock;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Value;
+import lombok.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,13 +11,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@SuppressWarnings("WeakerAccess")
 @Immutable
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class Try<E> implements Iterable<E> {
-
-  private Try() {
-
-  }
 
   public boolean isSuccess() {
     return false;
@@ -71,6 +65,8 @@ public abstract class Try<E> implements Iterable<E> {
   public abstract <F> Try<F> recoverWith(@Nonnull final ThrowingFunction<Exception, Try<F>> value);
 
   public abstract E orElse(final E value);
+
+  public abstract E orElseDo(final ThrowingConsumer<Exception> block);
 
   public abstract E orElseGet(@Nonnull final Supplier<? extends E> supplier);
 
@@ -187,6 +183,11 @@ public abstract class Try<E> implements Iterable<E> {
 
     @Override
     public E orElse(final E value) {
+      return this.value;
+    }
+
+    @Override
+    public E orElseDo(final ThrowingConsumer<Exception> block) {
       return this.value;
     }
 
@@ -382,6 +383,12 @@ public abstract class Try<E> implements Iterable<E> {
     @Override
     public E orElse(final E value) {
       return value;
+    }
+
+    @Override
+    public E orElseDo(@Nonnull final ThrowingConsumer<Exception> block) {
+      block.accept(this.exception);
+      throw new RuntimeException(exception);
     }
 
     @Override
