@@ -13,6 +13,8 @@ import java.util.UUID;
 @UtilityClass
 public class UUIDs {
 
+  public static final UUID NULL = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
   public static final UUID NAMESPACE_DNS = UUID.fromString("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
   public static final UUID NAMESPACE_URL = UUID.fromString("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
   public static final UUID NAMESPACE_OID = UUID.fromString("6ba7b812-9dad-11d1-80b4-00c04fd430c8");
@@ -66,5 +68,4 @@ public class UUIDs {
     final long leastSignificantBits = buffer.getLong();
     return new UUID(mostSignificantBits, leastSignificantBits);
   }
-
 }
