@@ -15,9 +15,8 @@ import static com.mscharhag.oleaster.matcher.Matchers.expect;
 @SuppressWarnings({"CodeBlock2Expr", "ClassInitializerMayBeStatic"})
 @RunWith(Spectrum.class)
 public class PromiseTest {
-
   {
-    describe("Promise", () -> {
+    describe(Promise.class.getSimpleName(), () -> {
       it("fulfill", () -> {
         val x = Executors.newSingleThreadExecutor();
         val p = Promise.<Integer>promise();
@@ -52,6 +51,26 @@ public class PromiseTest {
         expect(Promise.promise().isPending()).toBeTrue();
         expect(Promise.fulfilled(3).isPending()).toBeFalse();
         expect(Promise.failed(new NoSuchAlgorithmException()).isPending()).toBeFalse();
+      });
+      it("toTry", () -> {
+        expect(Promise.fulfilled(7).toTry().isSuccess()).toBeTrue();
+        expect(Promise.failed(new IllegalArgumentException()).toTry().isFailure()).toBeTrue();
+      });
+      it("toOptional", () -> {
+        expect(Promise.fulfilled(7).toOptional().isPresent()).toBeTrue();
+        expect(Promise.failed(new IllegalArgumentException()).toOptional().isPresent()).toBeFalse();
+      });
+      it("fulfill when already fulfilled", () -> {
+        expect(() -> Promise.fulfilled("").fulfill("")).toThrow(IllegalStateException.class);
+      });
+      it("fail when already fulfilled", () -> {
+        expect(() -> Promise.fulfilled("").fail(new IllegalArgumentException())).toThrow(IllegalStateException.class);
+      });
+      it("fulfill when already failed", () -> {
+        expect(() -> Promise.failed(new IllegalArgumentException()).fulfill("")).toThrow(IllegalStateException.class);
+      });
+      it("fail when already failed", () -> {
+        expect(() -> Promise.failed(new IllegalArgumentException()).fail(new IllegalArgumentException())).toThrow(IllegalStateException.class);
       });
     });
 

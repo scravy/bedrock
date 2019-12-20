@@ -78,7 +78,7 @@ public class Context {
     return with(ArrayMap.of(mappings));
   }
 
-  public void withContext(final ArrayMap<String, Object> mappings, final ThrowingRunnable f) {
+  public static void withContext(final ArrayMap<String, Object> mappings, final ThrowingRunnable f) {
     final Context context = currentcontext.get();
     currentcontext.set(new Context(context, mappings));
     try {

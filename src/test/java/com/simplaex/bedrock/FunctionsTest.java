@@ -30,6 +30,23 @@ public class FunctionsTest {
       it("constantDouble should return the given argument", () -> {
         expect(Functions.<String>constantDouble(9).applyAsDouble("x")).toEqual(9);
       });
+      describe("and", () -> {
+        it("should apply predicates combined using and", () -> {
+          expect(
+            Functions.<String>and(
+              str -> str.contains("a"),
+              str -> str.contains("b"),
+              str -> str.contains("c")
+            ).test("abc")
+          ).toBeTrue();
+          expect(
+            Functions.<String>and(
+              str -> str.contains("a"),
+              str -> str.contains("d")
+            ).test("abc")
+          ).toBeFalse();
+        });
+      });
     });
   }
 }

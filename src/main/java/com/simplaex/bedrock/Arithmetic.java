@@ -452,10 +452,8 @@ public class Arithmetic {
       if (stack.size() != 1) {
         throw new IllegalArgumentException("could not compile expression");
       }
-
       return stack.pop();
     }
-
   }
 
   public interface OptimizedExpression {
