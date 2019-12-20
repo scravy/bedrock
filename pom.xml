@@ -11,7 +11,7 @@
   <description>Essential utilities for modern Java.</description>
   <url>https://github.com/simplaex/bedrock</url>
 
-  <version>2019.12.20</version>
+  <version>2019.12.21</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -61,6 +61,10 @@
       <id>ossrh</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
+    <repository>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/simplaex</url>
+    </repository>
   </distributionManagement>
 
   <profiles>
