@@ -150,7 +150,12 @@ public abstract class Box<T> implements Function0<T>, Consumer<T> {
       intValue -= value;
     }
 
+    @Deprecated
     public boolean exists(final IntPredicate predicate) {
+      return intExists(predicate);
+    }
+
+    public boolean intExists(final IntPredicate predicate) {
       return predicate.test(intValue);
     }
 
@@ -218,7 +223,12 @@ public abstract class Box<T> implements Function0<T>, Consumer<T> {
       longValue -= value;
     }
 
+    @Deprecated
     public boolean exists(final LongPredicate predicate) {
+      return longExists(predicate);
+    }
+
+    public boolean longExists(final LongPredicate predicate) {
       return predicate.test(longValue);
     }
 
@@ -278,7 +288,12 @@ public abstract class Box<T> implements Function0<T>, Consumer<T> {
       doubleValue -= value;
     }
 
+    @Deprecated
     public boolean exists(final DoublePredicate predicate) {
+      return doubleExists(predicate);
+    }
+
+    public boolean doubleExists(final DoublePredicate predicate) {
       return predicate.test(doubleValue);
     }
 

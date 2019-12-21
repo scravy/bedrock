@@ -1,12 +1,21 @@
 package com.simplaex.bedrock;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.*;
 import java.util.concurrent.Callable;
+
+import static com.simplaex.bedrock.ForEach.forEach;
 
 @SuppressWarnings("RedundantCast")
 @UtilityClass
@@ -53,11 +62,26 @@ public class Reflections {
   ) {
     Objects.requireNonNull(from, "'from' must not be null");
     Objects.requireNonNull(clazz, "'clazz' must not be null");
-    final Optional<ThrowingFunction<S, T>> factory = getFactoryConstructor(from, clazz);
-    if (factory.isPresent()) {
-      return factory;
+    {
+      final Optional<ThrowingFunction<S, T>> factory = getFactoryConstructor(from, clazz);
+      if (factory.isPresent()) {
+        return factory;
+      }
     }
-    return getFactoryMethod(from, clazz);
+    {
+      final Optional<ThrowingFunction<S, T>> factory = getFactoryMethod(from, clazz);
+      if (factory.isPresent()) {
+        return factory;
+      }
+    }
+    final Class<?> boxedClass = getBoxedClassFor(clazz);
+    if (boxedClass != clazz) {
+      final Optional<? extends ThrowingFunction<S, ?>> factory = getFactory(from, boxedClass);
+      @SuppressWarnings("unchecked") final Optional<ThrowingFunction<S, T>> theFactory =
+        (Optional<ThrowingFunction<S, T>>) factory;
+      return theFactory;
+    }
+    return Optional.empty();
   }
 
   @SuppressWarnings("unchecked")
@@ -136,9 +160,83 @@ public class Reflections {
     return seqBuilder.result().reversed();
   }
 
-  public static Optional<Class<?>> getCommonBaseClass(final Class<?> oneClass, final Class<?> anotherClass) {
+  @Nonnull
+  public static Optional<Class<?>> getCommonBaseClass(
+    @Nonnull final Class<?> oneClass,
+    @Nonnull final Class<?> anotherClass
+  ) {
+    Objects.requireNonNull(oneClass);
+    Objects.requireNonNull(anotherClass);
     final Seq<Class<?>> commonAncestors = Seq.commonPrefixView(getParents(oneClass), getParents(anotherClass));
     return commonAncestors.lastOptional();
   }
 
+  @Value
+  @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+  public static class Property<T> implements Comparable<Property> {
+
+    final String name;
+
+    final Class<?> type;
+
+    final Method getter;
+
+    final Method setter;
+
+    public Object get(final T instance) {
+      try {
+        return getter.invoke(instance);
+      } catch (final IllegalAccessException | InvocationTargetException exc) {
+        throw new RuntimeException("could not invoke getter for " + name + " on " + instance, exc);
+      }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void set(final T instance, final Object value) {
+      if (setter == null) {
+        return;
+      }
+      try {
+        if (value == null) {
+          setter.invoke(instance, (Object) null);
+        } else if (type.isAssignableFrom(value.getClass())) {
+          setter.invoke(instance, value);
+        } else {
+          final Optional<ThrowingFunction<Object, Object>> maybeFactory =
+            Reflections.getFactory((Class<Object>) value.getClass(), (Class<Object>) type);
+          final Object finalValue = Try
+            .fromOptional(maybeFactory)
+            .map(f -> f.apply(value))
+            .orElseThrowRuntime();
+          setter.invoke(instance, finalValue);
+        }
+      } catch (final Exception exc) {
+        throw new RuntimeException("could not invoke setter for " + name + " and " + value + " on " + instance, exc);
+      }
+    }
+
+    @Override
+    public int compareTo(final Property property) {
+      return name.compareTo(property.name);
+    }
+  }
+
+  @Nonnull
+  public static <T> Set<Property<T>> getProperties(@Nonnull final Class<T> clazz) {
+    Objects.requireNonNull(clazz);
+    final SetBuilder<Property<T>> builder = Set.builder();
+    try {
+      forEach(Introspector.getBeanInfo(clazz).getPropertyDescriptors(), propertyDescriptor -> {
+        builder.add(new Property<>(
+          propertyDescriptor.getName(),
+          propertyDescriptor.getPropertyType(),
+          propertyDescriptor.getReadMethod(),
+          propertyDescriptor.getWriteMethod()
+        ));
+      });
+    } catch (final IntrospectionException exc) {
+      throw new RuntimeException("could not get property descriptors using BeanInfo Introspector", exc);
+    }
+    return builder.result();
+  }
 }

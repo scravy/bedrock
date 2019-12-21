@@ -87,4 +87,12 @@ public class Context {
       currentcontext.set(context);
     }
   }
+
+  public static Context getInstance() {
+    final Context context = currentcontext.get();
+    if (context == null) {
+      currentcontext.set(new Context(null, ArrayMap.empty()));
+    }
+    return currentcontext.get();
+  }
 }

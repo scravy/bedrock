@@ -24,12 +24,12 @@ public class ReflectionsTest {
 
   {
     describe("getFactory(S,T)", () -> {
-      Seq.of(Integer.class, Long.class, Double.class, BigDecimal.class, BigInteger.class).forEach(clazz -> {
+      Seq.of(Integer.class, Long.class, Double.class, BigDecimal.class, BigInteger.class, int.class, long.class).forEach(clazz -> {
         it("should find a String factory for " + clazz.getName(), () -> {
           expect(Reflections.getFactory(String.class, clazz).isPresent()).toBeTrue();
         });
         it("should instantiate an instance of " + clazz.getName(), () -> {
-          expect(Reflections.getFactory(String.class, clazz).map(f -> f.apply("1")).orElse(null)).toBeInstanceOf(clazz);
+          expect(Reflections.getFactory(String.class, clazz).map(f -> f.apply("1")).orElse(null)).toBeInstanceOf(Reflections.getBoxedClassFor(clazz));
           expect(Reflections.getFactory(String.class, clazz).map(f -> f.apply("1").intValue()).orElse(0)).toEqual(1);
         });
       });

@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import static com.simplaex.bedrock.Functions.curry;
 import static com.simplaex.bedrock.Functions.predicate;
 
-public interface Container<E> extends Iterable<E> {
+public interface Container<E> extends ExtendedIterable<E> {
 
   boolean isEmpty();
 

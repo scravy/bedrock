@@ -635,7 +635,6 @@ public class Arithmetic {
       }
       return true;
     }
-
   }
 
   @RequiredArgsConstructor
@@ -678,5 +677,4 @@ public class Arithmetic {
       return tokenizer.comparePrecedence(leftOperator, rightOperator);
     }
   }
-
 }

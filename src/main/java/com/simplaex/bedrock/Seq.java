@@ -929,11 +929,15 @@ public abstract class Seq<E> implements
     return new SeqSimple<>(array);
   }
 
+  @FunctionalInterface
+  @Deprecated
   public interface WithIndexConsumer<E> {
     void consume(int index, E element);
   }
 
-  public void forEach(final WithIndexConsumer<E> consumer) {
+  @Deprecated
+  public void forEach(@Nonnull final WithIndexConsumer<E> consumer) {
+    Objects.requireNonNull(consumer, "'consumer' must not be null");
     for (int i = 0; i < size(); i += 1) {
       consumer.consume(i, get(i));
     }

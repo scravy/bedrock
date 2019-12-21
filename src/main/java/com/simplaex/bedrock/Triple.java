@@ -135,4 +135,8 @@ public class Triple<A, B, C> implements Serializable, Comparable<Triple<A, B, C>
   public <D> Triple<A, B, D> withThird(final D v) {
     return Triple.of(getFirst(), getSecond(), v);
   }
+
+  public static <A, B, C> Triple<A, B, C> triple(final A a, final B b, final C c) {
+    return Triple.of(a, b, c);
+  }
 }
