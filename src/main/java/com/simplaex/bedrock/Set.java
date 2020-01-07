@@ -149,7 +149,7 @@ public final class Set<E extends Comparable<? super E>> implements
 
   @Nonnull
   @Override
-  public String asString(final String delimiter) {
+  public String asString(@Nonnull final String delimiter) {
     return underlying == null ? "" : underlying.asString(delimiter);
   }
 

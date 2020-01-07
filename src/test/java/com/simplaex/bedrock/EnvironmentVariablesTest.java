@@ -17,6 +17,7 @@ public class EnvironmentVariablesTest {
     private String schema = "someschema";
     private String host = "localhost";
     private int port;
+    private Double factor = null;
   }
 
   {
@@ -24,7 +25,8 @@ public class EnvironmentVariablesTest {
       it("readInto", () -> {
         EnvironmentVariables.ENVIRONMENT_VARIABLE_RETRIEVER = key -> ArrayMap.of(
           pair("HOST", "example.org"),
-          pair("PORT", "8080")
+          pair("PORT", "8080"),
+          pair("FACTOR", "0.0")
         ).getOrElse(key, null);
         final Config config = EnvironmentVariables.read(Config.class);
         expect(config.getHost()).toEqual("example.org");

@@ -167,4 +167,8 @@ public class Quadruple<A, B, C, D> implements Serializable, Comparable<Quadruple
   public <E> Quadruple<A, B, C, E> withFourth(final E v) {
     return Quadruple.of(getFirst(), getSecond(), getThird(), v);
   }
+
+  public static <A, B, C, D> Quadruple<A, B, C, D> quadruple(final A a, final B b, final C c, final D d) {
+    return Quadruple.of(a, b, c, d);
+  }
 }

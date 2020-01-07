@@ -10,7 +10,7 @@ import java.util.function.Function;
 @UtilityClass
 public class EnvironmentVariables {
 
-  // visible for testing
+  // visible + non-final for testing
   Function<String, String> ENVIRONMENT_VARIABLE_RETRIEVER = System::getenv;
 
   public static Optional<String> getenv(final String key) {

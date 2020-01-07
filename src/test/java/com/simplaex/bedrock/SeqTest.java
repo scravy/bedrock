@@ -4,14 +4,14 @@ import com.greghaskins.spectrum.Spectrum;
 import lombok.val;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
+import static com.simplaex.bedrock.Pair.pair;
+import static com.simplaex.bedrock.Quadruple.quadruple;
+import static com.simplaex.bedrock.Triple.triple;
 
 @SuppressWarnings({"CodeBlock2Expr", "ClassInitializerMayBeStatic"})
 @RunWith(Spectrum.class)
@@ -205,7 +205,7 @@ public class SeqTest {
 
       describe("ofPair", () -> {
         it("should consutrct a list", () -> {
-          val seq = Seq.<Number, Long, Double>ofPair(Pair.pair(231L, 3.4));
+          val seq = Seq.<Number, Long, Double>ofPair(pair(231L, 3.4));
           expect(seq.get(0)).toEqual(231L);
           expect(seq.get(1)).toEqual(3.4);
           expect(seq.length()).toEqual(2);
@@ -253,7 +253,6 @@ public class SeqTest {
         expect(Seq.rangeExclusive(7, -3)).toEqual(Seq.of(7, 6, 5, 4, 3, 2, 1, 0, -1, -2));
       });
     });
-
     describe("and", () -> {
       it("should apply and", () -> {
         expect(Seq.and(Seq.of(true, true, true))).toBeTrue();
@@ -262,7 +261,6 @@ public class SeqTest {
         expect(Seq.and(Seq.of(false, false, false))).toBeFalse();
       });
     });
-
     describe("or", () -> {
       it("should apply or", () -> {
         expect(Seq.or(Seq.of(true, true, true))).toBeTrue();
@@ -271,12 +269,114 @@ public class SeqTest {
         expect(Seq.or(Seq.of(false, false, false))).toBeFalse();
       });
     });
-
+    describe("all", () -> {
+      it("should apply and", () -> {
+        expect(Seq.all(Seq.of(true, true, true))).toBeTrue();
+        expect(Seq.all(Seq.of(true, false, true))).toBeFalse();
+        expect(Seq.all(Seq.of(false, false, true))).toBeFalse();
+        expect(Seq.all(Seq.of(false, false, false))).toBeFalse();
+      });
+    });
+    describe("any", () -> {
+      it("should apply or", () -> {
+        expect(Seq.any(Seq.of(true, true, true))).toBeTrue();
+        expect(Seq.any(Seq.of(true, false, true))).toBeTrue();
+        expect(Seq.any(Seq.of(false, false, true))).toBeTrue();
+        expect(Seq.any(Seq.of(false, false, false))).toBeFalse();
+      });
+    });
     describe("commonPrefix", () -> {
       it("should find a common prefix", () -> {
         expect(Seq.commonPrefix(Seq.ofString("hello"), Seq.ofString("world"))).toEqual(Seq.empty());
         expect(Seq.commonPrefix(Seq.ofString("hello"), Seq.ofString("hell"))).toEqual(Seq.ofString("hell"));
         expect(Seq.commonPrefix(Seq.ofString("hello"), Seq.ofString("help"))).toEqual(Seq.ofString("hel"));
+      });
+    });
+    describe("commonPrefixLength", () -> {
+      it("should find the length of a common prefix", () -> {
+        expect(Seq.commonPrefixLength(Seq.ofString("hello"), Seq.ofString("world"))).toEqual(0);
+        expect(Seq.commonPrefixLength(Seq.ofString("hello"), Seq.ofString("hell"))).toEqual(4);
+        expect(Seq.commonPrefixLength(Seq.ofString("hello"), Seq.ofString("help"))).toEqual(3);
+      });
+    });
+    describe("minimum and maximum", () -> {
+      class X {
+      }
+      final Seq<X> xs = Seq.of(new X(), new X());
+      it("should return null when invoked on a sequence without comparable elements", () -> {
+        expect(xs.minimum()).toBeNull();
+      });
+      it("should return null when invoked on a sequence without comparable elements", () -> {
+        expect(xs.maximum()).toBeNull();
+      });
+    });
+    describe("zip/2", () -> {
+      it("should zip two sequences of same length", () -> {
+        final Seq<Pair<Character, Character>> zipped =
+          Seq.zip(Seq.ofString("one"), Seq.ofString("two"));
+        expect(zipped).toEqual(Seq.of(
+          pair('o', 't'),
+          pair('n', 'w'),
+          pair('e', 'o')
+        ));
+      });
+      it("should zip two sequences of different lengths", () -> {
+        final Seq<Pair<Character, Character>> zipped =
+          Seq.zip(Seq.ofString("one"), Seq.ofString("three"));
+        expect(zipped).toEqual(Seq.of(
+          pair('o', 't'),
+          pair('n', 'h'),
+          pair('e', 'r')
+        ));
+      });
+    });
+    describe("zip/3", () -> {
+      it("should zip three sequences of same length", () -> {
+        final Seq<Triple<Character, Character, Character>> zipped =
+          Seq.zip(Seq.ofString("one"), Seq.ofString("two"), Seq.ofString("qux"));
+        expect(zipped).toEqual(Seq.of(
+          triple('o', 't', 'q'),
+          triple('n', 'w', 'u'),
+          triple('e', 'o', 'x')
+        ));
+      });
+      it("should zip three sequences of different length", () -> {
+        final Seq<Triple<Character, Character, Character>> zipped =
+          Seq.zip(Seq.ofString("one"), Seq.ofString("two"), Seq.ofString("three"));
+        expect(zipped).toEqual(Seq.of(
+          triple('o', 't', 't'),
+          triple('n', 'w', 'h'),
+          triple('e', 'o', 'r')
+        ));
+      });
+    });
+    describe("zip/4", () -> {
+      it("should zip four sequences of same length", () -> {
+        final Seq<Quadruple<Character, Character, Character, Character>> zipped =
+          Seq.zip(Seq.ofString("one"), Seq.ofString("two"), Seq.ofString("qux"), Seq.ofString("foo"));
+        expect(zipped).toEqual(Seq.of(
+          quadruple('o', 't', 'q', 'f'),
+          quadruple('n', 'w', 'u', 'o'),
+          quadruple('e', 'o', 'x', 'o')
+        ));
+      });
+      it("should zip four sequences of different length", () -> {
+        final Seq<Quadruple<Character, Character, Character, Character>> zipped =
+          Seq.zip(Seq.ofString("one"), Seq.ofString("two"), Seq.ofString("three"), Seq.ofString("four"));
+        expect(zipped).toEqual(Seq.of(
+          quadruple('o', 't', 't', 'f'),
+          quadruple('n', 'w', 'h', 'o'),
+          quadruple('e', 'o', 'r', 'u')
+        ));
+      });
+    });
+    describe("draw", () -> {
+      it("should draw a random element from a sequence", () -> {
+        final Seq<Integer> seq = Seq.of(1, 2, 3);
+        expect(seq.contains(seq.draw())).toBeTrue();
+      });
+      it("should throw if trying to draw from the empty sequence", () -> {
+        expect(() -> Seq.empty().draw()).toThrow(NoSuchElementException.class);
       });
     });
   }

@@ -52,7 +52,9 @@ public abstract class Seq<E> implements
     return new SeqSimple<>(array);
   }
 
-  public E draw(final Random random) throws NoSuchElementException {
+  @Override
+  public E draw(@Nonnull final Random random) throws NoSuchElementException {
+    Objects.requireNonNull(random, "the supplied 'random' generator must not be null");
     if (isEmpty()) {
       throw new NoSuchElementException("drawing from an empty set");
     }
@@ -77,7 +79,7 @@ public abstract class Seq<E> implements
 
   @Override
   @Nonnull
-  public String asString(final String delimiter) {
+  public String asString(@Nonnull final String delimiter) {
     return stream().map(Objects::toString).collect(Collectors.joining(delimiter));
   }
 
@@ -1225,12 +1227,24 @@ public abstract class Seq<E> implements
     return seq.maximumBy(Comparable::compareTo);
   }
 
-  public static boolean any(final Seq<Boolean> seq) {
-    return seq.exists(x -> x);
+  public static boolean any(@Nonnull final Seq<Boolean> seq) {
+    Objects.requireNonNull(seq, "the supplied sequence must not be null");
+    for (final Boolean e : seq) {
+      if (Boolean.TRUE.equals(e)) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  public static boolean all(final Seq<Boolean> seq) {
-    return seq.forAll(x -> x);
+  public static boolean all(@Nonnull final Seq<Boolean> seq) {
+    Objects.requireNonNull(seq, "the supplied sequence must not be null");
+    for (final Boolean e : seq) {
+      if (!Boolean.TRUE.equals(e)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public static int intSum(final Seq<Integer> seq) {
@@ -1264,13 +1278,11 @@ public abstract class Seq<E> implements
   }
 
   public static boolean and(final Seq<Boolean> seq) {
-    Objects.requireNonNull(seq, "'seq' must not be null");
-    return seq.foldr((left, right) -> left && right, true);
+    return all(seq);
   }
 
   public static boolean or(final Seq<Boolean> seq) {
-    Objects.requireNonNull(seq, "'seq' must not be null");
-    return seq.foldr((left, right) -> left || right, false);
+    return any(seq);
   }
 
   public static <A, B> int commonPrefixLength(final Seq<A> as, final Seq<B> bs) {

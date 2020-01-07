@@ -27,7 +27,7 @@ public interface Container<E> extends ExtendedIterable<E> {
     return b.toString();
   }
 
-  E draw(Random random) throws NoSuchElementException;
+  E draw(@Nonnull Random random) throws NoSuchElementException;
 
   default E draw() throws NoSuchElementException {
     return draw(ThreadLocalRandom.current());
@@ -42,7 +42,7 @@ public interface Container<E> extends ExtendedIterable<E> {
   }
 
   @Nonnull
-  String asString(String delimiter);
+  String asString(@Nonnull String delimiter);
 
   @Nonnull
   default Stream<E> stream() {

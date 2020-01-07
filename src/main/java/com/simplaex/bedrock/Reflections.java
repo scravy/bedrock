@@ -186,7 +186,7 @@ public class Reflections {
     public Object get(final T instance) {
       try {
         return getter.invoke(instance);
-      } catch (final IllegalAccessException | InvocationTargetException exc) {
+      } catch (final Exception exc) {
         throw new RuntimeException("could not invoke getter for " + name + " on " + instance, exc);
       }
     }
