@@ -10,9 +10,8 @@ import java.util.TreeSet;
  *
  * @param <E>
  */
-public class SetBuilder<E extends Comparable<? super E>>
-  extends AbstractBuilder<E, Set<E>, SetBuilder<E>>
-  implements Iterable<E> {
+public final class SetBuilder<E extends Comparable<? super E>>
+  extends AbstractBuilder<E, Set<E>, SetBuilder<E>> {
 
   private final SortedSet<E> underlyingSet = new TreeSet<>();
 

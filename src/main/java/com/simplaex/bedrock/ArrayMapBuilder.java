@@ -7,14 +7,9 @@ import java.util.TreeMap;
 import java.util.function.BiConsumer;
 
 public final class ArrayMapBuilder<K extends Comparable<? super K>, V>
-  extends AbstractBuilder<Pair<K, V>, ArrayMap<K, V>, ArrayMapBuilder<K, V>>
-  implements Iterable<Pair<K, V>> {
+  extends AbstractBuilder<Pair<K, V>, ArrayMap<K, V>, ArrayMapBuilder<K, V>> {
 
   private final TreeMap<K, V> underlyingMap = new TreeMap<>();
-
-  ArrayMapBuilder() {
-
-  }
 
   @Nonnull
   public ArrayMapBuilder<K, V> add(final K key, final V value) {

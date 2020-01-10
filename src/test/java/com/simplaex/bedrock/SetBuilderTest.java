@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
@@ -56,6 +57,16 @@ public class SetBuilderTest {
           .addFromEnumeration(new IteratorEnumeration<>(Arrays.asList(1, 2, 3).iterator()))
           .forEach(set::add);
         expect(set).toEqual(new TreeSet<>(Arrays.asList(1, 2, 3)));
+      });
+    });
+
+    describe("collector", () -> {
+      it("builder should collect values as collector", () -> {
+        final Set<String> arrayMap = Stream.of(
+          "one",
+          "two"
+        ).collect(Set.builder());
+        expect(arrayMap).toEqual(Set.of("two", "one"));
       });
     });
   }

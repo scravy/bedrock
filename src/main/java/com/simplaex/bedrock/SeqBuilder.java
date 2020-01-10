@@ -10,15 +10,15 @@ import java.util.Iterator;
  *
  * @param <E> The type of the elements the builder accepts.
  */
-public final class SeqBuilder<E> extends AbstractBuilder<E, Seq<E>, SeqBuilder<E>> implements Iterable<E> {
+public final class SeqBuilder<E> extends AbstractBuilder<E, Seq<E>, SeqBuilder<E>> {
 
   private final ArrayList<E> arrayList;
 
-  SeqBuilder() {
+  public SeqBuilder() {
     this.arrayList = new ArrayList<>();
   }
 
-  SeqBuilder(final int sizeHint) {
+  public SeqBuilder(final int sizeHint) {
     this.arrayList = new ArrayList<>(sizeHint);
   }
 

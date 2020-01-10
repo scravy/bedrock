@@ -6,8 +6,7 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
+import java.util.stream.Stream;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
@@ -23,6 +22,16 @@ public class SeqBuilderTest {
         val list = new ArrayList<Integer>();
         Seq.<Integer>builder().addAll(1, 2, 3).forEach(list::add);
         expect(list).toEqual(Arrays.asList(1, 2, 3));
+      });
+    });
+
+    describe("collector", () -> {
+      it("builder should collect values as collector", () -> {
+        final Seq<String> arrayMap = Stream.of(
+          "one",
+          "two"
+        ).collect(Seq.builder());
+        expect(arrayMap).toEqual(Seq.of("one", "two"));
       });
     });
   }

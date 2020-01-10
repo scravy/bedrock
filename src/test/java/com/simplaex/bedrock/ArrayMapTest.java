@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
@@ -249,6 +250,15 @@ public class ArrayMapTest {
         expect(map2.intersect(map1)).toEqual(ArrayMap.of(
           pair(4, "four")
         ));
+      });
+    });
+    describe("collector", () -> {
+      it("builder should collect values as collector", () -> {
+        final ArrayMap<String, Integer> arrayMap = Stream.of(
+          pair("one", 1),
+          pair("two", 2)
+        ).collect(ArrayMap.builder());
+        expect(arrayMap).toEqual(ArrayMap.of(pair("one", 1), pair("two", 2)));
       });
     });
   }
