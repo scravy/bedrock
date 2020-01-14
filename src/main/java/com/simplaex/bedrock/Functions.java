@@ -159,7 +159,23 @@ public class Functions {
     return predicate::apply;
   }
 
+  @Nonnull
   public static <A, B, R> Function<B, R> bind(@Nonnull final BiFunction<A, B, R> f, final A a) {
     return b -> f.apply(a, b);
+  }
+
+  @Nonnull
+  public static IntUnaryOperator bindInt(@Nonnull final IntBinaryOperator f, final int a) {
+    return b -> f.applyAsInt(a, b);
+  }
+
+  @Nonnull
+  public static LongUnaryOperator bindLong(@Nonnull final LongBinaryOperator f, final long a) {
+    return b -> f.applyAsLong(a, b);
+  }
+
+  @Nonnull
+  public static DoubleUnaryOperator bindDouble(@Nonnull final DoubleBinaryOperator f, final double a) {
+    return b -> f.applyAsDouble(a, b);
   }
 }

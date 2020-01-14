@@ -48,5 +48,20 @@ public class FunctionsTest {
         });
       });
     });
+    describe("Functions2", () -> {
+      final Function2<String, Integer, String> repeat = (str, times) -> {
+        final StringBuilder b = new StringBuilder();
+        for (int i = 0; i < times; i += 1) {
+          b.append(str);
+        }
+        return b.toString();
+      };
+      it("should flip the arguments to a function", () -> {
+        expect(repeat.flipped().apply(3, "ab")).toEqual("ababab");
+      });
+      it("should return the original function when flipping twice", () -> {
+        expect(repeat == repeat.flipped().flipped()).toBeTrue();
+      });
+    });
   }
 }

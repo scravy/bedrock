@@ -20,6 +20,20 @@ public interface Function2<A, B, R> extends BiFunction<A, B, R> {
     return (t) -> Function2.this.apply(t.getFirst(), t.getSecond());
   }
 
+  default Function2<B, A, R> flipped() {
+    return new Function2<B, A, R>() {
+      @Override
+      public R apply(final B b, final A a) {
+        return Function2.this.apply(a, b);
+      }
+
+      @Override
+      public Function2<A, B, R> flipped() {
+        return Function2.this;
+      }
+    };
+  }
+
   static <A, B, R> Function2<A, B, R> from(final BiFunction<A, B, R> f) {
     return f::apply;
   }

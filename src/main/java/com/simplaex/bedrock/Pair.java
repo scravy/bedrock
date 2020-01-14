@@ -126,6 +126,11 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
   }
 
   @Nonnull
+  public Pair<B, A> swapped() {
+    return of(getSecond(), getFirst());
+  }
+
+  @Nonnull
   public List<Object> toList() {
     return toList(this);
   }
@@ -164,4 +169,5 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
   public <C> Pair<A, C> withSecond(final C v) {
     return Pair.of(fst(), v);
   }
+
 }

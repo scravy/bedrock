@@ -699,4 +699,11 @@ public class Control {
       }
     };
   }
+
+  public static void times(final int n, @Nonnull final ThrowingIntConsumer runnable) {
+    Objects.requireNonNull(runnable, "'runnable' most not be null");
+    for (int i = 0; i < n; i += 1) {
+      runnable.accept(i);
+    }
+  }
 }

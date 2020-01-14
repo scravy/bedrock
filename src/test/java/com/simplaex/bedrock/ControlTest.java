@@ -13,7 +13,9 @@ import java.time.Duration;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.greghaskins.spectrum.Spectrum.*;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
@@ -448,6 +450,15 @@ public class ControlTest {
         expect(xs[0]).toEqual(3);
         expect(xs[1]).toEqual(2);
         expect(xs[2]).toEqual(1);
+      });
+    });
+    describe("times", () -> {
+      it("should execute the runnable 3 times", () -> {
+        final Box.IntBox box = Box.intBox(0);
+        Control.times(4, i -> {
+          box.update(Operators.plus(i));
+        });
+        expect(box.getValue()).toEqual(6);
       });
     });
   }
