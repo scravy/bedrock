@@ -658,7 +658,6 @@ public class Control {
    * @param <T>      The type of the thing the supplier supplies.
    * @return A memoizing supplier which calls the given supplier only ever once.
    */
-  @SuppressWarnings("unchecked")
   @Nonnull
   public static <T> Function0<T> memoizing(@Nonnull final Supplier<T> supplier) {
     Objects.requireNonNull(supplier, "'supplier' must not be null");
@@ -705,5 +704,27 @@ public class Control {
     for (int i = 0; i < n; i += 1) {
       runnable.accept(i);
     }
+  }
+
+  /**
+   * Evaluates the given functions one by one, returning the result of the first function that does not yield null,
+   * without executing the remaining functions.
+   * <p>
+   * If no function returned a non-null value, this function returns {@link Optional#empty()}.
+   *
+   * @param k  The single parameter to apply to the functions when evaluating them.
+   * @param fs The functions.
+   * @return The first non-null result wrapped in an {@link Optional}.
+   */
+  @Nonnull
+  @SafeVarargs
+  public static <K, T> Optional<T> findFirstNonNull(final K k, final Function<? super K, ? extends T>... fs) {
+    for (final Function<? super K, ? extends T> f : fs) {
+      final T result = f.apply(k);
+      if (result != null) {
+        return Optional.of(result);
+      }
+    }
+    return Optional.empty();
   }
 }

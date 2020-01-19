@@ -1,6 +1,7 @@
 package com.simplaex.bedrock;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -32,6 +33,11 @@ public interface Mapping<From, To> extends Function1<From, To>, ExtendedIterable
 
   default To getOrElse(final From key, final To fallback) {
     return get(key).orElse(fallback);
+  }
+
+  @Nullable
+  default To getOrNull(final From key) {
+    return get(key).orElse(null);
   }
 
   @Override

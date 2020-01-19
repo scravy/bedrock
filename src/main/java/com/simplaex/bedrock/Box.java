@@ -3,6 +3,8 @@ package com.simplaex.bedrock;
 import lombok.*;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.*;
 
@@ -13,7 +15,7 @@ import java.util.function.*;
  */
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public abstract class Box<T> implements Function0<T>, Consumer<T> {
+public abstract class Box<T> implements Function0<T>, Consumer<T>, ExtendedIterable<T> {
 
   interface NumberBox {
 
@@ -21,6 +23,12 @@ public abstract class Box<T> implements Function0<T>, Consumer<T> {
 
     void dec();
 
+  }
+
+  @Nonnull
+  @Override
+  public Iterator<T> iterator() {
+    return Collections.singleton(get()).iterator();
   }
 
   public T apply(@Nonnull final Function<T, T> function) {

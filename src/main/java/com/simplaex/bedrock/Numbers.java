@@ -73,4 +73,31 @@ public class Numbers {
     return value -> Math.abs(expected - value) < error;
   }
 
+  public static int byteToInt(final byte b) {
+    return b & 0xFF;
+  }
+
+  public static long longFromBytes(
+    final byte b0, final byte b1, final byte b2, final byte b3,
+    final byte b4, final byte b5, final byte b6, final byte b7
+  ) {
+    long value = 0L;
+    value |= byteToInt(b0);
+    value <<= 8;
+    value |= byteToInt(b1);
+    value <<= 8;
+    value |= byteToInt(b2);
+    value <<= 8;
+    value |= byteToInt(b3);
+    value <<= 8;
+    value |= byteToInt(b4);
+    value <<= 8;
+    value |= byteToInt(b5);
+    value <<= 8;
+    value |= byteToInt(b6);
+    value <<= 8;
+    value |= byteToInt(b7);
+    return value;
+  }
+
 }

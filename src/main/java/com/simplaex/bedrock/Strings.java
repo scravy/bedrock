@@ -6,6 +6,7 @@ import lombok.Value;
 import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -76,7 +77,7 @@ public class Strings {
 
     final ArrayMap<String, String> valuesMap = ArrayMap.of(values);
     final String regex = valuesMap.keys().stream().map(Pattern::quote).collect(Collectors.joining("|"));
-    final Template template = template(regex, Function.identity(), string);
+    final Template template = template(regex, string);
     return template.apply(valuesMap);
   }
 
@@ -176,6 +177,14 @@ public class Strings {
         consumer.accept(c1);
       }
     }
+  }
+
+  public static boolean isNullOrEmpty(@Nullable final String string) {
+    return string == null || string.isEmpty();
+  }
+
+  public static boolean isNonEmpty(@Nullable final String string) {
+    return string != null && !string.isEmpty();
   }
 
   @FunctionalInterface

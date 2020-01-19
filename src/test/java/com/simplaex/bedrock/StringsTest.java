@@ -76,6 +76,46 @@ public class StringsTest {
         });
       });
     });
+    describe("replace", () -> {
+      it("should replace values", () -> {
+        expect(Strings.replace("abba", pair("a", "bb"), pair("bb", "a")))
+          .toEqual("bbabb");
+      });
+    });
+    describe("isNullOrEmpty", () -> {
+      it("should check null", () -> {
+        //noinspection ConstantConditions
+        expect(Strings.isNullOrEmpty(null)).toBeTrue();
+      });
+      it("should check the empty string", () -> {
+        expect(Strings.isNullOrEmpty("")).toBeTrue();
+      });
+      it("should check all else", () -> {
+        expect(Strings.isNullOrEmpty("x")).toBeFalse();
+      });
+    });
+    describe("isNonEmpty", () -> {
+      it("should check null", () -> {
+        //noinspection ConstantConditions
+        expect(Strings.isNonEmpty(null)).toBeFalse();
+      });
+      it("should check the empty string", () -> {
+        expect(Strings.isNonEmpty("")).toBeFalse();
+      });
+      it("should check all else", () -> {
+        expect(Strings.isNonEmpty("x")).toBeTrue();
+      });
+    });
+    describe("forEachCodePointWithIndex", () -> {
+      it("should iterate emojis", () -> {
+        final Seq<Pair<Integer, Integer>> expectedResult = Seq.of(pair(1, 0x1F308), pair(3, 0x1F929));
+        final SeqBuilder<Pair<Integer, Integer>> resultBuilder = Seq.builder();
+        Strings.forEachCodepointWithIndex("\uD83C\uDF08\uD83E\uDD29", (cp, index) -> {
+          resultBuilder.add(pair(cp, index));
+        });
+        expect(resultBuilder.result()).toEqual(expectedResult);
+      });
+    });
   }
 
 }

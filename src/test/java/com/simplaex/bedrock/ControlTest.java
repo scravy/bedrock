@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -459,6 +460,29 @@ public class ControlTest {
           box.update(Operators.plus(i));
         });
         expect(box.getValue()).toEqual(6);
+      });
+    });
+    describe("findFirstNonNull", () -> {
+      it("should findFirstNonNull", () -> {
+        final Box.IntBox counter = Box.intBox(0);
+        final Optional<String> result = Control.findFirstNonNull(
+          "key",
+          k -> {
+            counter.inc();
+            return null;
+          },
+          k -> {
+            counter.inc();
+            return "bar";
+          },
+          k -> {
+            counter.inc();
+            return "qux";
+          }
+        );
+        expect(counter.getValue()).toEqual(2);
+        expect(result.isPresent()).toBeTrue();
+        expect(result.get()).toEqual("bar");
       });
     });
   }
