@@ -2,8 +2,11 @@ package com.simplaex.bedrock;
 
 import lombok.experimental.UtilityClass;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Objects;
 import java.util.function.DoublePredicate;
 
 @UtilityClass
@@ -77,6 +80,35 @@ public class Numbers {
     return b & 0xFF;
   }
 
+  public static int intFromBytes(
+    final byte b0, final byte b1, final byte b2, final byte b3
+  ) {
+    int value = 0;
+    value |= byteToInt(b0);
+    value <<= 8;
+    value |= byteToInt(b1);
+    value <<= 8;
+    value |= byteToInt(b2);
+    value <<= 8;
+    value |= byteToInt(b3);
+    return value;
+  }
+
+  public static int intFromByteArray(
+    @Nonnull final byte[] bytes
+  ) {
+    Objects.requireNonNull(bytes, "'bytes' must not be null.");
+    return intFromByteArrayAtOffset(0, bytes);
+  }
+
+  public static int intFromByteArrayAtOffset(
+    @Nonnegative final int offset,
+    @Nonnull final byte[] bytes
+  ) {
+    Objects.requireNonNull(bytes, "'bytes' must not be null.");
+    return intFromBytes(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]);
+  }
+
   public static long longFromBytes(
     final byte b0, final byte b1, final byte b2, final byte b3,
     final byte b4, final byte b5, final byte b6, final byte b7
@@ -98,6 +130,24 @@ public class Numbers {
     value <<= 8;
     value |= byteToInt(b7);
     return value;
+  }
+
+  public static long longFromByteArray(
+    @Nonnull final byte[] bytes
+  ) {
+    Objects.requireNonNull(bytes, "'bytes' must not be null.");
+    return longFromByteArrayAtOffset(0, bytes);
+  }
+
+  public static long longFromByteArrayAtOffset(
+    @Nonnegative final int offset,
+    @Nonnull final byte[] bytes
+  ) {
+    Objects.requireNonNull(bytes, "'bytes' must not be null.");
+    return longFromBytes(
+      bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3],
+      bytes[offset + 4], bytes[offset + 5], bytes[offset + 6], bytes[offset + 7]
+    );
   }
 
 }

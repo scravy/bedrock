@@ -21,16 +21,19 @@ public class Strings {
   public static abstract class Template implements Function<Function<String, String>, String> {
 
     @SafeVarargs
-    public final String substitute(final @Nonnull Pair<String, String>... values) {
+    @Nonnull
+    public final String substitute(@Nonnull final Pair<String, String>... values) {
       return apply(ArrayMap.of(values));
     }
 
     @Override
-    public abstract String apply(final @Nonnull Function<String, String> values);
+    @Nonnull
+    public abstract String apply(@Nonnull final Function<String, String> values);
 
   }
 
-  public static String capitalize(final String string) {
+  @Nonnull
+  public static String capitalize(@Nonnull final String string) {
     final StringBuilder stringBuilder = new StringBuilder();
     Strings.forEachCodepointWithIndex(string, (index, codepoint) -> {
       if (index == 0) {
@@ -42,7 +45,8 @@ public class Strings {
     return stringBuilder.toString();
   }
 
-  public static String capitalizeFirstCharacter(final String string) {
+  @Nonnull
+  public static String capitalizeFirstCharacter(@Nonnull final String string) {
     final StringBuilder stringBuilder = new StringBuilder();
     Strings.forEachCodepointWithIndex(string, (index, codepoint) -> {
       if (index == 0) {
@@ -54,6 +58,7 @@ public class Strings {
     return stringBuilder.toString();
   }
 
+  @Nonnull
   public static Seq<String> explode(
     final @Nonnull String string,
     final @Nonnull String delimiter) {
@@ -68,6 +73,7 @@ public class Strings {
   }
 
   @SafeVarargs
+  @Nonnull
   public static String replace(
     final @Nonnull String string,
     final @Nonnull Pair<String, String>... values) {
@@ -81,6 +87,7 @@ public class Strings {
     return template.apply(valuesMap);
   }
 
+  @Nonnull
   public static Template template(
     final @Nonnull String variableBeginDelimiter,
     final @Nonnull String variableEndDelimiter,
@@ -193,7 +200,7 @@ public class Strings {
     void accept(int a, int b);
 
     @Override
-    default void accept(final Integer a, final Integer b) {
+    default void accept(@Nonnull final Integer a, @Nonnull final Integer b) {
       accept(a.intValue(), b.intValue());
     }
   }
@@ -220,31 +227,38 @@ public class Strings {
     }
   }
 
-  public static String toUpperCamelCase(final String string) {
+  @Nonnull
+  public static String toUpperCamelCase(@Nonnull final String string) {
     return parseName(string).renderUpperCamelCase();
   }
 
-  public static String toLowerCamelCase(final String string) {
+  @Nonnull
+  public static String toLowerCamelCase(@Nonnull final String string) {
     return parseName(string).renderLowerCamelCase();
   }
 
-  public static String toLowerKebapCase(final String string) {
+  @Nonnull
+  public static String toLowerKebapCase(@Nonnull final String string) {
     return parseName(string).renderLowerKebapCase();
   }
 
-  public static String toKebapCamelCase(final String string) {
+  @Nonnull
+  public static String toKebapCamelCase(@Nonnull final String string) {
     return parseName(string).renderKebapCamelCase();
   }
 
-  public static String toUpperSnakeCase(final String string) {
+  @Nonnull
+  public static String toUpperSnakeCase(@Nonnull final String string) {
     return parseName(string).renderUpperSnakeCase();
   }
 
-  public static String toLowerSnakeCase(final String string) {
+  @Nonnull
+  public static String toLowerSnakeCase(@Nonnull final String string) {
     return parseName(string).renderLowerSnakeCase();
   }
 
-  public static Name parseName(final String name) {
+  @Nonnull
+  public static Name parseName(@Nonnull final String name) {
     final Seq<String> components;
     final StringBuilder componentBuilder = new StringBuilder();
     final SeqBuilder<String> nameBuilder = Seq.builder();
@@ -295,6 +309,7 @@ public class Strings {
 
     private Seq<String> components;
 
+    @Nonnull
     public String renderLowerCamelCase() {
       final StringBuilder stringBuilder = new StringBuilder();
       components.forEachWithIndex((index, component) -> {
@@ -307,12 +322,14 @@ public class Strings {
       return stringBuilder.toString();
     }
 
+    @Nonnull
     public String renderUpperCamelCase() {
       final StringBuilder stringBuilder = new StringBuilder();
       components.forEach(component -> stringBuilder.append(Strings.capitalize(component)));
       return stringBuilder.toString();
     }
 
+    @Nonnull
     public String renderUpperSnakeCase() {
       final StringBuilder stringBuilder = new StringBuilder();
       components.forEachWithIndex((index, component) -> {
@@ -324,6 +341,7 @@ public class Strings {
       return stringBuilder.toString();
     }
 
+    @Nonnull
     public String renderLowerSnakeCase() {
       final StringBuilder stringBuilder = new StringBuilder();
       components.forEachWithIndex((index, component) -> {
@@ -335,6 +353,7 @@ public class Strings {
       return stringBuilder.toString();
     }
 
+    @Nonnull
     public String renderKebapCamelCase() {
       final StringBuilder stringBuilder = new StringBuilder();
       components.forEachWithIndex((index, component) -> {
@@ -346,6 +365,7 @@ public class Strings {
       return stringBuilder.toString();
     }
 
+    @Nonnull
     public String renderLowerKebapCase() {
       final StringBuilder stringBuilder = new StringBuilder();
       components.forEachWithIndex((index, component) -> {

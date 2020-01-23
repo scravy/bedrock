@@ -62,7 +62,7 @@ public final class Set<E extends Comparable<? super E>> implements
   }
 
   @Override
-  public E draw(final Random random) throws NoSuchElementException {
+  public E draw(@Nonnull final Random random) throws NoSuchElementException {
     if (underlying == null) {
       throw new NoSuchElementException("drawing from an empty set");
     }

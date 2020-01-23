@@ -11,7 +11,7 @@
   <description>Essential utilities for modern Java.</description>
   <url>https://github.com/simplaex/bedrock</url>
 
-  <version>2020.01.19</version>
+  <version>2020.01.23</version>
   <packaging>jar</packaging>
 
   <properties>
