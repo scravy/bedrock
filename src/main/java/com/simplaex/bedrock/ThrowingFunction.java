@@ -3,7 +3,7 @@ package com.simplaex.bedrock;
 import java.util.function.Function;
 
 @FunctionalInterface
-public interface ThrowingFunction<A, R> extends Function<A, R> {
+public interface ThrowingFunction<A, R> extends Function1<A, R> {
 
   R execute(final A a) throws Exception;
 

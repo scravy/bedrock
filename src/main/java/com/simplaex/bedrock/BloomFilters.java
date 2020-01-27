@@ -5,8 +5,11 @@ import lombok.experimental.UtilityClass;
 /**
  * Utility for calculating the size of and false positives probabilities for
  * bloom filters as in googles guava library.
+ *
+ * @deprecated This item is too specific for this library.
  */
 @UtilityClass
+@Deprecated
 public final class BloomFilters {
 
   private static final double Log2Square = Math.log(2) * Math.log(2);

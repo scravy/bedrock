@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Value
+@Unstable
 public class Context {
 
   private final static ThreadLocal<Context> currentcontext = ThreadLocal.withInitial(() -> null);
@@ -15,11 +16,7 @@ public class Context {
   private final ArrayMap<String, Object> bindings;
 
   public static Object get(final String id) {
-    final Context current = currentcontext.get();
-    if (current != null) {
-      return current.apply(id);
-    }
-    return null;
+    return getInstance().apply(id);
   }
 
   @Nonnull
@@ -64,20 +61,6 @@ public class Context {
     return null;
   }
 
-  @Nonnull
-  public Context with(@Nonnull final ArrayMap<String, Object> mappings) {
-    Objects.requireNonNull(mappings);
-    if (mappings.isEmpty()) {
-      return this;
-    }
-    return new Context(this, mappings);
-  }
-
-  @SafeVarargs
-  public final Context withArgs(@Nonnull final Pair<String, Object>... mappings) {
-    return with(ArrayMap.of(mappings));
-  }
-
   public static void withContext(final ArrayMap<String, Object> mappings, final ThrowingRunnable f) {
     final Context context = currentcontext.get();
     currentcontext.set(new Context(context, mappings));
@@ -91,7 +74,7 @@ public class Context {
   public static Context getInstance() {
     final Context context = currentcontext.get();
     if (context == null) {
-      currentcontext.set(new Context(null, ArrayMap.empty()));
+      throw new IllegalStateException("no context set currently");
     }
     return currentcontext.get();
   }

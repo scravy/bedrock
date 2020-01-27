@@ -3,6 +3,7 @@ package com.simplaex.bedrock;
 import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -13,11 +14,20 @@ public class ForEach {
 
   static <A> void forEach(
     @Nonnull final Iterable<A> seq,
-    @Nonnull final Consumer<A> consumer
+    @Nonnull final Consumer<? super A> consumer
   ) {
     Objects.requireNonNull(seq);
     Objects.requireNonNull(consumer);
     seq.forEach(consumer);
+  }
+
+  static <A> void forEach(
+    @Nonnull final Iterator<A> seq,
+    @Nonnull final Consumer<? super A> consumer
+  ) {
+    Objects.requireNonNull(seq);
+    Objects.requireNonNull(consumer);
+    seq.forEachRemaining(consumer);
   }
 
   static <A, B> void forEach(

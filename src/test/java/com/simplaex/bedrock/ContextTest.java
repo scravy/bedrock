@@ -32,6 +32,10 @@ public class ContextTest {
           expect(Context.get("bar")).toEqual("no");
         });
       });
+      it("should throw if there is no context currently", () -> {
+        expect(() -> Context.get("something")).toThrow(IllegalStateException.class);
+        expect(Context::getInstance).toThrow(IllegalStateException.class);
+      });
     });
   }
 }

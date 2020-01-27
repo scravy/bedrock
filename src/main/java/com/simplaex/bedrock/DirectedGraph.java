@@ -16,7 +16,7 @@ public class DirectedGraph<V> extends SimpleDirectedGraph {
   private final Object[] vertices;
   private final Map<V, Integer> verticesToIndicesMap;
 
-  DirectedGraph(
+  private DirectedGraph(
     final Object[] vertices,
     final Map<V, Integer> verticesToIndicesMap,
     final int numberOfEdges,

@@ -1,7 +1,7 @@
 package com.simplaex.bedrock;
 
 @FunctionalInterface
-public interface ExtendedIterable<T> extends Iterable<T> {
+public interface ExtendedIterable<T> extends Iterable<T>, HasLengthAtLeast {
 
   @FunctionalInterface
   interface ForEachWithIndexConsumer<T> {
@@ -17,6 +17,18 @@ public interface ExtendedIterable<T> extends Iterable<T> {
         i += 1;
       }
     }
+  }
+
+  @Override
+  default boolean lengthAtLeast(final int length) {
+    int count = 0;
+    for (final T ignore : this) {
+      count += 1;
+      if (count >= length) {
+        return true;
+      }
+    }
+    return false;
   }
 
   static <T> ExtendedIterable<T> fromIterable(final Iterable<T> iterable) {
