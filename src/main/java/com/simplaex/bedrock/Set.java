@@ -208,23 +208,23 @@ public final class Set<E extends Comparable<? super E>> implements
 
   @SafeVarargs
   @Nonnull
-  public static <E extends Comparable<? super E>> Set<E> of(final E... elements) {
+  public static <E extends Comparable<? super E>> Set<E> of(@Nonnull final E... elements) {
     return ofSeqInternal(Seq.ofArray(elements));
   }
 
   @SafeVarargs
   @Nonnull
-  public static <E extends Comparable<? super E>> Set<E> set(final E... elements) {
+  public static <E extends Comparable<? super E>> Set<E> set(@Nonnull final E... elements) {
     return ofSeqInternal(Seq.ofArray(elements));
   }
 
   @Nonnull
-  public static <E extends Comparable<? super E>> Set<E> ofSeq(final Seq<E> elements) {
+  public static <E extends Comparable<? super E>> Set<E> ofSeq(@Nonnull final Seq<E> elements) {
     return ofSeqInternal(elements.distinct());
   }
 
   @Nonnull
-  public static <E extends Comparable<? super E>> Set<E> ofIterable(final Iterable<E> elements) {
+  public static <E extends Comparable<? super E>> Set<E> ofIterable(@Nonnull final Iterable<E> elements) {
     if (elements instanceof Collection) {
       return ofCollection((Collection<E>) elements);
     }
@@ -232,7 +232,14 @@ public final class Set<E extends Comparable<? super E>> implements
   }
 
   @Nonnull
-  public static <E extends Comparable<? super E>> Set<E> ofCollection(final Collection<E> elements) {
+  public static <E extends Comparable<? super E>> Set<E> ofIterator(@Nonnull final Iterator<E> elements) {
+    final SetBuilder<E> b = builder();
+    elements.forEachRemaining(b::add);
+    return b.result();
+  }
+
+  @Nonnull
+  public static <E extends Comparable<? super E>> Set<E> ofCollection(@Nonnull final Collection<E> elements) {
     if (elements.isEmpty()) {
       return empty();
     }
@@ -243,7 +250,7 @@ public final class Set<E extends Comparable<? super E>> implements
   }
 
   @Nonnull
-  public static <E extends Comparable<? super E>> Set<E> ofSortedSet(final SortedSet<E> elements) {
+  public static <E extends Comparable<? super E>> Set<E> ofSortedSet(@Nonnull final SortedSet<E> elements) {
     return ofSeqInternal(new SeqSimpleSorted<E>(elements.toArray()));
   }
 

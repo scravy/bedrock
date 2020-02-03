@@ -4,6 +4,8 @@ import com.greghaskins.spectrum.Spectrum;
 import lombok.Data;
 import org.junit.runner.RunWith;
 
+import java.time.Duration;
+
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
@@ -18,6 +20,7 @@ public class EnvironmentVariablesTest {
     private String host = "localhost";
     private int port;
     private Double factor = null;
+    private Duration duration = Duration.ofSeconds(10);
   }
 
   {
@@ -26,12 +29,14 @@ public class EnvironmentVariablesTest {
         EnvironmentVariables.ENVIRONMENT_VARIABLE_RETRIEVER = key -> ArrayMap.of(
           pair("HOST", "example.org"),
           pair("PORT", "8080"),
-          pair("FACTOR", "0.0")
+          pair("FACTOR", "0.0"),
+          pair("DURATION", "PT7H")
         ).getOrElse(key, null);
         final Config config = EnvironmentVariables.read(Config.class);
         expect(config.getHost()).toEqual("example.org");
         expect(config.getPort()).toEqual(8080);
         expect(config.getSchema()).toEqual("someschema");
+        expect(config.getDuration()).toEqual(Duration.ofHours(7));
       });
     });
   }

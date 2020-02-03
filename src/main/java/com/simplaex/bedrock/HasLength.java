@@ -9,6 +9,6 @@ public interface HasLength extends HasLengthAtLeast {
 
   @Override
   default boolean lengthAtLeast(@Nonnegative final int length) {
-    return length() >= length;
+    return length() <= length;
   }
 }

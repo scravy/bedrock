@@ -61,6 +61,12 @@ public class BoxTest {
         expect(b.get()).toEqual(15.0);
       });
     });
+    describe("Box", () -> {
+      it("contains", () -> {
+        expect(Box.box("string").contains("string")).toBeTrue();
+        expect(Box.box("string").contains("String")).toBeFalse();
+      });
+    });
   }
 
 }

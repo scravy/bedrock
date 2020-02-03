@@ -27,7 +27,7 @@ public class Cons<E> implements Container<E> {
     @Override
     @Nonnull
     public Cons<E> tail() {
-      return this;
+      throw new NoSuchElementException("invoked tail() on en empty() cons");
     }
 
     @Override
