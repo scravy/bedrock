@@ -48,6 +48,32 @@ public class CallbackTest {
         expect(e.contains(t.exc)).toBeTrue();
         expect(r.contains(null)).toBeTrue();
       });
+      it("after", () -> {
+        final Thing t = new Thing();
+        t.result = "foo";
+        final Box<String> r = Box.box();
+        final Box<Object> e = Box.box();
+        final Callback<String> c = callbackFactory.apply(t, r, e);
+        final Box<String> track = Box.box();
+        t.process(c.after(something -> {
+          track.accept(something);
+          return something + "!";
+        }));
+        expect(track.get()).toEqual("foo");
+        expect(r.get()).toEqual("foo!");
+      });
+      it("after (throwing exception)", () -> {
+        final Thing t = new Thing();
+        t.result = "foo";
+        final Box<String> r = Box.box();
+        final Box<Object> e = Box.box();
+        final Callback<String> c = callbackFactory.apply(t, r, e);
+        final Box<String> track = Box.box();
+        t.process(c.after(something -> {
+          throw new RuntimeException();
+        }));
+        expect(e.get().getClass()).toEqual(RuntimeException.class);
+      });
     });
   }
 

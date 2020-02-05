@@ -11,7 +11,7 @@ import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
 
-@SuppressWarnings("ClassInitializerMayBeStatic")
+@SuppressWarnings({"ClassInitializerMayBeStatic", "CodeBlock2Expr"})
 @RunWith(Spectrum.class)
 public class QuadrupleTest {
 
@@ -29,6 +29,7 @@ public class QuadrupleTest {
           Quadruple.of(1, 1, 0, 0),
           Quadruple.of(1, 0, 1, 0),
           Quadruple.of(0, 1, 0, 1),
+          Quadruple.of(null, null, null, null),
           Quadruple.of(1, 0, 0, 1),
           Quadruple.of(0, 0, -1, 0),
           Quadruple.of(0, -1, 0, 0),
@@ -42,6 +43,7 @@ public class QuadrupleTest {
         ).sorted();
 
         val expected = Seq.of(
+          Quadruple.of(null, null, null, null),
           Quadruple.of(-1, -1, 0, 0),
           Quadruple.of(-1, 0, -1, 0),
           Quadruple.of(-1, 0, 0, -1),
@@ -161,6 +163,10 @@ public class QuadrupleTest {
       it("should create a list of the given object", () -> {
         expect(xs).toEqual(Arrays.<Object>asList(1, 2.0, 1L, 2f));
         expect(ns).toEqual(Arrays.<Number>asList(1, 2.0, 1L, 2f));
+      });
+      it("should throw when trying to access an element outside the range", () -> {
+        //noinspection ResultOfMethodCallIgnored
+        expect(() -> q.toList().get(4)).toThrow(IndexOutOfBoundsException.class);
       });
     });
   }

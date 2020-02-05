@@ -16,6 +16,13 @@ public class ConversionsTest {
         expect(Conversions.fromTo(Integer.class, String.class).apply(7)).toEqual("7");
         expect(Conversions.fromTo(String.class, Integer.class).apply("7")).toEqual(7);
       });
+      it("should simply return the same thing when no conversion is actually requested", () -> {
+        final Integer i = 1337;
+        //noinspection NumberEquality
+        expect(Conversions.fromTo(Integer.class, Integer.class).apply(i) == i).toBeTrue();
+        //noinspection NumberEquality
+        expect(Conversions.fromTo(Integer.class, int.class).apply(i) == i).toBeTrue();
+      });
     });
   }
 

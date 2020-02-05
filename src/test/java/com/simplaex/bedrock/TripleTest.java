@@ -11,7 +11,7 @@ import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
 
-@SuppressWarnings("ClassInitializerMayBeStatic")
+@SuppressWarnings({"ClassInitializerMayBeStatic", "CodeBlock2Expr"})
 @RunWith(Spectrum.class)
 public class TripleTest {
 
@@ -27,6 +27,7 @@ public class TripleTest {
           Triple.of(0, 0, 1),
           Triple.of(0, 1, 1),
           Triple.of(1, 1, 0),
+          Triple.of(null, null, null),
           Triple.of(1, 0, 1),
           Triple.of(0, 1, 0),
           Triple.of(1, 0, 0),
@@ -40,8 +41,9 @@ public class TripleTest {
           Triple.of(0, -1, 0),
           Triple.of(-1, 0, 0)
         ).sorted();
-        
+
         val expected = Seq.of(
+          Triple.of(null, null, null),
           Triple.of(-1, -1, 0),
           Triple.of(-1, 0, -1),
           Triple.of(-1, 0, 0),
@@ -141,6 +143,11 @@ public class TripleTest {
         expect(Triple.of(1, 2, 3).mapThird(x -> "three"))
           .toEqual(Triple.of(1, 2, "three"));
       });
+      it("should apply the mapping function on each component", () -> {
+        final Integer v = 7;
+        expect(Triple.of(1, 2, 3).map(Operators.plus(v), Operators.times(v), Operators.minus(v)))
+          .toEqual(Triple.of(8, 14, -4));
+      });
     });
     describe("toList", () -> {
       final Triple<Integer, Double, Long> q = Triple.of(1, 2.0, 1L);
@@ -153,6 +160,10 @@ public class TripleTest {
       it("should create a list of the given object", () -> {
         expect(xs).toEqual(Arrays.<Object>asList(1, 2.0, 1L));
         expect(ns).toEqual(Arrays.<Number>asList(1, 2.0, 1L));
+      });
+      it("should throw when trying to access an element outside the range", () -> {
+        //noinspection ResultOfMethodCallIgnored
+        expect(() -> q.toList().get(3)).toThrow(IndexOutOfBoundsException.class);
       });
     });
   }

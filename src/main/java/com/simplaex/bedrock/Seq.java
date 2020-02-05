@@ -114,7 +114,7 @@ public abstract class Seq<E> implements
     final int len = length();
     for (int i = 0; i < len; i += 1) {
       final E el = get(i);
-      if (el == e || el != null && el.equals(e)) {
+      if (Objects.equals(el, e)) {
         return i;
       }
     }
@@ -635,10 +635,10 @@ public abstract class Seq<E> implements
     }
     final Iterator<E> thisIterator = iterator();
     final Iterator<E> thatIterator = thatSeq.iterator();
-    while (thisIterator.hasNext() && thatIterator.hasNext()) {
+    for (int i = 0; i < len; i += 1) {
       final E thisElement = thisIterator.next();
       final E thatElement = thatIterator.next();
-      if (!(thisElement == thatElement || thisElement != null && thisElement.equals(thatElement))) {
+      if (!Objects.equals(thisElement, thatElement)) {
         return false;
       }
     }

@@ -3,6 +3,8 @@ package com.simplaex.bedrock;
 import com.greghaskins.spectrum.Spectrum;
 import org.junit.runner.RunWith;
 
+import java.util.Optional;
+
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
@@ -35,6 +37,19 @@ public class ContextTest {
       it("should throw if there is no context currently", () -> {
         expect(() -> Context.get("something")).toThrow(IllegalStateException.class);
         expect(Context::getInstance).toThrow(IllegalStateException.class);
+      });
+      it("should return null if context does not have key", () -> {
+        Context.withContext(ArrayMap.empty(), () -> expect(Context.get("something")).toBeNull());
+      });
+      it("should return object iff class matches", () -> {
+        Context.withContext(ArrayMap.of(pair("foo", 3)), () -> {
+          expect(Context.get("foo", Integer.class)).toEqual(3);
+          expect(() -> Context.get("foo", Long.class)).toThrow(IllegalArgumentException.class);
+          expect(() -> Context.get("bar", Long.class)).toThrow(IllegalStateException.class);
+          expect(Context.getOptionally("foo", Integer.class)).toEqual(Optional.of(3));
+          expect(Context.getOptionally("foo", Long.class)).toEqual(Optional.empty());
+          expect(Context.getOptionally("bar", Long.class)).toEqual(Optional.empty());
+        });
       });
     });
   }

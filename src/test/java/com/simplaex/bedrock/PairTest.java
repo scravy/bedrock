@@ -96,5 +96,23 @@ public class PairTest {
         expect(Pair.of(1, 1.2).toList().size()).toEqual(2);
       });
     });
+    describe("swapped", () -> {
+      it("should swap", () -> {
+        expect(Pair.of(1, 2).swapped()).toEqual(Pair.of(2, 1));
+      });
+    });
+    describe("Withers", () -> {
+      it("withFirst", () -> {
+        expect(Pair.of(1, 2).withFirst(0)).toEqual(Pair.of(0, 2));
+      });
+      it("withSecond", () -> {
+        expect(Pair.of(1, 2).withSecond(0)).toEqual(Pair.of(1, 0));
+      });
+    });
+    describe("map", () -> {
+      it("should apply mapping function on each", () -> {
+        expect(Pair.of(1, 2).map(Operators.plus((Integer) 7), Operators.plus((Integer) 12))).toEqual(Pair.of(8, 14));
+      });
+    });
   }
 }

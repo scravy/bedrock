@@ -83,7 +83,8 @@ public class Cons<E> implements Container<E> {
 
   @Override
   public boolean isEmpty() {
-    return tail == null;
+    // this is correct by construction
+    return false;
   }
 
   @AllArgsConstructor

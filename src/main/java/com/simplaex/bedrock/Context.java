@@ -35,7 +35,7 @@ public class Context {
   }
 
   @Nonnull
-  public static <T> T get(@Nonnull final String id, @Nonnull final Class<T> clazz) {
+  public static <T> T get(@Nonnull final String id, @Nonnull final Class<T> clazz) throws IllegalStateException {
     Objects.requireNonNull(id);
     Objects.requireNonNull(clazz);
     final Object obj = get(id);
@@ -71,7 +71,8 @@ public class Context {
     }
   }
 
-  public static Context getInstance() {
+  @Nonnull
+  public static Context getInstance() throws IllegalStateException {
     final Context context = currentcontext.get();
     if (context == null) {
       throw new IllegalStateException("no context set currently");

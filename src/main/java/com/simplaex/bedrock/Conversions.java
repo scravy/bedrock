@@ -19,8 +19,8 @@ public class Conversions {
     if (value == null) {
       return null;
     }
-    if (to.isAssignableFrom(value.getClass())) {
-      @SuppressWarnings("unchecked") final To toCasted = (To) to;
+    if (Reflections.getBoxedClassFor(to).isAssignableFrom(Reflections.getBoxedClassFor(value.getClass()))) {
+      @SuppressWarnings("unchecked") final To toCasted = (To) value;
       return toCasted;
     }
     final Optional<To> attempt1 = Reflections.getFactory(from, to).flatMap(factory ->

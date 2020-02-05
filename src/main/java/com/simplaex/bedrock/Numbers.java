@@ -13,6 +13,7 @@ import java.util.function.DoublePredicate;
 public class Numbers {
 
   @SuppressWarnings("unchecked")
+  @Nonnull
   public static <N extends Number> N zero(final Class<N> numberClass) {
     final Class<?> clazz = Reflections.getBoxedClassFor(numberClass);
     if (Integer.class.equals(clazz)) {
@@ -39,10 +40,25 @@ public class Numbers {
     if (BigDecimal.class.equals(clazz)) {
       return (N) BigDecimal.ZERO;
     }
-    return null;
+    return Control.findFirstNonNull(
+      clazz,
+      c -> Reflections
+        .getFactory(String.class, c)
+        .map(factory -> (N) factory.apply("0"))
+        .orElse(null),
+      c -> Reflections
+        .getFactory(int.class, c)
+        .map(factory -> (N) factory.apply(0))
+        .orElse(null),
+      c -> Reflections
+        .getFactory(long.class, c)
+        .map(factory -> (N) factory.apply(0L))
+        .orElse(null)
+    ).orElseThrow(() -> new IllegalArgumentException(Objects.toString(clazz)));
   }
 
   @SuppressWarnings("unchecked")
+  @Nonnull
   public static <N extends Number> N one(final Class<N> numberClass) {
     final Class<?> clazz = Reflections.getBoxedClassFor(numberClass);
     if (Integer.class.equals(clazz)) {
@@ -69,7 +85,21 @@ public class Numbers {
     if (BigDecimal.class.equals(clazz)) {
       return (N) BigDecimal.ONE;
     }
-    return null;
+    return Control.findFirstNonNull(
+      clazz,
+      c -> Reflections
+        .getFactory(String.class, c)
+        .map(factory -> (N) factory.apply("1"))
+        .orElse(null),
+      c -> Reflections
+        .getFactory(int.class, c)
+        .map(factory -> (N) factory.apply(1))
+        .orElse(null),
+      c -> Reflections
+        .getFactory(long.class, c)
+        .map(factory -> (N) factory.apply(1L))
+        .orElse(null)
+    ).orElseThrow(() -> new IllegalArgumentException(Objects.toString(clazz)));
   }
 
   public static DoublePredicate isApproximately(final double expected, final double error) {

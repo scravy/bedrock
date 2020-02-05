@@ -6,8 +6,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.*;
-import java.util.stream.Collector;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @EqualsAndHashCode
 @Immutable
@@ -121,7 +121,7 @@ public final class Set<E extends Comparable<? super E>> implements
   }
 
   public <F extends Comparable<? super F>> Set<F> transform(final Function<E, F> f) {
-    return stream().map(f).collect(collector());
+    return stream().map(f).collect(builder());
   }
 
   public E maximum() {
@@ -278,39 +278,6 @@ public final class Set<E extends Comparable<? super E>> implements
   @Override
   public String toString() {
     return underlying == null ? "∅" : ('{' + underlying.asString(", ") + '}');
-  }
-
-  public static <T extends Comparable<? super T>> Collector<T, TreeSet<T>, Set<T>> collector() {
-    return new Collector<T, TreeSet<T>, Set<T>>() {
-
-      @Override
-      public Supplier<TreeSet<T>> supplier() {
-        return TreeSet::new;
-      }
-
-      @Override
-      public BiConsumer<TreeSet<T>, T> accumulator() {
-        return TreeSet::add;
-      }
-
-      @Override
-      public BinaryOperator<TreeSet<T>> combiner() {
-        return (left, right) -> {
-          left.addAll(right);
-          return left;
-        };
-      }
-
-      @Override
-      public Function<TreeSet<T>, Set<T>> finisher() {
-        return Set::ofCollection;
-      }
-
-      @Override
-      public java.util.Set<Characteristics> characteristics() {
-        return Collections.emptySet();
-      }
-    };
   }
 
 }

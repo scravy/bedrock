@@ -154,6 +154,14 @@ public class SeqGeneratedTest {
         expect(Seq.wrap(new Boolean[]{false, true, false, false})).toEqual(Seq.of(false, true, false, false));
       });
     });
+    describe("get", () -> {
+      it("should throw an IndexOutOfBoundsException when provided with a negative index", () -> {
+        expect(() -> Seq.ofGenerator(x -> x, 3).get(-1)).toThrow(IndexOutOfBoundsException.class);
+      });
+      it("should throw an IndexOutOfBoundsException when provided with an index >= length", () -> {
+        expect(() -> Seq.ofGenerator(x -> x, 3).get(3)).toThrow(IndexOutOfBoundsException.class);
+      });
+    });
   }
 
 }

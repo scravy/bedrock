@@ -92,7 +92,7 @@ public class Quadruple<A, B, C, D> implements Serializable, Comparable<Quadruple
           case 3:
             return tuple.getFourth();
           default:
-            return null;
+            throw new IndexOutOfBoundsException(Integer.toString(index));
         }
       }
 

@@ -165,11 +165,6 @@ public class Functions {
   }
 
   @Nonnull
-  public static IntUnaryOperator bindInt(@Nonnull final IntBinaryOperator f, final int a) {
-    return b -> f.applyAsInt(a, b);
-  }
-
-  @Nonnull
   public static LongUnaryOperator bindLong(@Nonnull final LongBinaryOperator f, final long a) {
     return b -> f.applyAsLong(a, b);
   }

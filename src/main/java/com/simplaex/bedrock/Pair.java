@@ -114,7 +114,7 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
           case 1:
             return pair.snd();
           default:
-            return null;
+            throw new IndexOutOfBoundsException(Integer.toString(index));
         }
       }
 

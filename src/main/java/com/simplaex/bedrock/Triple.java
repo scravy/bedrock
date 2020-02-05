@@ -75,7 +75,7 @@ public class Triple<A, B, C> implements Serializable, Comparable<Triple<A, B, C>
           case 2:
             return tuple.getThird();
           default:
-            return null;
+            throw new IndexOutOfBoundsException(Integer.toString(index));
         }
       }
 
