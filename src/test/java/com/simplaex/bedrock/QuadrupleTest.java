@@ -18,7 +18,6 @@ public class QuadrupleTest {
   {
     describe("Comparable", () -> {
       it("should be sortable", () -> {
-
         val sorted = Seq.of(
           Quadruple.of(0, 0, 0, 0),
           Quadruple.of(0, 0, 1, 0),
@@ -75,9 +74,13 @@ public class QuadrupleTest {
           Quadruple.of(0, 1, 0, 0),
           Quadruple.of(1, 0, 0, 0),
           Quadruple.of(0, 0, 1, 1),
+          Quadruple.of(null, null, null, null),
+          Quadruple.of(null, null, null, null),
+          Quadruple.of(null, null, null, 0),
           Quadruple.of(0, 1, 1, 0),
           Quadruple.of(1, 1, 0, 0),
           Quadruple.of(1, 0, 1, 0),
+          Quadruple.of(null, null, null, 0),
           Quadruple.of(0, 1, 0, 1),
           Quadruple.of(1, 0, 0, 1),
           Quadruple.of(0, 0, null, 0),
@@ -92,6 +95,10 @@ public class QuadrupleTest {
         ).sorted();
 
         val expected = Seq.of(
+          Quadruple.of(null, null, null, null),
+          Quadruple.of(null, null, null, null),
+          Quadruple.of(null, null, null, 0),
+          Quadruple.of(null, null, null, 0),
           Quadruple.of(null, null, 0, 0),
           Quadruple.of(null, 0, null, 0),
           Quadruple.of(null, 0, 0, null),
@@ -150,6 +157,11 @@ public class QuadrupleTest {
       it("mapFourth", () -> {
         expect(Quadruple.of(1, 2, 3, 4).mapFourth(x -> "four"))
           .toEqual(Quadruple.of(1, 2, 3, "four"));
+      });
+      it("should apply the mapping function on each component", () -> {
+        final Integer v = 7;
+        expect(Quadruple.of(1, 2, 3, 4).map(Operators.plus(v), Operators.times(v), Operators.minus(v), Operators.div((Integer) 2)))
+          .toEqual(Quadruple.of(8, 14, -4, 2));
       });
     });
     describe("toList", () -> {
