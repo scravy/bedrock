@@ -173,4 +173,9 @@ public class Functions {
   public static DoubleUnaryOperator bindDouble(@Nonnull final DoubleBinaryOperator f, final double a) {
     return b -> f.applyAsDouble(a, b);
   }
+
+  @Nonnull
+  public static <A, B, R> Function2<B, A, R> flip(@Nonnull final BiFunction<A, B, R> f) {
+    return (a, b) -> f.apply(b, a);
+  }
 }

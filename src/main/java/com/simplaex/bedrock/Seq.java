@@ -259,6 +259,13 @@ public abstract class Seq<E> implements
     return foldl(function, head());
   }
 
+  public <A> A foldl1f(
+    @Nonnull final BiFunction<? super A, ? super E, ? extends A> function,
+    @Nonnull final Function<? super E, ? extends A> startValueFunction
+  ) {
+    return tail().foldl(function, startValueFunction.apply(head()));
+  }
+
   public <A> A foldr(@Nonnull final BiFunction<? super E, ? super A, ? extends A> function, final A startValue) {
     Objects.requireNonNull(function, "'function' must not be null");
     A acc = startValue;
@@ -270,6 +277,14 @@ public abstract class Seq<E> implements
 
   public E foldr1(@Nonnull final BiFunction<? super E, ? super E, ? extends E> function) {
     return foldr(function, last());
+  }
+
+  public <A> A foldr1f(
+    @Nonnull final BiFunction<? super E, ? super A, ? extends A> function,
+    @Nonnull final Function<? super E, ? extends A> startValueFunction
+  ) {
+    Objects.requireNonNull(startValueFunction, "'startValueFunction' must not be null");
+    return initView().foldr(function, startValueFunction.apply(last()));
   }
 
   @Override
