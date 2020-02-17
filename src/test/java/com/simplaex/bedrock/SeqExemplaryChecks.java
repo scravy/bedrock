@@ -204,6 +204,7 @@ class SeqExemplaryChecks {
     final Consumer<Supplier<Seq<Seq<Integer>>>> initsChecks = f -> {
       it("should return all the inits", () -> {
         expect(f.get()).toEqual(Seq.of(
+          Seq.empty(),
           Seq.of(1),
           Seq.of(1, 2),
           Seq.of(1, 2, 2),
@@ -218,6 +219,7 @@ class SeqExemplaryChecks {
     final Consumer<Supplier<Seq<Seq<Integer>>>> tailsChecks = f -> {
       it("should return all the tails", () -> {
         expect(f.get()).toEqual(Seq.of(
+          Seq.empty(),
           Seq.of(3),
           Seq.of(4, 3),
           Seq.of(2, 4, 3),

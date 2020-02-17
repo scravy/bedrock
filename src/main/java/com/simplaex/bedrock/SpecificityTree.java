@@ -37,8 +37,8 @@ public class SpecificityTree<K extends HList<K>, V> extends AbstractMap<K, V> im
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder<L extends HList<L>> {
     public <T> Builder<C<T, L>> withDimension(
-      @SuppressWarnings("unused") @Nonnull final String name,
-      @SuppressWarnings("unused") @Nonnull final Class<T> clazz
+      @SuppressWarnings("unused") final String name,
+      @SuppressWarnings("unused") final Class<T> clazz
     ) {
       return new Builder<>();
     }

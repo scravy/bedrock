@@ -1,5 +1,7 @@
 package com.simplaex.bedrock;
 
+import com.simplaex.bedrock.hlist.HList;
+import com.simplaex.bedrock.hlist.Nil;
 import lombok.Value;
 
 import javax.annotation.Nonnull;
@@ -7,6 +9,7 @@ import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Value(staticConstructor = "of")
@@ -78,7 +81,10 @@ public class Quadruple<A, B, C, D> implements Serializable, Comparable<Quadruple
   }
 
   @Nonnull
-  public static <E, A extends E, B extends E, C extends E, D extends E> List<E> toList(final Quadruple<A, B, C, D> tuple) {
+  public static <E, A extends E, B extends E, C extends E, D extends E> List<E> toList(
+    @Nonnull final Tuple4<A, B, C, D> tuple
+  ) {
+    Objects.requireNonNull(tuple, "'tuple' must not be null");
     return new AbstractList<E>() {
       @Override
       public E get(final int index) {
@@ -104,18 +110,30 @@ public class Quadruple<A, B, C, D> implements Serializable, Comparable<Quadruple
   }
 
   @Nonnull
-  public List<Object> toList() {
-    return toList(this);
+  public com.simplaex.bedrock.hlist.C<A,
+    com.simplaex.bedrock.hlist.C<B,
+      com.simplaex.bedrock.hlist.C<C,
+        com.simplaex.bedrock.hlist.C<D, Nil>>>> toHList() {
+    return toHList4();
+  }
+
+  @Nonnull
+  public static <A, B, C, D, L extends HList<L>> Quadruple<A, B, C, D> fromHList(
+    @Nonnull final com.simplaex.bedrock.hlist.C<A,
+      com.simplaex.bedrock.hlist.C<B,
+        com.simplaex.bedrock.hlist.C<C,
+          com.simplaex.bedrock.hlist.C<D, L>>>> hlist) {
+    return quadruple(
+      hlist.getHead(),
+      hlist.getTail().getHead(),
+      hlist.getTail().getTail().getHead(),
+      hlist.getTail().getTail().getTail().getHead()
+    );
   }
 
   @Nonnull
   public static <E, A extends E, B extends E, C extends E, D extends E> Seq<E> toSeq(final Tuple4<A, B, C, D> quadruple) {
     return Seq.of(quadruple.getFirst(), quadruple.getSecond(), quadruple.getThird(), quadruple.getFourth());
-  }
-
-  @Nonnull
-  public Seq<Object> toSeq() {
-    return toSeq(this);
   }
 
   @Nonnull
@@ -129,22 +147,26 @@ public class Quadruple<A, B, C, D> implements Serializable, Comparable<Quadruple
   }
 
   @Nonnull
-  public <E> Quadruple<E, B, C, D> mapFirst(final Function<A, E> f) {
+  public <E> Quadruple<E, B, C, D> mapFirst(@Nonnull final Function<A, E> f) {
+    Objects.requireNonNull(f, "Function 'f' must not be null");
     return Quadruple.of(f.apply(getFirst()), getSecond(), getThird(), getFourth());
   }
 
   @Nonnull
-  public <E> Quadruple<A, E, C, D> mapSecond(final Function<B, E> f) {
+  public <E> Quadruple<A, E, C, D> mapSecond(@Nonnull final Function<B, E> f) {
+    Objects.requireNonNull(f, "Function 'f' must not be null");
     return Quadruple.of(getFirst(), f.apply(getSecond()), getThird(), getFourth());
   }
 
   @Nonnull
-  public <E> Quadruple<A, B, E, D> mapThird(final Function<C, E> f) {
+  public <E> Quadruple<A, B, E, D> mapThird(@Nonnull final Function<C, E> f) {
+    Objects.requireNonNull(f, "Function 'f' must not be null");
     return Quadruple.of(getFirst(), getSecond(), f.apply(getThird()), getFourth());
   }
 
   @Nonnull
-  public <E> Quadruple<A, B, C, E> mapFourth(final Function<D, E> f) {
+  public <E> Quadruple<A, B, C, E> mapFourth(@Nonnull final Function<D, E> f) {
+    Objects.requireNonNull(f, "Function 'f' must not be null");
     return Quadruple.of(getFirst(), getSecond(), getThird(), f.apply(getFourth()));
   }
 

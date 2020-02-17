@@ -55,12 +55,9 @@ public class C<E, L extends HList<L>> extends HList<C<E, L>> {
 
       @Override
       public Object next() {
-        if (current instanceof C) {
-          final C<?, ?> xs = (C) current;
-          current = xs.tail;
-          return xs.head;
-        }
-        return null;
+        final C<?, ?> xs = (C) current;
+        current = xs.tail;
+        return xs.head;
       }
     };
   }

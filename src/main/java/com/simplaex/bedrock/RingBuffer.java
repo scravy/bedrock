@@ -2,10 +2,8 @@ package com.simplaex.bedrock;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
-import java.util.AbstractQueue;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.Spliterators;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -110,4 +108,10 @@ public class RingBuffer<E> extends AbstractQueue<E> implements ExtendedIterable<
     return (current + 1) % capacity();
   }
 
+  @Override
+  public String toString() {
+    return stream()
+      .map(Objects::toString)
+      .collect(Collectors.joining(",", "[", "]"));
+  }
 }

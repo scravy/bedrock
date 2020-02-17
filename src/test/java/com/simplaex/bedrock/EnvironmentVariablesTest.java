@@ -11,6 +11,7 @@ import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
 import static com.simplaex.bedrock.Pair.pair;
 
+@SuppressWarnings({"CodeBlock2Expr", "ClassInitializerMayBeStatic"})
 @RunWith(Spectrum.class)
 public class EnvironmentVariablesTest {
 
@@ -26,12 +27,12 @@ public class EnvironmentVariablesTest {
   {
     describe("EnvironmentVariables", () -> {
       it("readInto", () -> {
-        EnvironmentVariables.ENVIRONMENT_VARIABLE_RETRIEVER = key -> ArrayMap.of(
+        EnvironmentVariables.setDefaultEnvironmentVariableRetriever(ArrayMap.of(
           pair("HOST", "example.org"),
           pair("PORT", "8080"),
           pair("FACTOR", "0.0"),
           pair("DURATION", "PT7H")
-        ).getOrElse(key, null);
+        ).setDefaultReturnValue(null));
         final Config config = EnvironmentVariables.read(Config.class);
         expect(config.getHost()).toEqual("example.org");
         expect(config.getPort()).toEqual(8080);

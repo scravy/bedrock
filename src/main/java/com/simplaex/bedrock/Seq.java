@@ -26,6 +26,8 @@ public abstract class Seq<E> implements
   Container<E>,
   IntFunction<E> {
 
+  public static final long serialVersionUID = -2984177390254L;
+
   private int hashCode = 0;
 
   public abstract E get(@Nonnegative final int index);
@@ -81,6 +83,10 @@ public abstract class Seq<E> implements
   @Nonnull
   public String asString(@Nonnull final String delimiter) {
     return stream().map(Objects::toString).collect(Collectors.joining(delimiter));
+  }
+
+  <T> T nonEmpty(final Supplier<T> ifEmpty, final Supplier<T> ifNonEmpty) {
+    return (isEmpty() ? ifEmpty : ifNonEmpty).get();
   }
 
   @Nonnegative
@@ -180,7 +186,7 @@ public abstract class Seq<E> implements
   @Nonnull
   public <F> Seq<F> flatMap(@Nonnull final Function<? super E, Seq<F>> function) {
     Objects.requireNonNull(function, "'function' must not be null");
-    @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
     int i = 0;
     int c = 0;
     for (final E e : this) {
@@ -201,7 +207,7 @@ public abstract class Seq<E> implements
   @Nonnull
   public <F> Seq<F> flatMapOptional(@Nonnull final Function<? super E, Optional<F>> function) {
     Objects.requireNonNull(function, "'function' must not be null");
-    @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
     final SeqBuilder<F> resultBuilder = Seq.builder();
     for (final E e : this) {
       final Optional<F> result = function.apply(e);
@@ -213,7 +219,7 @@ public abstract class Seq<E> implements
   @Nonnull
   public <F> Seq<F> flatMapIterable(@Nonnull final Function<? super E, ? extends Iterable<F>> function) {
     Objects.requireNonNull(function, "'function' must not be null");
-    @SuppressWarnings("unchecked") final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Seq<F>[] array = (Seq<F>[]) new Seq[length()];
     final SeqBuilder<F> resultBuilder = Seq.builder();
     for (final E e : this) {
       resultBuilder.addElements(function.apply(e));
@@ -256,7 +262,7 @@ public abstract class Seq<E> implements
   }
 
   public E foldl1(@Nonnull final BiFunction<? super E, ? super E, ? extends E> function) {
-    return foldl(function, head());
+    return tailView().foldl(function, head());
   }
 
   public <A> A foldl1f(
@@ -276,7 +282,7 @@ public abstract class Seq<E> implements
   }
 
   public E foldr1(@Nonnull final BiFunction<? super E, ? super E, ? extends E> function) {
-    return foldr(function, last());
+    return initView().foldr(function, last());
   }
 
   public <A> A foldr1f(
@@ -340,33 +346,29 @@ public abstract class Seq<E> implements
   @Nonnull
   public Seq<Seq<E>> groupBy(@Nonnull final BiPredicate<? super E, ? super E> operator) {
     Objects.requireNonNull(operator, "'operator' must not be null");
-    if (isEmpty()) {
-      return Seq.empty();
-    }
-    final SeqBuilder<Seq<E>> b1 = Seq.builder();
-    final SeqBuilder<E> b2 = Seq.builder();
-    E previous = head();
-    b2.add(previous);
-    for (int i = 1; i < size(); i += 1) {
-      final E current = get(i);
-      if (!operator.test(previous, current)) {
-        b1.add(b2.result());
-        b2.clear();
+    return nonEmpty(Seq::empty, () -> {
+      final SeqBuilder<Seq<E>> b1 = Seq.builder();
+      final SeqBuilder<E> b2 = Seq.builder();
+      E previous = head();
+      b2.add(previous);
+      for (int i = 1; i < size(); i += 1) {
+        final E current = get(i);
+        if (!operator.test(previous, current)) {
+          b1.add(b2.result());
+          b2.clear();
+        }
+        b2.add(current);
+        previous = current;
       }
-      b2.add(current);
-      previous = current;
-    }
-    if (!b2.isEmpty()) {
       b1.add(b2.result());
-    }
-    return b1.result();
+      return b1.result();
+    });
   }
 
   @Nonnull
   @SuppressWarnings("unchecked")
   public <F extends E> Seq<F> filter(@Nonnull final Class<F> clazz) {
-    final Seq res = filter(element -> element != null && clazz.isAssignableFrom(element.getClass()));
-    return (Seq<F>) res;
+    return (Seq<F>) filter(element -> element != null && clazz.isAssignableFrom(element.getClass()));
   }
 
   @Override
@@ -480,9 +482,9 @@ public abstract class Seq<E> implements
   @Nonnull
   public Seq<Seq<E>> inits() {
     final int len = length();
-    @SuppressWarnings("unchecked") final Seq<E>[] seqs = (Seq<E>[]) new Seq[len];
-    for (int i = 0; i < len; i += 1) {
-      seqs[i] = take(i + 1);
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Seq<E>[] seqs = (Seq<E>[]) new Seq[len + 1];
+    for (int i = 0; i <= len; i += 1) {
+      seqs[i] = take(i);
     }
     return new SeqSimple<>(seqs);
   }
@@ -491,9 +493,9 @@ public abstract class Seq<E> implements
   @Nonnull
   public Seq<Seq<E>> initsView() {
     final int len = length();
-    @SuppressWarnings("unchecked") final Seq<E>[] seqs = (Seq<E>[]) new Seq[len];
-    for (int i = 0; i < len; i += 1) {
-      seqs[i] = takeView(i + 1);
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Seq<E>[] seqs = (Seq<E>[]) new Seq[len + 1];
+    for (int i = 0; i <= len; i += 1) {
+      seqs[i] = takeView(i);
     }
     return new SeqSimple<>(seqs);
   }
@@ -502,9 +504,9 @@ public abstract class Seq<E> implements
   @Nonnull
   public Seq<Seq<E>> tails() {
     final int len = length();
-    @SuppressWarnings("unchecked") final Seq<E>[] seqs = (Seq<E>[]) new Seq[len];
-    for (int i = 0; i < len; i += 1) {
-      seqs[i] = takeRight(i + 1);
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Seq<E>[] seqs = (Seq<E>[]) new Seq[len + 1];
+    for (int i = 0; i <= len; i += 1) {
+      seqs[i] = takeRight(i);
     }
     return new SeqSimple<>(seqs);
   }
@@ -513,9 +515,9 @@ public abstract class Seq<E> implements
   @Nonnull
   public Seq<Seq<E>> tailsView() {
     final int len = length();
-    @SuppressWarnings("unchecked") final Seq<E>[] seqs = (Seq<E>[]) new Seq[len];
-    for (int i = 0; i < len; i += 1) {
-      seqs[i] = takeRightView(i + 1);
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Seq<E>[] seqs = (Seq<E>[]) new Seq[len + 1];
+    for (int i = 0; i <= len; i += 1) {
+      seqs[i] = takeRightView(i);
     }
     return new SeqSimple<>(seqs);
   }
@@ -530,52 +532,44 @@ public abstract class Seq<E> implements
 
   @Nonnull
   public Optional<E> headOptional() {
-    if (isEmpty()) {
-      return Optional.empty();
-    }
-    return Optional.of(head());
+    return nonEmpty(Optional::empty, () -> Optional.of(head()));
   }
 
   @Nonnull
   public Optional<E> lastOptional() {
-    if (isEmpty()) {
-      return Optional.empty();
-    }
-    return Optional.of(last());
+    return nonEmpty(Optional::empty, () -> Optional.of(last()));
   }
 
   @Nonnull
   public Seq<E> intercalate(@Nonnull final Seq<E> seq) {
-    if (isEmpty()) {
-      return this;
-    }
-    final int targetSize = (seq.size() + 1) * size() - seq.size();
-    final Object[] targetArray = new Object[targetSize];
-    targetArray[0] = head();
-    int targetIndex = 1;
-    for (int i = 1; i < size(); i += 1) {
-      for (int j = 0; j < seq.size(); j += 1) {
-        targetArray[targetIndex++] = seq.get(j);
+    return nonEmpty(Seq::empty, () -> {
+      final int targetSize = (seq.size() + 1) * size() - seq.size();
+      final Object[] targetArray = new Object[targetSize];
+      targetArray[0] = head();
+      int targetIndex = 1;
+      for (int i = 1; i < size(); i += 1) {
+        for (int j = 0; j < seq.size(); j += 1) {
+          targetArray[targetIndex++] = seq.get(j);
+        }
+        targetArray[targetIndex++] = get(i);
       }
-      targetArray[targetIndex++] = get(i);
-    }
-    return new SeqSimple<>(targetArray);
+      return new SeqSimple<>(targetArray);
+    });
   }
 
   @Nonnull
   public Seq<E> intersperse(final E e) {
-    if (isEmpty()) {
-      return this;
-    }
-    final int targetSize = size() * 2 - 1;
-    final Object[] targetArray = new Object[targetSize];
-    targetArray[0] = head();
-    int targetIndex = 1;
-    for (int i = 1; i < size(); i += 1) {
-      targetArray[targetIndex++] = e;
-      targetArray[targetIndex++] = get(i);
-    }
-    return new SeqSimple<>(targetArray);
+    return nonEmpty(Seq::empty, () -> {
+      final int targetSize = size() * 2 - 1;
+      final Object[] targetArray = new Object[targetSize];
+      targetArray[0] = head();
+      int targetIndex = 1;
+      for (int i = 1; i < size(); i += 1) {
+        targetArray[targetIndex++] = e;
+        targetArray[targetIndex++] = get(i);
+      }
+      return new SeqSimple<>(targetArray);
+    });
   }
 
   /**
@@ -865,6 +859,7 @@ public abstract class Seq<E> implements
 
   @SafeVarargs
   @Nonnull
+  @SuppressWarnings("varargs")
   public static <E> Seq<E> of(@Nonnull final E... es) {
     Objects.requireNonNull(es);
     if (es.length == 0) {
@@ -875,6 +870,7 @@ public abstract class Seq<E> implements
 
   @SafeVarargs
   @Nonnull
+  @SuppressWarnings("varargs")
   public static <E> Seq<E> seq(@Nonnull final E... es) {
     return ofArray(es);
   }
@@ -952,14 +948,6 @@ public abstract class Seq<E> implements
     void consume(int index, E element);
   }
 
-  @Deprecated
-  public void forEach(@Nonnull final WithIndexConsumer<E> consumer) {
-    Objects.requireNonNull(consumer, "'consumer' must not be null");
-    for (int i = 0; i < size(); i += 1) {
-      consumer.consume(i, get(i));
-    }
-  }
-
   @Nonnull
   public static Seq<Integer> codepointsOfString(@Nonnull final String string) {
     final SeqBuilder<Integer> b = builder();
@@ -985,11 +973,8 @@ public abstract class Seq<E> implements
     return new SeqGenerated<E>(
       ix -> {
         Seq<E> seq = seqs[0];
-        int i = 1;
-        while (ix >= seq.length() && i < seqs.length) {
+        for (int i = 1; ix >= seq.length(); seq = seqs[i++]) {
           ix -= seq.length();
-          seq = seqs[i];
-          i += 1;
         }
         return seq.get(ix);
       },
@@ -1226,6 +1211,7 @@ public abstract class Seq<E> implements
     return ofGenerator(string::charAt, string.length());
   }
 
+  @SuppressWarnings("rawtypes")
   public static <E extends Comparable<? super E>> E minimum(final Seq<E> seq) {
     if (seq instanceof SeqSimpleSorted) {
       return seq.head();
@@ -1234,6 +1220,7 @@ public abstract class Seq<E> implements
     return seq.minimumBy(Comparable::compareTo);
   }
 
+  @SuppressWarnings("rawtypes")
   public static <E extends Comparable<? super E>> E maximum(final Seq<E> seq) {
     if (seq instanceof SeqSimpleSorted) {
       return seq.last();

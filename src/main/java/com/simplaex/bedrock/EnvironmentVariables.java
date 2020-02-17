@@ -3,6 +3,7 @@ package com.simplaex.bedrock;
 import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -10,18 +11,30 @@ import java.util.function.Function;
 @UtilityClass
 public class EnvironmentVariables {
 
-  // visible + non-final for testing
-  Function<String, String> ENVIRONMENT_VARIABLE_RETRIEVER = System::getenv;
+  private Function<String, String> defaultEnvironmentVariableRetriever = System::getenv;
 
-  public static Optional<String> getenv(final String key) {
-    Objects.requireNonNull(key);
-    return Optional.ofNullable(ENVIRONMENT_VARIABLE_RETRIEVER.apply(key));
+  @SuppressWarnings({"UnusedReturnValue", "WeakerAccess"})
+  public static Function<String, String> setDefaultEnvironmentVariableRetriever(@Nonnull final Function<String, String> retriever) {
+    Objects.requireNonNull(retriever, "'retriever' must not be null");
+    final Function<String, String> oldRetriever = defaultEnvironmentVariableRetriever;
+    defaultEnvironmentVariableRetriever = retriever;
+    return oldRetriever;
+  }
+
+  @Nonnull
+  public static Optional<String> getenv(@Nullable final Function<String, String> retriever, @Nonnull final String key) {
+    Objects.requireNonNull(key, "'key' must not be null");
+    return Optional.ofNullable(Optional.ofNullable(retriever).orElse(defaultEnvironmentVariableRetriever).apply(key));
   }
 
   public static <T> T read(@Nonnull final Class<T> clazz) {
+    return read(null, clazz);
+  }
+
+  public static <T> T read(@Nullable final Function<String, String> retriever, @Nonnull final Class<T> clazz) {
     try {
       final T instance = clazz.newInstance();
-      readInto(instance);
+      readInto(retriever, instance);
       return instance;
     } catch (final Exception exc) {
       throw new RuntimeException(exc);
@@ -29,6 +42,10 @@ public class EnvironmentVariables {
   }
 
   public static <T> void readInto(@Nonnull final T instance) {
+    readInto(null, instance);
+  }
+
+  public static <T> void readInto(@Nullable final Function<String, String> retriever, @Nonnull final T instance) {
     Objects.requireNonNull(instance);
     @SuppressWarnings("unchecked") final Set<Reflections.Property<T>> properties =
       Reflections.getProperties((Class<T>) instance.getClass());
@@ -37,7 +54,7 @@ public class EnvironmentVariables {
         return;
       }
       final String environmentVariableName = Strings.toUpperSnakeCase(property.getName());
-      getenv(environmentVariableName).ifPresent(value -> property.set(instance, value));
+      getenv(retriever, environmentVariableName).ifPresent(value -> property.set(instance, value));
     });
   }
 

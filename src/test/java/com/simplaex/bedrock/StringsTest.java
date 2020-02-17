@@ -106,6 +106,17 @@ public class StringsTest {
         expect(Strings.isNonEmpty("x")).toBeTrue();
       });
     });
+    describe("isNullOrBlank", () -> {
+      it("should identify null not as blank", () -> {
+        expect(Strings.isNullOrBlank(null)).toBeTrue();
+      });
+      it("should identify a string consisting of whitespace as blank", () -> {
+        expect(Strings.isNullOrBlank("   ")).toBeTrue();
+      });
+      it("should identify the empty string as blank", () -> {
+        expect(Strings.isNullOrBlank("")).toBeTrue();
+      });
+    });
     describe("forEachCodePointWithIndex", () -> {
       it("should iterate emojis", () -> {
         final Seq<Pair<Integer, Integer>> expectedResult = Seq.of(pair(1, 0x1F308), pair(3, 0x1F929));

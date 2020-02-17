@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.util.*;
 import java.util.function.*;
@@ -36,8 +37,16 @@ public final class ArrayMap<K extends Comparable<? super K>, V> implements Mappi
     EMPTY = new ArrayMap(empty, empty);
   }
 
+  private Function<K, V> defaultReturnValue = key -> {
+    throw new NoSuchElementException(Objects.toString(key));
+  };
   private final Object[] keys;
   private final Object[] values;
+
+  public ArrayMap<K, V> setDefaultReturnValue(@Nullable final V value) {
+    defaultReturnValue = ignore -> value;
+    return this;
+  }
 
   @SuppressWarnings("unchecked")
   @Nonnull
@@ -48,6 +57,16 @@ public final class ArrayMap<K extends Comparable<? super K>, V> implements Mappi
       return Optional.ofNullable((V) values[ix]);
     } else {
       return Optional.empty();
+    }
+  }
+
+  @Override
+  public V apply(final K key) {
+    final Optional<V> result = get(key);
+    if (result.isPresent()) {
+      return result.get();
+    } else {
+      return defaultReturnValue.apply(key);
     }
   }
 

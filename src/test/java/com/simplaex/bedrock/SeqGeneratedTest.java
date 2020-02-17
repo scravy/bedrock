@@ -5,6 +5,8 @@ import lombok.val;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collections;
 import java.util.function.IntFunction;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
@@ -102,6 +104,18 @@ public class SeqGeneratedTest {
       it("should wrap an empty Boolean array as the empty Seq", () -> {
         expect(Seq.wrap(new Boolean[0]) == Seq.<Boolean>empty()).toBeTrue();
       });
+      it("should wrap an empty something as the empty Seq", () -> {
+        expect(Seq.wrap(new Number[0]) == Seq.<Number>empty()).toBeTrue();
+      });
+      it("should wrap an empty BitSet as the empty Seq", () -> {
+        expect(Seq.wrap(BitSet.valueOf(new byte[0])) == Seq.<Boolean>empty()).toBeTrue();
+      });
+      it("should wrap an empty List as the empty Seq", () -> {
+        expect(Seq.wrap(Collections.emptyList()) == Seq.empty()).toBeTrue();
+      });
+      it("should wrap an empty String as the empty Seq", () -> {
+        expect(Seq.wrap("") == Seq.<Character>empty()).toBeTrue();
+      });
     });
 
     describe("wrap arrays and collections", () -> {
@@ -152,6 +166,11 @@ public class SeqGeneratedTest {
       });
       it("should wrap a Boolean array as a Seq", () -> {
         expect(Seq.wrap(new Boolean[]{false, true, false, false})).toEqual(Seq.of(false, true, false, false));
+      });
+      it("should wrap a BitSet as a Seq", () -> {
+        expect(Seq.wrap(BitSet.valueOf(new byte[]{0, 1}))).toEqual(Seq.of(
+          false, false, false, false, false, false, false, false, true
+        ));
       });
     });
     describe("get", () -> {

@@ -1,55 +1,63 @@
 package com.simplaex.bedrock;
 
 import com.greghaskins.spectrum.Spectrum;
+import com.simplaex.bedrock.hlist.Nil;
 import org.junit.runner.RunWith;
-
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
+import static com.simplaex.bedrock.Functions.call;
+import static com.simplaex.bedrock.Functions.flip;
 import static com.simplaex.bedrock.hlist.HList.hlist;
+import static com.simplaex.bedrock.hlist.HList.nil;
 
 @RunWith(Spectrum.class)
 @SuppressWarnings({"ClassInitializerMayBeStatic", "CodeBlock2Expr"})
 public class HListTest {
-  private static <T> void apply(final T arg, final Consumer<T> consumer) {
-    consumer.accept(arg);
-  }
-
-  private static <T, U> void apply(final T t, final U u, final BiConsumer<T, U> consumer) {
-    consumer.accept(t, u);
-  }
-
   {
     describe("HList", () -> {
       it("should toString()", () -> {
-        apply(
+        call(
           hlist(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
           ls -> expect(ls.toString()).toEqual("[1,2,3,4,5,6,7,8,9,10]"));
       });
       it("should equal itself", () -> {
-        apply(
-          hlist(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-          hlist(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+        call(
+          hlist(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+          hlist(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
           (l1, l2) -> expect(l1).toEqual(l2));
       });
       it("should compare equal to itself", () -> {
-        apply(
+        call(
           hlist(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
           hlist(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
           (l1, l2) -> expect(l1.compareTo(l2)).toEqual(0));
       });
       it("should compare lexicographically", () -> {
-        apply(
+        call(
           hlist(0, 2, 3, 4, 5, 6, 7, 8, 9, 10),
           hlist(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
           (l1, l2) -> expect(l1.compareTo(l2)).toEqual(-1));
-        apply(
+        call(
           hlist(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
           hlist(1, 2, 3, 4, 5, 6, 7, 8, 9, 11),
           (l1, l2) -> expect(l1.compareTo(l2)).toEqual(-1));
+      });
+      it("should foldl", () -> {
+        call(
+          hlist(1L, "2", 3),
+          ls -> expect(ls.foldl(StringBuilder::append, new StringBuilder()).toString()).toEqual("123"));
+      });
+      it("should foldr", () -> {
+        call(
+          hlist(1L, 2, "3"),
+          ls -> expect(ls.foldr(flip(StringBuilder::append), new StringBuilder()).toString()).toEqual("321"));
+      });
+      it("should calculate size correctly", () -> {
+        call(nil(), ls -> expect(ls.size()).toEqual(0));
+        call(Nil.cons("one"), ls -> expect(ls.size()).toEqual(1));
+        call(Nil.cons("one").cons(123), ls -> expect(ls.size()).toEqual(2));
       });
     });
   }

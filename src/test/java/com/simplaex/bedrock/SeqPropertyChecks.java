@@ -22,6 +22,15 @@ class SeqPropertyChecks {
 
   void checks(final Seq<Integer> seq, final Integer one) {
 
+    describe("arguments checking", () -> {
+      it("should throw an IndexOutOfBoundsException for negative indices", () -> {
+        expect(() -> seq.get(-1)).toThrow(IndexOutOfBoundsException.class);
+      });
+      it("should throw an IndexOutOfBoundsException for indices that are too large", () -> {
+        expect(() -> seq.get(seq.length())).toThrow(IndexOutOfBoundsException.class);
+      });
+    });
+
     describe("length + isEmpty", () -> {
       it("length() > 0 == !isEmpty()", () -> expect(seq.length() > 0 == !seq.isEmpty()).toBeTrue());
       it("length() == 0 == isEmpty()", () -> expect(seq.length() == 0 == seq.isEmpty()).toBeTrue());

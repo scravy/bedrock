@@ -1,5 +1,8 @@
 package com.simplaex.bedrock;
 
+import com.simplaex.bedrock.hlist.C;
+import com.simplaex.bedrock.hlist.HList;
+import com.simplaex.bedrock.hlist.Nil;
 import lombok.Value;
 
 import javax.annotation.Nonnull;
@@ -104,15 +107,15 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
   }
 
   @Nonnull
-  public static <C, A extends C, B extends C> List<C> toList(final Pair<A, B> pair) {
+  public static <C, A extends C, B extends C> List<C> toList(@Nonnull final Tuple2<A, B> pair) {
     return new AbstractList<C>() {
       @Override
       public C get(final int index) {
         switch (index) {
           case 0:
-            return pair.fst();
+            return pair.getFirst();
           case 1:
-            return pair.snd();
+            return pair.getSecond();
           default:
             throw new IndexOutOfBoundsException(Integer.toString(index));
         }
@@ -131,18 +134,17 @@ public class Pair<A, B> implements Map.Entry<A, B>, Serializable, Comparable<Pai
   }
 
   @Nonnull
-  public List<Object> toList() {
-    return toList(this);
+  public C<A, C<B, Nil>> toHList() {
+    return toHList2();
+  }
+
+  public static <A, B, L extends HList<L>> Pair<A, B> fromHList(final C<A, C<B, L>> hlist) {
+    return pair(hlist.getHead(), hlist.getTail().getHead());
   }
 
   @Nonnull
   public static <C, A extends C, B extends C> Seq<C> toSeq(final Tuple2<A, B> pair) {
-    return Seq.of(pair.getFirst(), pair.getSecond());
-  }
-
-  @Nonnull
-  public Seq<Object> toSeq() {
-    return toSeq(this);
+    return Tuple2.toSeq(pair);
   }
 
   @Nonnull

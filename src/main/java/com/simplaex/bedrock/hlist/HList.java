@@ -96,6 +96,7 @@ public abstract class HList<This extends HList<This>> implements Container<Objec
     return cons(e, hlist(f, g, h, i, j, k, l, m, n, o));
   }
 
+  @Nonnegative
   public abstract int size();
 
   public abstract <T> T foldl(@Nonnull final BiFunction<T, Object, T> f, final T init);

@@ -1,5 +1,7 @@
 package com.simplaex.bedrock;
 
+import com.simplaex.bedrock.hlist.HList;
+import com.simplaex.bedrock.hlist.Nil;
 import lombok.Value;
 
 import javax.annotation.Nonnull;
@@ -7,6 +9,7 @@ import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Value(staticConstructor = "of")
@@ -63,7 +66,7 @@ public class Triple<A, B, C> implements Serializable, Comparable<Triple<A, B, C>
   }
 
   @Nonnull
-  public static <D, A extends D, B extends D, C extends D> List<D> toList(final Triple<A, B, C> tuple) {
+  public static <D, A extends D, B extends D, C extends D> List<D> toList(@Nonnull final Tuple3<A, B, C> tuple) {
     return new AbstractList<D>() {
       @Override
       public D get(final int index) {
@@ -87,37 +90,47 @@ public class Triple<A, B, C> implements Serializable, Comparable<Triple<A, B, C>
   }
 
   @Nonnull
-  public List<Object> toList() {
-    return toList(this);
+  public com.simplaex.bedrock.hlist.C<A, com.simplaex.bedrock.hlist.C<B, com.simplaex.bedrock.hlist.C<C, Nil>>> toHList() {
+    return toHList3();
   }
 
   @Nonnull
-  public static <D, A extends D, B extends D, C extends D> Seq<D> toSeq(final Tuple3<A, B, C> triple) {
+  public static <A, B, C, L extends HList<L>> Triple<A, B, C> fromHList(
+    @Nonnull final com.simplaex.bedrock.hlist.C<A, com.simplaex.bedrock.hlist.C<B, com.simplaex.bedrock.hlist.C<C, L>>> hlist) {
+    return triple(hlist.getHead(), hlist.getTail().getHead(), hlist.getTail().getTail().getHead());
+  }
+
+  @Nonnull
+  public static <D, A extends D, B extends D, C extends D> Seq<D> toSeq(
+    @Nonnull final Tuple3<A, B, C> triple
+  ) {
     return Seq.of(triple.getFirst(), triple.getSecond(), triple.getThird());
   }
 
   @Nonnull
-  public Seq<Object> toSeq() {
-    return toSeq(this);
-  }
-
-  @Nonnull
-  public <D, E, F> Triple<D, E, F> map(final Function<A, D> f, final Function<B, E> g, final Function<C, F> h) {
+  public <D, E, F> Triple<D, E, F> map(
+    @Nonnull final Function<A, D> f,
+    @Nonnull final Function<B, E> g,
+    @Nonnull final Function<C, F> h
+  ) {
     return Triple.of(f.apply(getFirst()), g.apply(getSecond()), h.apply(getThird()));
   }
 
   @Nonnull
-  public <D> Triple<D, B, C> mapFirst(final Function<A, D> f) {
+  public <D> Triple<D, B, C> mapFirst(@Nonnull final Function<A, D> f) {
+    Objects.requireNonNull(f, "Function 'f' must not be null");
     return Triple.of(f.apply(getFirst()), getSecond(), getThird());
   }
 
   @Nonnull
-  public <D> Triple<A, D, C> mapSecond(final Function<B, D> f) {
+  public <D> Triple<A, D, C> mapSecond(@Nonnull final Function<B, D> f) {
+    Objects.requireNonNull(f, "Function 'f' must not be null");
     return Triple.of(getFirst(), f.apply(getSecond()), getThird());
   }
 
   @Nonnull
-  public <D> Triple<A, B, D> mapThird(final Function<C, D> f) {
+  public <D> Triple<A, B, D> mapThird(@Nonnull final Function<C, D> f) {
+    Objects.requireNonNull(f, "Function 'f' must not be null");
     return Triple.of(getFirst(), getSecond(), f.apply(getThird()));
   }
 

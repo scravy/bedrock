@@ -9,6 +9,7 @@ import java.util.*;
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
+import static com.simplaex.bedrock.Functions.flip;
 import static com.simplaex.bedrock.Pair.pair;
 import static com.simplaex.bedrock.Quadruple.quadruple;
 import static com.simplaex.bedrock.Triple.triple;
@@ -214,6 +215,30 @@ public class SeqTest {
 
     });
 
+    describe("folds", () -> {
+      final Seq<String> seq = Seq.of("1", "2", "3");
+      it("foldr1", () -> {
+        expect(seq.foldr1((a, b) -> a + b)).toEqual("123");
+      });
+      it("foldl1", () -> {
+        expect(seq.foldl1((a, b) -> a + b)).toEqual("123");
+      });
+      it("foldr1f", () -> {
+        expect(seq.foldr1f(flip(StringBuilder::append), StringBuilder::new).toString()).toEqual("321");
+      });
+      it("foldl1f", () -> {
+        expect(seq.foldl1f(StringBuilder::append, StringBuilder::new).toString()).toEqual("123");
+      });
+      it("minimumBy", () -> {
+        expect(seq.minimumBy(Comparator.comparing(Integer::parseInt))).toEqual("1");
+        expect(seq.reversed().minimumBy(Comparator.comparing(Integer::parseInt))).toEqual("1");
+      });
+      it("maximumBy", () -> {
+        expect(seq.maximumBy(Comparator.comparing(Integer::parseInt))).toEqual("3");
+        expect(seq.reversed().maximumBy(Comparator.comparing(Integer::parseInt))).toEqual("3");
+      });
+    });
+
     describe("sequences with null values", () -> {
       it("should compare sequences with null values using equals", () -> {
         expect(Seq.of(1, null)).toEqual(Seq.of(1, null));
@@ -296,7 +321,13 @@ public class SeqTest {
       it("should find the length of a common prefix", () -> {
         expect(Seq.commonPrefixLength(Seq.ofString("hello"), Seq.ofString("world"))).toEqual(0);
         expect(Seq.commonPrefixLength(Seq.ofString("hello"), Seq.ofString("hell"))).toEqual(4);
+        expect(Seq.commonPrefixLength(Seq.ofString("hello"), Seq.ofString("hello"))).toEqual(5);
         expect(Seq.commonPrefixLength(Seq.ofString("hello"), Seq.ofString("help"))).toEqual(3);
+      });
+      it("should find the length of a common prefix with null values", () -> {
+        expect(Seq.commonPrefixLength(Seq.of(1, null, null, 3), Seq.of(1, null, null, null))).toEqual(3);
+        expect(Seq.commonPrefixLength(Seq.of(1, null, null, null), Seq.of(1, null, null, 3))).toEqual(3);
+        expect(Seq.commonPrefixLength(Seq.of(1, null, null, null), Seq.of(1, null, null, null))).toEqual(4);
       });
     });
     describe("minimum and maximum", () -> {
@@ -379,6 +410,42 @@ public class SeqTest {
         expect(() -> Seq.empty().draw()).toThrow(NoSuchElementException.class);
       });
     });
+    describe("filter", () -> {
+      it("should filter by Clazz", () -> {
+        final Seq<Number> seq = Seq.of(3, 4L, null, 3.0, 5L, null);
+        final Seq<Long> seqLongs = seq.filter(Long.class);
+        expect(seqLongs).toEqual(Seq.of(4L, 5L));
+        final Seq<Float> seqFloats = seq.filter(Float.class);
+        expect(seqFloats).toEqual(Seq.empty());
+      });
+    });
+    describe("takeWhile/dropWhile", () -> {
+      it("takeWhile", () -> {
+        expect(Seq.of(1, 2, 3).takeWhile(x -> x > 0)).toEqual(Seq.of(1, 2, 3));
+      });
+      it("takeWhileView", () -> {
+        expect(Seq.of(1, 2, 3).takeWhileView(x -> x > 0)).toEqual(Seq.of(1, 2, 3));
+      });
+      it("dropWhile", () -> {
+        expect(Seq.of(1, 2, 3).dropWhile(x -> x > 0)).toEqual(Seq.empty());
+      });
+      it("dropWhileView", () -> {
+        expect(Seq.of(1, 2, 3).dropWhileView(x -> x > 0)).toEqual(Seq.empty());
+      });
+      it("concatView", () -> {
+        final Seq<Integer> seq = Seq.concatView(Seq.of(1, 2, 3), Seq.of(4, 5), Seq.of(3, 4, 6, 0));
+        expect(seq.get(0)).toEqual(1);
+        expect(seq.get(1)).toEqual(2);
+        expect(seq.get(2)).toEqual(3);
+        expect(seq.get(3)).toEqual(4);
+        expect(seq.get(4)).toEqual(5);
+        expect(seq.get(5)).toEqual(3);
+        expect(seq.get(6)).toEqual(4);
+        expect(seq.get(7)).toEqual(6);
+        expect(seq.get(8)).toEqual(0);
+        expect(() -> seq.get(9)).toThrow(IndexOutOfBoundsException.class);
+        expect(() -> seq.get(10)).toThrow(IndexOutOfBoundsException.class);
+      });
+    });
   }
-
 }

@@ -164,6 +164,16 @@ public class Functions {
     return b -> f.apply(a, b);
   }
 
+  @FunctionalInterface
+  public interface ToBooleanBiFunction<A, B> {
+    boolean applyAsBool(final A a, final B b);
+  }
+
+  @Nonnull
+  public static <A, B, R> Predicate<B> bindToBool(@Nonnull final ToBooleanBiFunction<A, B> f, final A a) {
+    return b -> f.applyAsBool(a, b);
+  }
+
   @Nonnull
   public static LongUnaryOperator bindLong(@Nonnull final LongBinaryOperator f, final long a) {
     return b -> f.applyAsLong(a, b);
@@ -178,4 +188,29 @@ public class Functions {
   public static <A, B, R> Function2<B, A, R> flip(@Nonnull final BiFunction<A, B, R> f) {
     return (a, b) -> f.apply(b, a);
   }
+
+  public static <A, R> Function1<A, R> f1(final Function<A, R> f) {
+    return f::apply;
+  }
+
+  public static <A, B, R> Function2<A, B, R> f2(final BiFunction<A, B, R> f) {
+    return f::apply;
+  }
+
+  public static <T> void call(final T arg, final Consumer<T> consumer) {
+    consumer.accept(arg);
+  }
+
+  public static <T, U> void call(final T t, final U u, final BiConsumer<T, U> consumer) {
+    consumer.accept(t, u);
+  }
+
+  public static <A, R> R apply(final A arg, final Function<A, R> f) {
+    return f.apply(arg);
+  }
+
+  public static <A, B, R> R apply(final A arg1, final B arg2, final BiFunction<A, B, R> f) {
+    return f.apply(arg1, arg2);
+  }
+
 }

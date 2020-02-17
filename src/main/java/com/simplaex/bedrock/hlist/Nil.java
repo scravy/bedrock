@@ -12,9 +12,10 @@ import java.util.function.BiFunction;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Nil extends HList<Nil> {
 
-  static Nil INSTANCE = new Nil();
+  final static Nil INSTANCE = new Nil();
 
   @Override
+  @Nonnegative
   public int size() {
     return 0;
   }
@@ -34,6 +35,7 @@ public class Nil extends HList<Nil> {
     return this;
   }
 
+  @Nonnull
   public static <E> C<E, Nil> cons(final E elem) {
     return new C<>(elem, INSTANCE);
   }

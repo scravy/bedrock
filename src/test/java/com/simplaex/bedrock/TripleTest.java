@@ -10,6 +10,8 @@ import java.util.List;
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
+import static com.simplaex.bedrock.Triple.triple;
+import static com.simplaex.bedrock.hlist.HList.hlist;
 
 @SuppressWarnings({"ClassInitializerMayBeStatic", "CodeBlock2Expr"})
 @RunWith(Spectrum.class)
@@ -164,6 +166,26 @@ public class TripleTest {
       it("should throw when trying to access an element outside the range", () -> {
         //noinspection ResultOfMethodCallIgnored
         expect(() -> q.toList().get(3)).toThrow(IndexOutOfBoundsException.class);
+      });
+    });
+    describe("toHList", () -> {
+      it("should convert to heterogeneous lists", () -> {
+        expect(triple(1, 2, 3).toHList()).toEqual(hlist(1, 2, 3));
+        expect(triple(1, 2, 3).toHList3()).toEqual(hlist(1, 2, 3));
+        expect(triple(1, 2, 3).toHList2()).toEqual(hlist(1, 2));
+      });
+    });
+    describe("fromHList", () -> {
+      it("should construct a triple from an HList", () -> {
+        expect(Triple.fromHList(hlist(1, 2, 3))).toEqual(triple(1, 2, 3));
+        expect(Triple.fromHList(hlist(1, 2, 3, 4))).toEqual(triple(1, 2, 3));
+        expect(Triple.fromHList(hlist(1, 2, 3, 4, 5))).toEqual(triple(1, 2, 3));
+      });
+    });
+    describe("compareTo", () -> {
+      it("should compare null values", () -> {
+        expect(triple(null, null, 3).compareTo(triple(null, null, null))).toEqual(1);
+        expect(triple(null, null, null).compareTo(triple(null, null, 3))).toEqual(-1);
       });
     });
   }

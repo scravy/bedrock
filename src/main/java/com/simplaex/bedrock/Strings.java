@@ -153,6 +153,7 @@ public class Strings {
     final Seq<Function<Function<String, String>, String>> builders = buildersBuilder.result();
     final int sizeEstimate = length;
     return new Template() {
+      @Nonnull
       @Override
       public String apply(@Nonnull final Function<String, String> values) {
         final StringBuilder result = new StringBuilder(sizeEstimate);
@@ -191,7 +192,15 @@ public class Strings {
   }
 
   public static boolean isNonEmpty(@Nullable final String string) {
-    return string != null && !string.isEmpty();
+    return !isNullOrEmpty(string);
+  }
+
+  public static boolean isNullOrBlank(@Nullable final String string) {
+    return string == null || string.trim().isEmpty();
+  }
+
+  public static boolean isNonBlank(@Nullable final String string) {
+    return !isNullOrBlank(string);
   }
 
   @FunctionalInterface

@@ -673,6 +673,7 @@ public class Control {
         return box.value;
       }
 
+      @Nonnull
       @Override
       public Function0<T> memoizing() {
         return this;
