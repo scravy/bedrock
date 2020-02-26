@@ -31,7 +31,7 @@ public interface Builder<Element, TargetCollection>
   @SuppressWarnings("unchecked")
   @Override
   default Supplier<Builder<Element, TargetCollection>> supplier() {
-    return () -> Try.execute(getClass()::newInstance).orElseThrowRuntime();
+    return () -> Try.execute(() -> getClass().getDeclaredConstructor().newInstance()).orElseThrowRuntime();
   }
 
   @Override

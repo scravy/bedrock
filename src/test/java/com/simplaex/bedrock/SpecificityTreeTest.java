@@ -11,11 +11,12 @@ import java.util.TreeMap;
 import static com.greghaskins.spectrum.Spectrum.describe;
 import static com.greghaskins.spectrum.Spectrum.it;
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
+import static com.simplaex.bedrock.hlist.HList.hlist;
 import static com.simplaex.bedrock.hlist.HList.nil;
 
 @RunWith(Spectrum.class)
 @SuppressWarnings({"ClassInitializerMayBeStatic", "ConstantConditions"})
-public class SpecificityTest {
+public class SpecificityTreeTest {
   {
     describe("SpecificityTree", () -> {
       final String none = null;

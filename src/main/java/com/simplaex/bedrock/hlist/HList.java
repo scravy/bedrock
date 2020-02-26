@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
@@ -106,6 +107,10 @@ public abstract class HList<This extends HList<This>> implements Container<Objec
   @FunctionalInterface
   public interface ForEachWithIndexPredicate {
     boolean test(@Nonnegative final int index, final Object obj);
+  }
+
+  public static HList dynamic(final Iterable<?> keys) {
+    return HList.empty();
   }
 
   @Nonnull

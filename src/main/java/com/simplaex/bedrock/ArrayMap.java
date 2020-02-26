@@ -1,7 +1,6 @@
 package com.simplaex.bedrock;
 
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Nonnull;
@@ -26,7 +25,6 @@ import java.util.stream.Collectors;
  * @param <V> The type of the values of this ArrayMap. Can be anything. Allows for null values.
  */
 @Immutable
-@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class ArrayMap<K extends Comparable<? super K>, V> implements Mapping<K, V> {
 
@@ -330,5 +328,42 @@ public final class ArrayMap<K extends Comparable<? super K>, V> implements Mappi
   @Nonnull
   public static <K extends Comparable<? super K>, V> ArrayMapBuilder<K, V> builder() {
     return new ArrayMapBuilder<>();
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (other instanceof ArrayMap) {
+      final ArrayMap<?, ?> arrayMap = (ArrayMap<?, ?>) other;
+      return Arrays.equals(keys, arrayMap.keys) &&
+        Arrays.equals(values, arrayMap.values);
+    }
+    if (!(other instanceof Mapping)) {
+      return false;
+    }
+    final Mapping otherMapping = (Mapping) other;
+    if (isEmpty() && otherMapping.isEmpty()) {
+      return true;
+    }
+    if (size() != ((Mapping) other).size()) {
+      return false;
+    }
+    for (final K key : keys()) {
+      @SuppressWarnings("unchecked") final Object otherValue = otherMapping.get(key);
+      if (!Objects.equals(get(key), otherValue)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    if (isEmpty()) {
+      return Mapping.empty().hashCode();
+    }
+    return 31 * Arrays.hashCode(keys) + Arrays.hashCode(values);
   }
 }

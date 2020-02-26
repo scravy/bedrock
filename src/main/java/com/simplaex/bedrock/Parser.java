@@ -160,7 +160,7 @@ public interface Parser<T> {
       return new Result.NoParse<>(seq);
     };
   }
-
+  
   static <T> Parser<T> satisfies(final Class<T> clazz, final Predicate<T> predicate) {
     return seq -> {
       if (seq.nonEmpty()) {

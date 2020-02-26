@@ -11,7 +11,7 @@
   <description>Essential utilities for modern Java.</description>
   <url>https://github.com/simplaex/bedrock</url>
 
-  <version>2020.02.20</version>
+  <version>2020.02.27</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -23,6 +23,7 @@
     <coverage.instruction.method.minimum>0.0</coverage.instruction.method.minimum>
 
     <findbugs.version>3.0.2</findbugs.version>
+    <jackson.version>2.10.1</jackson.version>
     <java.version>1.8</java.version>
     <junit.version>4.12</junit.version>
     <lombok.version>1.18.10</lombok.version>
@@ -112,7 +113,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.2</version>
+        <version>3.8.0</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
@@ -139,6 +140,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.1.1</version>
+        <configuration>
+          <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+        </configuration>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -146,7 +150,7 @@
               <goal>jar</goal>
             </goals>
             <configuration>
-              <source>8</source>
+              <source>${java.version}</source>
               <additionalparam>-Xdoclint:none</additionalparam>
             </configuration>
           </execution>
@@ -291,6 +295,27 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <version>${jackson.version}</version>
       <scope>test</scope>
     </dependency>
 

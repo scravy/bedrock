@@ -4,6 +4,7 @@ import com.simplaex.bedrock.hlist.C;
 import com.simplaex.bedrock.hlist.HList;
 import com.simplaex.bedrock.hlist.Nil;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -14,18 +15,23 @@ import java.util.*;
 
 public class SpecificityTree<K extends HList<K>, V> extends AbstractMap<K, V> implements Container<Pair<K, V>> {
 
+  @Getter
+  @Nonnull
+  private final Seq<String> dimensionNames;
+
   @Nonnull
   private final Map<K, V> items;
 
   @SuppressWarnings("unchecked")
   @SneakyThrows
-  private SpecificityTree(final Class<?> underlyingMap) {
+  private SpecificityTree(final Iterable<String> dimensions, final Class<?> underlyingMap) {
     Objects.requireNonNull(underlyingMap, "'underlyingMap' must not be null");
-    this.items = (Map<K, V>) underlyingMap.newInstance();
+    this.dimensionNames = Seq.ofIterable(dimensions);
+    this.items = (Map<K, V>) underlyingMap.getDeclaredConstructor().newInstance();
   }
 
-  private SpecificityTree() {
-    this(HashMap.class);
+  private SpecificityTree(final Iterable<String> dimensions) {
+    this(dimensions, HashMap.class);
   }
 
   @Nonnull
@@ -36,21 +42,23 @@ public class SpecificityTree<K extends HList<K>, V> extends AbstractMap<K, V> im
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder<L extends HList<L>> {
+    private final Cons<String> dimensions;
+
     public <T> Builder<C<T, L>> withDimension(
       @SuppressWarnings("unused") final String name,
       @SuppressWarnings("unused") final Class<T> clazz
     ) {
-      return new Builder<>();
+      return new Builder<>(Cons.cons(name, dimensions));
     }
 
     @Nonnull
     public <V> SpecificityTree<L, V> build() {
-      return new SpecificityTree<>();
+      return new SpecificityTree<>(dimensions);
     }
 
     @Nonnull
     public <V, M extends Map<?, ?>> SpecificityTree<L, V> build(@Nonnull final Class<M> underlyingMap) {
-      return new SpecificityTree<>(underlyingMap);
+      return new SpecificityTree<>(dimensions, underlyingMap);
     }
 
     @Nonnull
@@ -67,7 +75,7 @@ public class SpecificityTree<K extends HList<K>, V> extends AbstractMap<K, V> im
     @SuppressWarnings("unused") @Nonnull final String name,
     @SuppressWarnings("unused") @Nonnull final Class<T> clazz
   ) {
-    return new Builder<>();
+    return new Builder<>(Cons.singleton(name));
   }
 
   public SpecificityTree<K, V> add(@Nonnull final K key, @Nonnull final V value) {

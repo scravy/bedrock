@@ -1287,7 +1287,7 @@ public abstract class Seq<E> implements
     return any(seq);
   }
 
-  public static <A, B> int commonPrefixLength(final Seq<A> as, final Seq<B> bs) {
+  public static <A, B> int commonPrefixLength(@Nonnull final Seq<A> as, @Nonnull final Seq<B> bs) {
     Objects.requireNonNull(as, "'as' must not be null");
     Objects.requireNonNull(bs, "'bs' must not be null");
 
@@ -1298,33 +1298,27 @@ public abstract class Seq<E> implements
       final A a = as.get(i);
       final B b = bs.get(i);
 
-      if (a == null) {
-        if (b == null) {
-          commonPrefixLength += 1;
-          continue;
-        }
+      if (!Objects.equals(a, b)) {
         break;
       }
-      if (a.equals(b)) {
-        commonPrefixLength += 1;
-        continue;
-      }
-      break;
+      commonPrefixLength += 1;
     }
-
     return commonPrefixLength;
   }
 
+  @Nonnull
   public static <E, A extends E, B extends E> Seq<A> commonPrefix(final Seq<A> as, final Seq<B> bs) {
     final int commonPrefixLength = commonPrefixLength(as, bs);
     return as.subSequence(0, commonPrefixLength);
   }
 
+  @Nonnull
   public static <E, A extends E, B extends E> Seq<A> commonPrefixView(final Seq<A> as, final Seq<B> bs) {
     final int commonPrefixLength = commonPrefixLength(as, bs);
     return as.subSequenceView(0, commonPrefixLength);
   }
 
+  @Nonnull
   public static Seq<Integer> rangeInclusive(final int from, final int to) {
     if (from <= to) {
       return ofGenerator(index -> from + index, to - from + 1);
@@ -1333,6 +1327,7 @@ public abstract class Seq<E> implements
     return ofGenerator(index -> to + (length - index), length + 1);
   }
 
+  @Nonnull
   public static Seq<Integer> rangeExclusive(final int from, final int to) {
     if (from == to) {
       return empty();

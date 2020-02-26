@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -200,6 +199,19 @@ public interface Mapping<From, To> extends Function1<From, To>, ExtendedIterable
     @Override
     public Seq<K> keys() {
       return Seq.empty();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+        return true;
+      }
+      return obj instanceof Mapping && ((Mapping) obj).isEmpty();
+    }
+
+    @Override
+    public int hashCode() {
+      return 1;
     }
   }
 

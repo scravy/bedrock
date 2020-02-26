@@ -62,7 +62,7 @@ public final class SeqBuilder<E> extends AbstractBuilder<E, Seq<E>, SeqBuilder<E
   }
 
   @Nonnull
-  public SeqBuilder clear() {
+  public SeqBuilder<E> clear() {
     arrayList.clear();
     return this;
   }
