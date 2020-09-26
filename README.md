@@ -7,8 +7,8 @@ Utilities for modern java development.
 ## Maven coordinates
 
     <dependency>
-        <groupId>com.simplaex</groupId>
+        <groupId>de.scravy</groupId>
         <artifactId>bedrock</artifactId>
-        <version>2020.02.27</version>
+        <version>2020.09.25</version>
     </dependency>
 
