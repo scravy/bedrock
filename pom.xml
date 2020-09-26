@@ -4,14 +4,14 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.simplaex</groupId>
+  <groupId>de.scravy</groupId>
   <artifactId>bedrock</artifactId>
 
   <name>bedrock</name>
   <description>Essential utilities for modern Java.</description>
-  <url>https://github.com/simplaex/bedrock</url>
+  <url>https://github.com/scravy/bedrock</url>
 
-  <version>2020.02.27</version>
+  <version>2020.09.25</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -26,16 +26,16 @@
     <jackson.version>2.10.1</jackson.version>
     <java.version>1.8</java.version>
     <junit.version>4.12</junit.version>
-    <lombok.version>1.18.10</lombok.version>
+    <lombok.version>1.18.12</lombok.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <scm>
-    <connection>scm:git:ssh://git@github.com:simplaex/bedrock.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com:simplaex/bedrock.git
+    <connection>scm:git:ssh://git@github.com:scravy/bedrock.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:scravy/bedrock.git
     </developerConnection>
-    <url>https://github.com/simplaex/bedrock</url>
+    <url>https://github.com/scravy/bedrock</url>
   </scm>
 
   <licenses>
@@ -45,15 +45,10 @@
     </license>
   </licenses>
 
-  <organization>
-    <name>Simplaex GmbH</name>
-    <url>https://simplaex.com/</url>
-  </organization>
-
   <developers>
     <developer>
       <name>Julian Fleischer</name>
-      <email>julian@simplaex.com</email>
+      <email>tirednesscankill@warhog.net</email>
     </developer>
   </developers>
 
