@@ -1,4 +1,4 @@
-# bedrock [![Build Status](https://travis-ci.org/simplaex/bedrock.svg?branch=master)](https://travis-ci.org/simplaex/bedrock)
+# bedrock [![Build Status](https://travis-ci.org/scravy/bedrock.svg?branch=master)](https://travis-ci.org/simplaex/bedrock)
 
 *The fundamental principles on which something is based.*
 
