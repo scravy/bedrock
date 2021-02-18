@@ -23,7 +23,7 @@
     <coverage.instruction.method.minimum>0.0</coverage.instruction.method.minimum>
 
     <findbugs.version>3.0.2</findbugs.version>
-    <jackson.version>2.10.1</jackson.version>
+    <jackson.version>2.12.1</jackson.version>
     <java.version>1.8</java.version>
     <junit.version>4.13.1</junit.version>
     <lombok.version>1.18.12</lombok.version>
